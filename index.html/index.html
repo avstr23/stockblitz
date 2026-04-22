@@ -275,7 +275,7 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 780px;
 }
 thead th {
   text-align: left;
@@ -786,6 +786,194 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 #tut-btn-skip { position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: var(--text-dim); font-family: var(--mono); font-size: 0.65em; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 #tut-btn-skip:hover { color: var(--text); }
 
+/* ══════════════════════════════════════════════════════════
+   ADVANCED SIMULATION SYSTEMS v3 — CSS
+══════════════════════════════════════════════════════════ */
+
+/* Trend badges shown in the Signal column */
+.trend-badge {
+  display: inline-block; font-size: 0.57em; font-weight: bold;
+  padding: 1px 5px; border-radius: 10px; letter-spacing: 0.3px; white-space: nowrap;
+}
+.trend-breakout  { background:rgba(0,230,118,0.14); color:var(--green);  border:1px solid rgba(0,230,118,0.3); }
+.trend-downtrend { background:rgba(255,23,68,0.12);  color:var(--red);    border:1px solid rgba(255,23,68,0.25); }
+.trend-momentum  { background:rgba(255,214,0,0.12);  color:var(--gold);   border:1px solid rgba(255,214,0,0.25); }
+.trend-sideways  { background:rgba(41,182,246,0.07); color:var(--blue);   border:1px solid rgba(41,182,246,0.18); }
+.trend-hype      { background:rgba(255,152,0,0.16);  color:var(--orange); border:1px solid rgba(255,152,0,0.3);
+                   animation:hype-pulse 0.9s ease-in-out infinite; }
+@keyframes hype-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.activity-flag { color:var(--orange); font-size:0.62em; margin-left:2px; }
+.sentiment-mini { width:34px; height:4px; background:var(--bg4); border-radius:2px;
+                  display:inline-block; vertical-align:middle; overflow:hidden; margin-left:3px; }
+.sentiment-fill { height:4px; border-radius:2px; transition:width 0.5s, background 0.5s; }
+
+/* Emergency market day banner */
+#emergency-banner {
+  display:none; background:linear-gradient(90deg,rgba(255,23,68,0.92),rgba(180,0,30,0.92));
+  color:#fff; text-align:center; padding:5px 16px; font-size:0.72em; font-weight:bold;
+  letter-spacing:2px; text-transform:uppercase; border-bottom:2px solid #ff1744;
+  animation:emerg-flash 0.6s ease-in-out infinite; z-index:99; position:relative;
+}
+#emergency-banner.active { display:block; }
+@keyframes emerg-flash { 0%,100%{opacity:1} 50%{opacity:0.65} }
+
+/* Staged event area in news tab */
+.staged-event-item {
+  margin-bottom:6px; padding:6px 8px 6px 10px; border-radius:4px;
+  border-left:3px solid var(--orange); background:rgba(255,152,0,0.06);
+  font-size:0.7em; animation:slide-in 0.3s ease;
+}
+.stage-badge {
+  display:inline-block; font-size:0.78em; border-radius:10px; padding:0 6px;
+  margin-right:4px; font-weight:bold;
+}
+.stage-1 { background:rgba(41,182,246,0.18);  color:var(--blue);   }
+.stage-2 { background:rgba(255,152,0,0.18);   color:var(--orange); }
+.stage-3 { background:rgba(0,230,118,0.15);   color:var(--green);  }
+.stage-3-neg { background:rgba(255,23,68,0.15); color:var(--red);  }
+@keyframes slide-in { from{opacity:0;transform:translateX(6px)} to{opacity:1;transform:translateX(0)} }
+
+/* Hype-wave flash overlay */
+.hype-overlay-flash {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(255,152,0,0.95); color:#000; padding:10px 24px; border-radius:8px;
+  font-size:0.88em; font-weight:bold; text-transform:uppercase; letter-spacing:2px;
+  z-index:2000; pointer-events:none; animation:hype-appear 2.2s forwards;
+}
+@keyframes hype-appear {
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)}
+  12%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+  25%{transform:translate(-50%,-50%) scale(1)}
+  72%{opacity:1} 100%{opacity:0;transform:translate(-50%,-62%)}
+}
+/* Scandal flash */
+.scandal-overlay-flash {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(255,23,68,0.95); color:#fff; padding:10px 24px; border-radius:8px;
+  font-size:0.88em; font-weight:bold; text-transform:uppercase; letter-spacing:2px;
+  z-index:2000; pointer-events:none; animation:scandal-appear 2.5s forwards;
+}
+@keyframes scandal-appear {
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.6)}
+  10%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}
+  22%{transform:translate(-50%,-50%) scale(1)}
+  75%{opacity:1} 100%{opacity:0}
+}
+
+/* Intel tab */
+#tab-intel { overflow-y:auto; padding:6px 10px; flex-direction:column; }
+.intel-sec { margin-bottom:10px; }
+.intel-sec-title {
+  font-size:0.58em; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-dim);
+  border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:5px;
+}
+.intel-row { display:flex; align-items:center; gap:5px; padding:2px 0; font-size:0.67em; }
+.intel-sym { width:42px; font-weight:bold; color:var(--text-hi); }
+.intel-bar-wrap { flex:1; height:4px; background:var(--bg4); border-radius:2px; overflow:hidden; }
+.intel-bar { height:4px; border-radius:2px; transition:width 0.5s, background 0.5s; }
+.intel-lbl { width:38px; text-align:right; color:var(--text-dim); font-size:0.88em; }
+.alert-card {
+  background:rgba(255,152,0,0.07); border:1px solid rgba(255,152,0,0.25);
+  border-radius:4px; padding:5px 8px; font-size:0.67em; margin-bottom:4px;
+  color:var(--orange);
+}
+.synergy-card {
+  background:var(--bg3); border:1px solid var(--border); border-radius:4px;
+  padding:7px 9px; font-size:0.68em; margin-bottom:5px;
+}
+.synergy-bonus { font-size:1.1em; font-weight:bold; color:var(--gold); }
+.active-event-card {
+  background:rgba(255,152,0,0.06); border:1px solid rgba(255,152,0,0.22);
+  border-radius:4px; padding:5px 8px; font-size:0.67em; margin-bottom:4px;
+}
+.active-event-title { font-weight:bold; color:var(--orange); margin-bottom:2px; }
+.active-event-stages { display:flex; gap:3px; margin-top:3px; }
+.evt-stage { width:28px; height:4px; border-radius:2px; background:var(--bg4); }
+.evt-stage.done { background:var(--orange); }
+
+/* Skill tree in settings */
+#xp-display {
+  font-size:0.65em; color:var(--text-dim); text-align:center; padding:5px 0 2px;
+  display:flex; align-items:center; gap:8px; justify-content:center;
+}
+.xp-bar-wrap { flex:1; max-width:160px; height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+.xp-bar-fill { height:5px; background:var(--accent); border-radius:3px; transition:width 0.4s; }
+.skill-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:6px; }
+.skill-card {
+  background:var(--bg3); border:1px solid var(--border); border-radius:4px;
+  padding:7px 8px; transition:border-color 0.15s;
+}
+.skill-card.maxed { border-color:var(--gold); background:rgba(255,214,0,0.05); }
+.skill-name { font-size:0.70em; font-weight:bold; color:var(--text-hi); margin-bottom:2px; }
+.skill-desc { font-size:0.58em; color:var(--text-dim); margin-bottom:4px; line-height:1.3; }
+.skill-pips { display:flex; gap:3px; margin-bottom:4px; }
+.skill-pip { width:14px; height:4px; background:var(--bg4); border-radius:2px; border:1px solid var(--border); }
+.skill-pip.lit { background:var(--accent); border-color:var(--accent); }
+.skill-up-btn {
+  width:100%; background:rgba(var(--accent-rgb),0.10); border:1px solid rgba(var(--accent-rgb),0.28);
+  color:var(--accent); padding:3px 6px; font-family:var(--mono); font-size:0.60em;
+  cursor:pointer; border-radius:3px; text-transform:uppercase; transition:all 0.12s;
+}
+.skill-up-btn:hover:not(:disabled) { background:var(--accent); color:#000; }
+.skill-up-btn:disabled { opacity:0.3; cursor:not-allowed; }
+/* Portfolio synergy line */
+.synergy-line {
+  font-size:0.62em; padding:3px 8px; margin-top:4px;
+  background:rgba(255,214,0,0.06); border:1px solid rgba(255,214,0,0.2);
+  border-radius:3px; color:var(--gold);
+}
+
+/* Hype banner */
+#hype-banner {
+  display:none; position:fixed; top:80px; left:50%; transform:translateX(-50%);
+  background:rgba(255,152,0,0.95); color:#000; padding:8px 22px; border-radius:8px;
+  font-size:0.8em; font-weight:bold; letter-spacing:1px; z-index:1200;
+  animation:hype-banner-fade 8s forwards; pointer-events:none;
+}
+@keyframes hype-banner-fade { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+#hype-banner.on { display:block; }
+
+/* Alert items in feed */
+.alert-item {
+  padding:3px 8px; margin:2px 0; border-radius:3px; font-size:0.66em;
+  background:rgba(255,152,0,0.10); border-left:2px solid var(--orange);
+  color:var(--orange); animation:alert-fadeout 5.5s forwards;
+}
+.alert-item.volatility { color:var(--red); border-color:var(--red); background:rgba(255,23,68,0.08); }
+.alert-item.scandal    { color:var(--red); border-color:#ff6e00; background:rgba(255,23,68,0.12); font-weight:bold; }
+.alert-item.hype       { color:var(--orange); border-color:var(--orange); }
+@keyframes alert-fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0;height:0;padding:0;margin:0} }
+
+/* Sim cards */
+.sim-card { background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:6px 9px; margin-bottom:4px; }
+.sim-card.active  { border-color:rgba(255,152,0,0.35); background:rgba(255,152,0,0.04); }
+.sim-card.danger  { border-color:rgba(255,23,68,0.35);  background:rgba(255,23,68,0.06); }
+.sim-card.synergy { border-color:rgba(255,214,0,0.35);  background:rgba(255,214,0,0.04); }
+.sim-card-title { font-size:0.72em; font-weight:bold; color:var(--text-hi); }
+.sim-card-sub   { font-size:0.64em; color:var(--text-dim); margin-top:2px; }
+.phase-indicator { display:flex; align-items:center; gap:4px; margin-top:4px; }
+.phase-dot { width:12px; height:4px; border-radius:2px; background:var(--bg4); }
+.phase-dot.done   { background:var(--orange); }
+.phase-dot.active { background:var(--gold); }
+.phase-label { font-size:0.62em; color:var(--text-dim); margin-left:4px; }
+.synergy-bonus-val { color:var(--gold); font-weight:bold; }
+.sim-progress-wrap { height:4px; background:var(--bg4); border-radius:2px; margin-top:4px; overflow:hidden; }
+.sim-progress-fill { height:4px; border-radius:2px; transition:width 0.5s; }
+
+/* Fund bars */
+.fund-row { display:flex; justify-content:space-between; align-items:center; padding:2px 0; }
+.fund-bar  { display:inline-block; width:60px; height:5px; background:var(--bg4); border-radius:2px; vertical-align:middle; margin:0 5px; }
+.fund-fill { display:inline-block; height:5px; border-radius:2px; vertical-align:top; }
+
+/* Trend label class for table (replacing old .trend-badge approach) */
+.trend-lbl { font-size:0.6em; font-weight:bold; padding:1px 5px; border-radius:10px; white-space:nowrap; }
+.trend-breakout  { background:rgba(0,230,118,0.14); color:var(--green);  border:1px solid rgba(0,230,118,0.3); }
+.trend-downtrend { background:rgba(255,23,68,0.12);  color:var(--red);    border:1px solid rgba(255,23,68,0.25); }
+.trend-momentum  { background:rgba(255,214,0,0.12);  color:var(--gold);   border:1px solid rgba(255,214,0,0.25); }
+.trend-hype      { background:rgba(255,152,0,0.16);  color:var(--orange); border:1px solid rgba(255,152,0,0.3); animation:hype-pulse 0.9s ease-in-out infinite; }
+.trend-neutral   { color:var(--text-dim); }
+.alert-row td { background:rgba(255,152,0,0.04) !important; }
+
 /* ─── SHORTCUTS BAR ──────────────────────────────────────── */
 #shortcuts {
   background: var(--bg2);
@@ -894,13 +1082,19 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
   <!-- NEWS TICKER -->
   <div id="ticker-bar">
     <span id="ticker-inner">
-      <span class="ti ti-neu">⚡ STOCKBLITZ 2.0 — GLOBAL LEADERBOARD LIVE — 48 STOCKS TRADING NOW</span>
+      <span class="ti ti-neu">⚡ STOCKBLITZ 3.0 — SECTOR INTERCONNECTION · SENTIMENT ENGINE · SKILL TREE LIVE</span>
       <span class="ti ti-up">TECH ▲ AI boom continues — analysts bullish</span>
       <span class="ti ti-down">MEME ▼ High volatility warning in effect</span>
       <span class="ti ti-up">ENERGY ▲ Solar subsidies expanded globally</span>
       <span class="ti ti-neu">Press P for Boss Key | ⚙️ for Settings | 🏆 for Global Leaderboard</span>
     </span>
   </div>
+
+  <!-- Emergency market day banner (hidden by default) -->
+  <div id="emergency-banner">🚨 EMERGENCY MARKET DAY — EXTREME VOLATILITY — ALL AI BOTS ACTIVATED 🚨</div>
+
+  <!-- Hype wave banner -->
+  <div id="hype-banner"></div>
 
   <!-- MAIN GRID -->
   <div id="main">
@@ -939,6 +1133,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
             <th data-col="sector">Sector</th>
             <th class="r" data-col="price">Price</th>
             <th class="r" data-col="chg">Sess %</th>
+            <th class="r" data-col="signal">Signal</th>
             <th class="r" data-col="owned">Owned</th>
             <th class="r" data-col="value">Pos $</th>
             <th class="r">Qty</th>
@@ -956,6 +1151,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
         <button class="rp-tab active" data-tab="chart">⚡ Chart</button>
         <button class="rp-tab" data-tab="portfolio">💼 Portfolio</button>
         <button class="rp-tab" data-tab="picks">🎯 Best Buys</button>
+        <button class="rp-tab" data-tab="intel">🧠 Intel</button>
         <button class="rp-tab" data-tab="news">📰 News</button>
         <button class="rp-tab" data-tab="ach">🏅 Badges</button>
       </div>
@@ -1002,6 +1198,41 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
         </div>
         <div id="picks-list"></div>
         <div class="picks-disclaimer">⚠️ This is a game. Picks are based on simulated momentum &amp; volatility signals — not real financial advice.</div>
+      </div>
+
+      <!-- INTEL TAB — Sim, Fundamentals, Events, Synergy, Skill -->
+      <div class="tab-content" id="tab-intel">
+        <!-- Market conditions row -->
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:0.66em;flex-shrink:0;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:4px">
+            <span id="mkt-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green)"></span>
+            <span id="mkt-status" style="color:var(--text-dim)">Market: Normal</span>
+          </span>
+          <span style="color:var(--text-dim)">│</span>
+          <span>Synergy: <span id="mkt-synergy" style="color:var(--text-dim)">+0%</span></span>
+          <span style="color:var(--text-dim)">│</span>
+          <span>Event: <span id="mkt-phase" style="color:var(--text-dim)">No active events</span></span>
+          <span style="color:var(--text-dim)">│</span>
+          <span>SkillPts: <span id="mkt-skillpts" style="color:var(--gold)">0</span></span>
+          <div id="mkt-hype-row" style="display:none;gap:4px;align-items:center">
+            <span style="color:var(--orange)">🔥 HYPE:</span>
+            <span id="mkt-hype-sym" style="color:var(--orange);font-weight:bold">—</span>
+          </div>
+        </div>
+        <!-- Alert feed -->
+        <div id="alert-feed" style="padding:2px 8px;flex-shrink:0;min-height:0"></div>
+        <!-- Active events -->
+        <div style="padding:4px 10px 2px;font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);flex-shrink:0">🎭 Active Multi-Stage Events</div>
+        <div id="sim-events-list" style="padding:0 10px 4px;flex-shrink:0"></div>
+        <!-- Synergy bundles -->
+        <div style="padding:4px 10px 2px;font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);flex-shrink:0">💎 Portfolio Synergy</div>
+        <div id="sim-synergy-list" style="padding:0 10px 4px;flex-shrink:0"></div>
+        <!-- Fundamentals for selected stock -->
+        <div style="padding:4px 10px 2px;font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);flex-shrink:0">📦 Fundamentals — <span id="fund-sym-label">TECH</span></div>
+        <div id="sim-fundamentals" style="padding:0 10px 4px;flex-shrink:0"></div>
+        <!-- Market conditions summary -->
+        <div style="padding:4px 10px 2px;font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);flex-shrink:0">📊 Market Conditions</div>
+        <div id="sim-conditions" style="padding:0 10px 6px;overflow-y:auto;flex:1"></div>
       </div>
 
       <!-- NEWS TAB -->
@@ -1177,6 +1408,17 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
           <span class="toggle-slider"></span>
         </label>
       </div>
+    </div>
+
+    <!-- Skill Tree -->
+    <div class="settings-section">
+      <div class="settings-section-title">🌲 Skill Tree — <span id="skill-pts-display" style="color:var(--gold)">0</span> pts available</div>
+      <div id="xp-display">
+        <span id="xp-label">XP: 0 / 10</span>
+        <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+        <span id="xp-level-label" style="color:var(--accent)">Lv.1</span>
+      </div>
+      <div class="skill-grid" id="skill-grid"><!-- built by JS --></div>
     </div>
 
     <!-- Danger Zone -->
@@ -1376,12 +1618,223 @@ const STOCKS = {
 
 const SYM_LIST = Object.keys(STOCKS);
 
-/* Init stock history and prev */
+/* Init stock history, prev, and NEW fundamentals */
 for (const s of Object.values(STOCKS)) {
-  s.startP = s.price;
-  s.prev   = s.price;
-  s.history = [];
+  s.startP      = s.price;
+  s.prev        = s.price;
+  s.history     = [];
+  // ── Company Fundamentals (hidden stats) ──
+  s.production  = 0.45 + Math.random() * 0.55; // 0.45–1.0
+  s.demand      = 0.40 + Math.random() * 0.60; // 0.40–1.0
+  s.supply      = 0.40 + Math.random() * 0.55; // 0.40–0.95
+  // ── Sentiment (-1 bad → +1 good) ──
+  s.sentiment   = (Math.random() - 0.5) * 0.4;
+  // ── Market Memory ──
+  s.crashMemory = 0;    // 0–1: how recently it crashed
+  s.recoveryRate = 0.5 + Math.random() * 0.5; // 0.5–1.0: strong companies recover faster
+  // ── Trend detection ──
+  s.trend       = 'neutral';
+  s.trendStrength = 0;
+  // ── Hype & alerts ──
+  s.hypeActive  = false;
+  s.hypeTick    = 0;
+  s.unusualVol  = false;
+  s.volHistory  = []; // recent abs(price change) for unusual detection
 }
+
+/* ═══════════════════════════════════════════════════════════
+   🌍 SECTOR INTERCONNECTION MAP
+   Each link: when src moves, dst gets a fraction of that move
+   inverse:true means they move opposite (e.g. airlines ↓ → oil ↑)
+═══════════════════════════════════════════════════════════ */
+const SECTOR_LINKS = [
+  // Airlines ↓ → Fuel companies ↑ (less fuel demand = lower prices, inverse)
+  { src:'SAIR', dst:'OIL',    factor:0.30, inverse:true  },
+  { src:'SAIR', dst:'GAS',    factor:0.20, inverse:true  },
+  // Tech boom → Semiconductor demand
+  { src:'TECH', dst:'SEMI',   factor:0.40, inverse:false },
+  { src:'APPL', dst:'SEMI',   factor:0.35, inverse:false },
+  { src:'GOOG', dst:'SEMI',   factor:0.20, inverse:false },
+  { src:'MSFT', dst:'SEMI',   factor:0.18, inverse:false },
+  // EV growth → Oil demand drops
+  { src:'EV',   dst:'OIL',    factor:0.25, inverse:true  },
+  { src:'EV',   dst:'ENERGY', factor:0.15, inverse:false },
+  // Banking crash → ripple effects
+  { src:'BANK', dst:'INSUR',  factor:0.30, inverse:false },
+  { src:'BANK', dst:'PAYM',   factor:0.25, inverse:false },
+  { src:'BANK', dst:'HEDG',   factor:0.20, inverse:false },
+  // Pharma → hospitals
+  { src:'PHARMA', dst:'HOSP', factor:0.25, inverse:false },
+  { src:'GENE',   dst:'PHARMA', factor:0.20, inverse:false },
+  // Food sector linkage
+  { src:'FOOD', dst:'FARM',   factor:0.20, inverse:false },
+  { src:'CAFE', dst:'FARM',   factor:0.15, inverse:false },
+  // Crypto chaos → hedges benefit / hurt
+  { src:'COIN', dst:'HEDG',   factor:0.18, inverse:false },
+  // Space → Future tech
+  { src:'SPACE', dst:'ROBO',  factor:0.22, inverse:false },
+  { src:'SPACE', dst:'QUAN',  factor:0.18, inverse:false },
+  { src:'SPACE', dst:'PRNT',  factor:0.12, inverse:false },
+  // Trucking / shipping costs → retail margins
+  { src:'TRUK', dst:'MART',   factor:0.15, inverse:true  },
+  { src:'SHIP', dst:'SHOP',   factor:0.18, inverse:true  },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   🏭 SUPPLY CHAIN DEPENDENCY MAP
+   When supplier changes significantly, dependent absorbs effect
+═══════════════════════════════════════════════════════════ */
+const SUPPLY_CHAINS = [
+  { supplier:'SEMI',   dependent:'APPL',  multiplier:0.35 },
+  { supplier:'SEMI',   dependent:'TECH',  multiplier:0.25 },
+  { supplier:'SEMI',   dependent:'ROBO',  multiplier:0.30 },
+  { supplier:'SEMI',   dependent:'QUAN',  multiplier:0.20 },
+  { supplier:'OIL',    dependent:'SAIR',  multiplier:0.40 },
+  { supplier:'OIL',    dependent:'SHIP',  multiplier:0.25 },
+  { supplier:'GAS',    dependent:'TRUK',  multiplier:0.30 },
+  { supplier:'FARM',   dependent:'FOOD',  multiplier:0.30 },
+  { supplier:'FARM',   dependent:'BEER',  multiplier:0.20 },
+  { supplier:'FARM',   dependent:'SODA',  multiplier:0.15 },
+  { supplier:'BANK',   dependent:'INSUR', multiplier:0.30 },
+  { supplier:'BANK',   dependent:'PAYM',  multiplier:0.20 },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   🧬 SKILL TREE
+═══════════════════════════════════════════════════════════ */
+const SKILL_TREE = {
+  analysis:   { name:'Market Analysis', level:0, max:3, cost:[100,300,700],  desc:'Trend labels appear earlier & more accurately', icon:'🔍' },
+  fees:       { name:'Trading Edge',    level:0, max:3, cost:[150,400,900],  desc:'Tiny cost rebate on buy orders (0.3% per level)', icon:'💸' },
+  insight:    { name:'Market Insight',  level:0, max:3, cost:[200,500,1100], desc:'Reveals sentiment & demand bars in Sim tab', icon:'🧠' },
+  resilience: { name:'Risk Shield',     level:0, max:3, cost:[250,600,1300], desc:'Reduces crash impact on your portfolio by 5%/lvl', icon:'🛡️' },
+  timing:     { name:'Timing Mastery',  level:0, max:3, cost:[300,700,1600], desc:'Long-hold bonus (30s+) increases by 10%/lvl', icon:'⏱' },
+};
+// Skill points: earn 1 per 10 trades
+G.skillPts      = 0;
+G.skillSpent    = 0;
+G.holdTimers    = {}; // { sym: timestamp when first bought }
+
+/* ── SKILL_DEFS: compatibility alias so buy/sell/init can use it ── */
+const SKILL_DEFS = Object.entries(SKILL_TREE).map(([id, s]) => ({
+  id, name:s.name, icon:s.icon, max:s.max, desc:s.desc
+}));
+
+/* ── XP SYSTEM ─────────────────────────────────────────────
+   Simple XP accumulator shown in settings skill tree.
+   gainXP() is called on each trade (buy = +1, profitable sell = +2).
+   XP is purely cosmetic flavor — actual power comes from skill pts. */
+if (G.xp === undefined) G.xp = 0;
+
+function gainXP(amount) {
+  G.xp = (G.xp || 0) + amount;
+  // Also refresh skill-pts display every time XP changes
+  const el = document.getElementById('mkt-skillpts');
+  if (el) el.textContent = getAvailableSkillPts();
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   🎁 PORTFOLIO SYNERGY BUNDLES
+═══════════════════════════════════════════════════════════ */
+const SYNERGY_BUNDLES = [
+  { name:'Tech Stack',     syms:['TECH','SEMI','APPL','GOOG','MSFT'], need:3, bonus:0.015, icon:'💻' },
+  { name:'Energy Mix',     syms:['ENERGY','OIL','WIND','NUKE','GAS'],  need:3, bonus:0.012, icon:'⚡' },
+  { name:'Meme Portfolio', syms:['MEME','DOGE','PUMP','GILD'],         need:3, bonus:0.030, icon:'🚀' },
+  { name:'Health & Bio',   syms:['PHARMA','GENE','HOSP','VACC','FIT'], need:3, bonus:0.010, icon:'💊' },
+  { name:'Finance Hub',    syms:['BANK','COIN','PAYM','HEDG'],          need:3, bonus:0.012, icon:'🏦' },
+  { name:'Future Tech',    syms:['SPACE','ROBO','QUAN','PRNT'],         need:3, bonus:0.020, icon:'🌌' },
+  { name:'Diversified',    syms:null, diversified:true, need:6, bonus:0.008, icon:'📊' },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   🌩️ ACTIVE EVENTS (multi-stage)
+═══════════════════════════════════════════════════════════ */
+const ACTIVE_EVENTS = []; // { id, name, phase, maxPhase, sym, timer, phases:[] }
+G.emergencyDay       = false;
+G.emergencyIntensity = 0;
+G.emergencyTicksLeft = 0;
+G.lastEmergencyTick  = -9999;
+
+/* ─── STAGED EVENT TEMPLATES ────────────────────────────── */
+const STAGED_TEMPLATES = [
+  {
+    id:'tech_acquisition', name:'Acquisition Rumor',
+    phases:[
+      { label:'Rumor',        txt:'🤫 Rumor circulating: TechNova mulling major acquisition deal…',            sym:'TECH',   imp:0.025, type:'positive' },
+      { label:'Confirmation', txt:'📋 Sources confirm: TechNova acquisition talks are official',               sym:'TECH',   imp:0.045, type:'positive' },
+      { label:'Reaction',     txt:'🎉 DEAL CLOSED: TechNova completes $18B acquisition — stock soars!',        sym:'TECH',   imp:0.080, type:'positive' },
+    ], phaseDelay:25000
+  },
+  {
+    id:'pharma_trial', name:'Drug Trial',
+    phases:[
+      { label:'Rumor',        txt:'🤫 Leaked docs hint at MediCure Phase 3 trial results incoming…',           sym:'PHARMA', imp:0.020, type:'positive' },
+      { label:'Results',      txt:'📋 Phase 3 trial shows promising early data — analysts watching',           sym:'PHARMA', imp:0.055, type:'positive' },
+      { label:'FDA Verdict',  txt:'💊 BREAKTHROUGH: MediCure receives FDA fast-track approval!',              sym:'PHARMA', imp:0.120, type:'positive' },
+    ], phaseDelay:30000
+  },
+  {
+    id:'crypto_crash', name:'Crypto Exchange Probe',
+    phases:[
+      { label:'Rumor',        txt:'🤫 Unverified: SEC reportedly examining CryptoCoin trading activity…',     sym:'COIN',   imp:-0.03, type:'negative' },
+      { label:'Confirmation', txt:'⚠️ SEC subpoenas CryptoCoin Exchange for trading records',                 sym:'COIN',   imp:-0.06, type:'negative' },
+      { label:'Reaction',     txt:'🚨 TRADING HALTED: CryptoCoin Exchange frozen by regulators!',             sym:'COIN',   imp:-0.18, type:'negative' },
+    ], phaseDelay:20000
+  },
+  {
+    id:'ev_subsidy', name:'EV Government Subsidy',
+    phases:[
+      { label:'Rumor',        txt:'🤫 Leaked budget draft may include $5B EV incentive program…',             sym:'EV',     imp:0.030, type:'positive' },
+      { label:'Announcement', txt:'📋 Government confirms EV subsidy bill advancing through congress',        sym:'EV',     imp:0.060, type:'positive' },
+      { label:'Signed',       txt:'🎉 SIGNED INTO LAW: $5B EV subsidy bill — ElectroRide surges!',           sym:'EV',     imp:0.130, type:'positive' },
+    ], phaseDelay:28000
+  },
+  {
+    id:'bank_scandal', name:'Banking Scandal',
+    phases:[
+      { label:'Rumor',        txt:'🤫 Anonymous tip: possible accounting irregularities at FirstNation Bank…',sym:'BANK',   imp:-0.02, type:'negative' },
+      { label:'Investigation',txt:'⚖️ Regulators open formal investigation into FirstNation Bank',            sym:'BANK',   imp:-0.05, type:'negative' },
+      { label:'Fallout',      txt:'🚨 FRAUD CONFIRMED: FirstNation Bank CFO arrested — stock in freefall!',  sym:'BANK',   imp:-0.14, type:'negative' },
+    ], phaseDelay:22000
+  },
+  {
+    id:'space_contract', name:'NASA Contract',
+    phases:[
+      { label:'Bid Confirmed',txt:'🤫 OrbitX Space shortlisted for classified $20B NASA moon contract',       sym:'SPACE',  imp:0.040, type:'positive' },
+      { label:'Finalist',     txt:'📋 OrbitX Space selected as final two bidders — decision imminent',        sym:'SPACE',  imp:0.080, type:'positive' },
+      { label:'Win',          txt:'🌙 HISTORIC WIN: OrbitX Space awarded $20B NASA Artemis contract!',        sym:'SPACE',  imp:0.180, type:'positive' },
+    ], phaseDelay:26000
+  },
+];
+
+/* ─── COMPANY SCANDAL TEMPLATES ────────────────────────── */
+const SCANDAL_EVENTS = [
+  { sym:'TECH',   txt:'💀 SCANDAL: TechNova CEO arrested for insider trading — shares halted', imp:-0.18 },
+  { sym:'BANK',   txt:'💀 FRAUD ALERT: FirstNation Bank hides $3B in bad loans — panic selling', imp:-0.22 },
+  { sym:'PHARMA', txt:'💀 DATA BREACH: MediCure patient records exposed — massive lawsuits filed', imp:-0.15 },
+  { sym:'COIN',   txt:'💀 RUG PULL: CryptoCoin Exchange founder vanishes with funds', imp:-0.35 },
+  { sym:'MEME',   txt:'💀 CEO TWEETS MELTDOWN: MoonShot Inc leadership in total chaos', imp:-0.25 },
+  { sym:'AUTO',   txt:'💀 RECALL: VeloRide motors linked to 12 fatalities — federal probe opens', imp:-0.20 },
+  { sym:'APPL',   txt:'💀 LEAK: AppleSeed supplier exposed using child labor — boycott viral', imp:-0.12 },
+  { sym:'GOOG',   txt:'💀 ANTITRUST: Court orders Googleplex AI breakup — historic ruling', imp:-0.14 },
+  { sym:'EV',     txt:'💀 FIRE HAZARD: ElectroRide EV mass recall — 50,000 vehicles spontaneously ignite', imp:-0.28 },
+  { sym:'SPACE',  txt:'💀 DISASTER: OrbitX Space rocket explosion kills crew — stock obliterated', imp:-0.30 },
+];
+
+/* ─── HYPE WAVE TEMPLATES ──────────────────────────────── */
+const HYPE_EVENTS = [
+  { sym:'MEME',  src:'TikTok',   txt:'🔥 TIKTOK HYPE: MoonShot Inc goes mega-viral — #MoonShot trending worldwide!' },
+  { sym:'DOGE',  src:'Discord',  txt:'🔥 DISCORD PUMP: DogeRocket coordinated buy — chat servers on fire!' },
+  { sym:'PUMP',  src:'Reddit',   txt:'🔥 REDDIT SQUEEZE: PumpMax Token targeted — WSB army mobilizing!' },
+  { sym:'GILD',  src:'Twitter',  txt:'🔥 TWITTER FRENZY: Gilad Inc endorsed by influential accounts!' },
+  { sym:'SPACE', src:'YouTube',  txt:'🔥 YOUTUBE VIRAL: OrbitX Space launch video hits 100M views overnight!' },
+  { sym:'COIN',  src:'Discord',  txt:'🔥 CRYPTO PUMP: CryptoCoin Exchange trending — buy pressure explodes!' },
+  { sym:'GAME',  src:'Twitch',   txt:'🔥 TWITCH HYPE: GameStrike Studios new game breaks Twitch record — stock surging!' },
+  { sym:'EV',    src:'TikTok',   txt:'🔥 TIKTOK TREND: ElectroRide EV review goes viral — stock demand spikes!' },
+  { sym:'QUAN',  src:'Reddit',   txt:'🔥 REDDIT BUZZ: QuantumCore breakthrough discussed on r/investing — inflow surge!' },
+  { sym:'GENE',  src:'Twitter',  txt:'🔥 BIO HYPE: GenomeX Bio aging reversal claim goes viral on social media!' },
+];
 
 /* ─── ACHIEVEMENTS ──────────────────────────────── */
 const ACHIEVES = [
@@ -1644,21 +2097,575 @@ const snd = {
   ach:  () => { [523,659,784,1047].forEach((f,i) => setTimeout(()=>tone(f,0.14,'sine',0.11),i*90)); }
 };
 
-/* ─── PRICE ENGINE ──────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   🧬 SIMULATION ENGINE — replaces old tickPrices
+   Order: fundamentals → base moves → interconnections →
+          supply chains → commit → trends → alerts
+═══════════════════════════════════════════════════════════ */
+
+/**
+ * Box-Muller transform — returns a standard normal (mean=0, stddev=1) sample.
+ * Used everywhere prices need realistic bell-curve random movement.
+ */
 function randNormal() {
-  let u; do { u = Math.random(); } while (u===0);
-  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*Math.random());
+  let u;
+  do { u = Math.random(); } while (u === 0);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
 }
+
+/**
+ * Apply a price change to a stock, enforcing a hard cap of 20× startP
+ * and a floor of 0.5% of startP. Use this everywhere instead of raw assignment.
+ */
+function applyPrice(s, newPrice) {
+  const floor = s.startP * 0.005;
+  const ceil  = s.startP * 20;
+  s.price = Math.max(floor, Math.min(ceil, Math.max(0.01, newPrice)));
+}
+
 function tickPrices() {
   G.tickCount++;
+
+  // ── Step 1: Evolve hidden fundamentals ──
+  tickFundamentals();
+
+  // ── Step 2: Compute base change per stock ──
+  const changes = {};
   for (const [sym, s] of Object.entries(STOCKS)) {
     s.prev = s.price;
+
+    // Base random (Box-Muller stays intact)
     let chg = randNormal() * s.vol + s.drift;
-    if (Math.random() < 0.02) chg += (Math.random()-0.42)*0.14;
-    s.price = Math.max(0.01, s.price * (1+chg));
+
+    // Emergency day: amplify volatility
+    if (G.emergencyDay) {
+      chg *= (1.5 + G.emergencyIntensity);
+      chg += randNormal() * 0.04 * G.emergencyIntensity;
+    }
+
+    // Hype wave: strong upward pressure
+    if (s.hypeActive) {
+      chg += 0.012 + Math.random() * 0.018;
+    }
+
+    // Fundamentals influence (demand vs supply vs production)
+    // Kept deliberately small — major driver should stay random noise, not drift
+    const demandPressure  = (s.demand  - s.supply) * 0.15;
+    const productionBoost = (s.production - 0.5)   * 0.04;
+    chg += (demandPressure + productionBoost) * 0.001;
+
+    // Sentiment influence (positive → upward bias)
+    chg += s.sentiment * 0.006;
+
+    // Market memory: recently crashed stocks are more volatile
+    if (s.crashMemory > 0.1) {
+      chg += randNormal() * s.crashMemory * 0.025;
+    }
+
+    // Timing skill bonus: positions held 30s+ get tiny return boost
+    if (SKILL_TREE.timing.level > 0 && G.holdTimers[sym]) {
+      const held = (Date.now() - G.holdTimers[sym]) / 1000;
+      if (held > 30 && s.price > s.startP) {
+        chg += 0.0003 * SKILL_TREE.timing.level;
+      }
+    }
+
+    // Random spike/crash (2% chance — preserved from original)
+    if (Math.random() < 0.02) chg += (Math.random() - 0.42) * 0.14;
+
+    changes[sym] = chg;
+  }
+
+  // ── Step 3: Sector interconnections ──
+  applyInterconnections(changes);
+
+  // ── Step 4: Supply chain propagation ──
+  applySupplyChain(changes);
+
+  // ── Step 5: Commit prices & update histories ──
+  for (const [sym, s] of Object.entries(STOCKS)) {
+    let finalChg = changes[sym] || 0;
+
+    // ── MEAN REVERSION: gentle force pulling price back toward startP ──
+    // The further a stock drifts from its starting price, the stronger the pull.
+    // This prevents prices from compounding into billions over long sessions.
+    const ratio = s.price / s.startP;
+    if (ratio > 2.5) {
+      // Above 2.5x start: increasingly strong reversion (~0.3% per unit above 2.5x)
+      finalChg -= (ratio - 2.5) * 0.003;
+    } else if (ratio < 0.15) {
+      // Below 15% of start: floor reversion so stocks don't die completely
+      finalChg += (0.15 - ratio) * 0.04;
+    }
+
+    // ── SOFT CAP: absolute ceiling at 20x starting price ──
+    // If already at cap, force a downward correction this tick.
+    const CAP_MULT = 20;
+    if (s.price > s.startP * CAP_MULT) {
+      finalChg = -0.02 - Math.random() * 0.03; // forced pullback
+    }
+
+    // Commit
+    s.price = Math.max(0.01, s.price * (1 + finalChg));
+
+    // Hard floor: never drop below 0.5% of starting price
+    s.price = Math.max(s.startP * 0.005, s.price);
+
     s.history.push(s.price);
     if (s.history.length > 60) s.history.shift();
+
+    // Market memory: track significant crashes
+    if (finalChg < -0.045) {
+      s.crashMemory = Math.min(1, s.crashMemory + 0.6);
+    }
+    // Memory decays toward 0 (faster for strong companies)
+    s.crashMemory *= (0.99 - s.recoveryRate * 0.005);
+
+    // Hype wave decay after 30 ticks
+    if (s.hypeActive && G.tickCount > s.hypeTick + 30) {
+      s.hypeActive = false;
+      const hypeRow = document.getElementById('mkt-hype-row');
+      if (hypeRow) hypeRow.style.display = 'none';
+    }
+
+    // Volume history (track magnitude of moves for unusual detection)
+    s.volHistory.push(Math.abs(finalChg));
+    if (s.volHistory.length > 20) s.volHistory.shift();
   }
+
+  // ── Step 6: Detect trends (every 3 ticks for performance) ──
+  if (G.tickCount % 3 === 0) detectAllTrends();
+
+  // ── Step 7: Check unusual activity (every 5 ticks) ──
+  if (G.tickCount % 5 === 0) checkUnusualActivity();
+
+  // ── Step 8: Emergency day countdown ──
+  if (G.emergencyDay) {
+    G.emergencyTicksLeft--;
+    if (G.emergencyTicksLeft <= 0) endEmergencyDay();
+  }
+
+  // ── Step 9: Advance staged events ──
+  advanceStagedEvents();
+
+  // ── Step 10: Decay sentiment ──
+  for (const s of Object.values(STOCKS)) {
+    s.sentiment *= 0.97;
+  }
+}
+
+/* ─── FUNDAMENTALS TICK ─────────────────────────────────── */
+function tickFundamentals() {
+  for (const s of Object.values(STOCKS)) {
+    // Slowly drift with mean reversion (realistic market cycles)
+    s.production += (0.7 - s.production) * 0.008 + randNormal() * 0.018;
+    s.demand     += (0.6 - s.demand)     * 0.008 + randNormal() * 0.015;
+    s.supply     += (0.5 - s.supply)     * 0.006 + randNormal() * 0.012;
+
+    s.production = Math.max(0.05, Math.min(1.0, s.production));
+    s.demand     = Math.max(0.05, Math.min(1.0, s.demand));
+    s.supply     = Math.max(0.05, Math.min(1.0, s.supply));
+  }
+}
+
+/* ─── SECTOR INTERCONNECTION PROPAGATION ───────────────── */
+function applyInterconnections(changes) {
+  for (const link of SECTOR_LINKS) {
+    const srcChg = changes[link.src] || 0;
+    if (Math.abs(srcChg) < 0.004) continue; // ignore noise
+    const effect = srcChg * link.factor * 0.55; // dampened
+    changes[link.dst] = (changes[link.dst] || 0) + (link.inverse ? -effect : effect);
+  }
+}
+
+/* ─── SUPPLY CHAIN PROPAGATION ──────────────────────────── */
+function applySupplyChain(changes) {
+  for (const chain of SUPPLY_CHAINS) {
+    const supplierChg = changes[chain.supplier] || 0;
+    if (Math.abs(supplierChg) < 0.006) continue;
+    // Supplier move partially propagates to dependents (dampened)
+    changes[chain.dependent] = (changes[chain.dependent] || 0)
+      + supplierChg * chain.multiplier * 0.45;
+  }
+}
+
+/* ─── TREND DETECTION ────────────────────────────────────── */
+function detectAllTrends() {
+  const sensitivity = 1 - SKILL_TREE.analysis.level * 0.08; // higher skill = detects sooner
+  for (const [sym, s] of Object.entries(STOCKS)) {
+    const hist = s.history;
+    if (hist.length < 8) { s.trend = 'neutral'; continue; }
+
+    const recentN = Math.max(8, Math.floor(hist.length * 0.4));
+    const recent  = hist.slice(-recentN);
+    const older   = hist.slice(-recentN * 2, -recentN);
+
+    const upTicks = recent.reduce((n,v,i) => i>0 && v>recent[i-1] ? n+1 : n, 0);
+    const pctChg  = (recent[recent.length-1] - recent[0]) / recent[0];
+    const recentAvg = recent.reduce((a,b)=>a+b,0) / recent.length;
+    const olderAvg  = older.length > 0 ? older.reduce((a,b)=>a+b,0)/older.length : recentAvg;
+    const momentum  = recentAvg / (olderAvg || recentAvg);
+
+    if      (s.hypeActive)                              s.trend = 'hype';
+    else if (pctChg >  0.035*sensitivity && upTicks >= 6) s.trend = 'breakout';
+    else if (pctChg < -0.035*sensitivity && upTicks <= 3) s.trend = 'downtrend';
+    else if (momentum > 1.015 && upTicks >= 5)          s.trend = 'momentum';
+    else                                                s.trend = 'neutral';
+  }
+}
+
+/* ─── UNUSUAL ACTIVITY DETECTION ────────────────────────── */
+function checkUnusualActivity() {
+  for (const [sym, s] of Object.entries(STOCKS)) {
+    if (s.volHistory.length < 8) continue;
+    const recent   = s.volHistory.slice(-3);
+    const baseline = s.volHistory.slice(0, -3);
+    const recentAvg   = recent.reduce((a,b)=>a+b,0) / recent.length;
+    const baselineAvg = baseline.reduce((a,b)=>a+b,0) / baseline.length || 0.001;
+
+    if (recentAvg > baselineAvg * 2.8 && !s.unusualVol) {
+      s.unusualVol = true;
+      fireAlert(`⚠️ Unusual trading volume detected in ${s.name} (${sym})`, sym, 'unusual');
+      setTimeout(() => { s.unusualVol = false; }, 20000);
+    }
+    if (recentAvg > s.vol * 4 && Math.random() < 0.3) {
+      fireAlert(`🔺 High volatility spike detected in ${sym}`, sym, 'volatility');
+    }
+  }
+}
+
+/* ─── ALERT FEED ─────────────────────────────────────────── */
+function fireAlert(msg, sym, type) {
+  const feed = document.getElementById('alert-feed');
+  if (!feed) return;
+  const div = document.createElement('div');
+  div.className = `alert-item${type==='volatility'?' volatility':type==='scandal'?' scandal':type==='hype'?' hype':''}`;
+  div.textContent = msg;
+  feed.appendChild(div);
+  // Auto-remove after 5.5s (matches CSS animation)
+  setTimeout(() => { if (div.parentNode) div.parentNode.removeChild(div); }, 5800);
+  // Cap feed at 4 alerts
+  while (feed.children.length > 4) feed.removeChild(feed.firstChild);
+}
+
+/* ─── SYNERGY BONUS CALCULATION ──────────────────────────── */
+function calcSynergyBonus() {
+  let totalBonus = 0;
+  const activeBundles = [];
+  for (const bundle of SYNERGY_BUNDLES) {
+    let count = 0;
+    if (bundle.diversified) {
+      const sectors = new Set(SYM_LIST.filter(s=>(G.portfolio[s]||0)>0).map(s=>STOCKS[s].sector));
+      count = sectors.size;
+    } else {
+      count = bundle.syms.filter(s=>(G.portfolio[s]||0)>0).length;
+    }
+    if (count >= bundle.need) {
+      totalBonus += bundle.bonus;
+      activeBundles.push({ ...bundle, count });
+    }
+  }
+  return { bonus: totalBonus, active: activeBundles };
+}
+
+/* ─── PORTFOLIO SYNERGY APPLIED IN BUY/SELL ─────────────── */
+function getSynergyMultiplier() {
+  const { bonus } = calcSynergyBonus();
+  const resBonus = SKILL_TREE.resilience.level * 0.005; // risk shield
+  return 1 + bonus + resBonus;
+}
+
+/* ─── SKILL TREE ─────────────────────────────────────────── */
+function calcSkillPoints() {
+  return Math.floor(G.trades / 10);
+}
+function getAvailableSkillPts() {
+  return calcSkillPoints() - G.skillSpent;
+}
+function buySkill(id) {
+  const skill = SKILL_TREE[id];
+  if (!skill || skill.level >= skill.max) return;
+  const cost = skill.cost[skill.level];
+  if (getAvailableSkillPts() < cost) {
+    flash(`❌ Need ${cost} skill points (have ${getAvailableSkillPts()})`, '#ff1744'); return;
+  }
+  G.skillSpent += cost;
+  skill.level++;
+  buildSkillModal();
+  flash(`🧬 ${skill.name} upgraded to Level ${skill.level}!`, 'var(--gold)');
+  snd.ach();
+}
+
+function buildSkillModal() {
+  const pts = getAvailableSkillPts();
+  const ptEl = document.getElementById('skill-pts-display');
+  if (ptEl) ptEl.textContent = pts;
+  const mktEl = document.getElementById('mkt-skillpts');
+  if (mktEl) mktEl.textContent = pts;
+
+  const grid = document.getElementById('skill-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(SKILL_TREE).map(([id, skill]) => {
+    const cost = skill.level < skill.max ? skill.cost[skill.level] : 0;
+    const canAfford = pts >= cost && skill.level < skill.max;
+    const stars = Array.from({length:skill.max}, (_,i) =>
+      `<div class="skill-star${i<skill.level?' lit':''}"></div>`).join('');
+    const btn = skill.level >= skill.max
+      ? `<div class="skill-maxed">✨ MAXED OUT</div>`
+      : `<button class="skill-buy-btn" ${canAfford?'':'disabled'} onclick="buySkill('${id}')">
+           Upgrade — ${cost} pts
+         </button>`;
+    return `
+      <div class="skill-card">
+        <div class="skill-card-top">
+          <span class="skill-icon">${skill.icon}</span>
+          <span class="skill-name">${skill.name}</span>
+        </div>
+        <div class="skill-desc">${skill.desc}</div>
+        <div class="skill-stars">${stars}</div>
+        ${btn}
+      </div>`;
+  }).join('');
+}
+
+/* ─── STAGED MULTI-PHASE EVENTS ──────────────────────────── */
+function launchStagedEvent() {
+  if (ACTIVE_EVENTS.length >= 2) return; // max 2 concurrent
+  const template = STAGED_TEMPLATES[Math.floor(Math.random()*STAGED_TEMPLATES.length)];
+  // Don't repeat same event
+  if (ACTIVE_EVENTS.find(e=>e.id===template.id)) return;
+
+  const event = {
+    id:        template.id,
+    name:      template.name,
+    phase:     0,
+    maxPhase:  template.phases.length,
+    phases:    template.phases,
+    phaseDelay:template.phaseDelay,
+    startTime: Date.now(),
+    sym:       template.phases[0].sym,
+  };
+  ACTIVE_EVENTS.push(event);
+  advanceEventPhase(event);
+}
+
+function advanceEventPhase(event) {
+  if (event.phase >= event.maxPhase) {
+    const idx = ACTIVE_EVENTS.indexOf(event);
+    if (idx !== -1) ACTIVE_EVENTS.splice(idx, 1);
+    refreshIntelTab();
+    return;
+  }
+  const phase = event.phases[event.phase];
+  // Apply price effect
+  const s = STOCKS[phase.sym];
+  if (s) {
+    s.prev    = s.price;
+    applyPrice(s, s.price * (1 + phase.imp));
+    s.history.push(s.price);
+    if (s.history.length > 60) s.history.shift();
+    // Apply sentiment shock
+    s.sentiment += phase.imp > 0 ? 0.4 : -0.4;
+  }
+  // Post to news feed (limited to 2 items)
+  addLimitedNewsItem(phase.txt, phase.sym, phase.type, phase.label);
+  event.phase++;
+  refreshIntelTab();
+
+  if (event.phase < event.maxPhase) {
+    setTimeout(() => advanceEventPhase(event), event.phaseDelay);
+  } else {
+    setTimeout(() => {
+      const idx = ACTIVE_EVENTS.indexOf(event);
+      if (idx !== -1) ACTIVE_EVENTS.splice(idx, 1);
+      refreshIntelTab();
+    }, event.phaseDelay);
+  }
+}
+
+function advanceStagedEvents() {
+  // Update condition bar phase display
+  if (ACTIVE_EVENTS.length > 0) {
+    const ev = ACTIVE_EVENTS[0];
+    const ph = ev.phases[Math.min(ev.phase, ev.maxPhase-1)];
+    const phaseEl = document.getElementById('mkt-phase');
+    if (phaseEl) phaseEl.textContent = `${ev.name}: ${ph.label}`;
+  } else {
+    const phaseEl = document.getElementById('mkt-phase');
+    if (phaseEl) phaseEl.textContent = 'No active events';
+  }
+}
+
+/* ─── LIMITED NEWS FEED (max 2-3 items) ─────────────────── */
+function addLimitedNewsItem(txt, sym, type, tag) {
+  const feed = document.getElementById('news-list');
+  if (!feed) return;
+  const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const tagHtml = tag ? ` · <span style="color:var(--orange);font-weight:bold">[${tag}]</span>` : '';
+  const symHtml = sym ? ` · <span style="font-weight:bold">${sym}</span>` : ' · MACRO';
+  const item = document.createElement('div');
+  item.className = 'news-item ' + (type||'neutral');
+  item.innerHTML = `<div class="news-time">${now}${symHtml}${tagHtml}</div><div class="news-text">${txt}</div>`;
+  feed.insertBefore(item, feed.firstChild);
+  // Keep only 3 items visible (auto-replace old ones)
+  while (feed.children.length > 3) feed.removeChild(feed.lastChild);
+}
+
+/* ─── EMERGENCY MARKET DAY ───────────────────────────────── */
+function triggerEmergencyDay() {
+  if (G.emergencyDay) return;
+  G.emergencyDay       = true;
+  G.emergencyIntensity = 0.6 + Math.random() * 0.8;
+  G.emergencyTicksLeft = 20 + Math.floor(Math.random() * 25);
+  G.lastEmergencyTick  = G.tickCount;
+
+  document.getElementById('emergency-banner').classList.add('on');
+  document.getElementById('mkt-dot').style.background = 'var(--red)';
+  document.getElementById('mkt-status').textContent    = '🚨 EMERGENCY DAY';
+  fireAlert('🚨 EMERGENCY MARKET CONDITIONS — extreme volatility across all assets!', null, 'volatility');
+  addLimitedNewsItem('🚨 EMERGENCY MARKET DAY: Circuit breakers tripped — extreme volatility in all sectors!', null, 'negative', 'EMERGENCY');
+
+  // Boost news frequency during emergency
+  scheduleNews();
+}
+function endEmergencyDay() {
+  G.emergencyDay       = false;
+  G.emergencyIntensity = 0;
+  document.getElementById('emergency-banner').classList.remove('on');
+  document.getElementById('mkt-dot').style.background = 'var(--green)';
+  document.getElementById('mkt-status').textContent    = 'Market: Normal';
+  addLimitedNewsItem('✅ Emergency conditions lifted — markets stabilizing', null, 'positive', 'RESOLVED');
+}
+
+/* ─── COMPANY SCANDAL ────────────────────────────────────── */
+function triggerScandal() {
+  const ev = SCANDAL_EVENTS[Math.floor(Math.random() * SCANDAL_EVENTS.length)];
+  const s  = STOCKS[ev.sym];
+  s.prev   = s.price;
+  applyPrice(s, s.price * (1 + ev.imp));
+  s.history.push(s.price);
+  if (s.history.length > 60) s.history.shift();
+  s.sentiment += ev.imp * 3; // huge sentiment hit
+  s.crashMemory = Math.min(1, s.crashMemory + 0.8);
+
+  addLimitedNewsItem(ev.txt, ev.sym, 'negative', 'SCANDAL');
+  fireAlert(ev.txt, ev.sym, 'scandal');
+  snd.bad();
+
+  // Ticker update
+  const ti = document.createElement('span');
+  ti.className = 'ti ti-down';
+  ti.textContent = '💀 SCANDAL: ' + ev.txt;
+  document.getElementById('ticker-inner').prepend(ti);
+}
+
+/* ─── HYPE WAVE ──────────────────────────────────────────── */
+function triggerHypeWave() {
+  const ev = HYPE_EVENTS[Math.floor(Math.random() * HYPE_EVENTS.length)];
+  const s  = STOCKS[ev.sym];
+  s.hypeActive = true;
+  s.hypeTick   = G.tickCount;
+  s.sentiment += 0.6;
+  s.demand    += 0.2;
+
+  const banner = document.getElementById('hype-banner');
+  banner.textContent = ev.txt;
+  banner.classList.add('on');
+  setTimeout(() => banner.classList.remove('on'), 8000);
+
+  document.getElementById('mkt-hype-row').style.display = 'flex';
+  document.getElementById('mkt-hype-sym').textContent   = ev.sym;
+
+  addLimitedNewsItem(ev.txt, ev.sym, 'positive', ev.src);
+  fireAlert(ev.txt, ev.sym, 'hype');
+  snd.good();
+
+  const ti = document.createElement('span');
+  ti.className = 'ti ti-up';
+  ti.textContent = '🔥 ' + ev.txt;
+  document.getElementById('ticker-inner').prepend(ti);
+}
+
+/* ─── SIM TAB REFRESH ────────────────────────────────────── */
+function refreshIntelTab() {
+  if (!document.getElementById('tab-intel').classList.contains('active')) return;
+
+  // Active events
+  const evList = document.getElementById('sim-events-list');
+  if (evList) {
+    if (ACTIVE_EVENTS.length === 0 && !G.emergencyDay) {
+      evList.innerHTML = '<div style="color:var(--text-dim);font-size:0.72em;padding:6px 0">No active events — markets are quiet.</div>';
+    } else {
+      evList.innerHTML = ACTIVE_EVENTS.map(ev => {
+        const ph = ev.phases[Math.min(ev.phase, ev.maxPhase-1)];
+        const dots = ev.phases.map((_,i) => {
+          const cls = i < ev.phase ? 'phase-dot done' : i === ev.phase-1 ? 'phase-dot active' : 'phase-dot';
+          return `<span class="${cls}"></span>`;
+        }).join('');
+        return `
+          <div class="sim-card active">
+            <div class="sim-card-title">${ev.name}</div>
+            <div class="sim-card-sub">${ph.label} — ${STOCKS[ph.sym]?.name||''}</div>
+            <div class="phase-indicator">${dots}<span class="phase-label">Phase ${ev.phase}/${ev.maxPhase}</span></div>
+          </div>`;
+      }).join('');
+      if (G.emergencyDay) {
+        evList.innerHTML += `<div class="sim-card danger"><div class="sim-card-title">🚨 EMERGENCY MARKET DAY</div>
+          <div class="sim-card-sub">Ticks remaining: ${G.emergencyTicksLeft} · Intensity: ${(G.emergencyIntensity*100).toFixed(0)}%</div>
+          <div class="sim-progress-wrap"><div class="sim-progress-fill" style="width:${(G.emergencyTicksLeft/45*100)}%;background:var(--red)"></div></div></div>`;
+      }
+    }
+  }
+
+  // Synergy
+  const synList = document.getElementById('sim-synergy-list');
+  if (synList) {
+    const { active } = calcSynergyBonus();
+    if (active.length === 0) {
+      synList.innerHTML = '<div style="color:var(--text-dim);font-size:0.72em;padding:6px 0">Buy related stocks to unlock synergy bonuses.</div>';
+    } else {
+      synList.innerHTML = active.map(b =>
+        `<div class="sim-card synergy"><div class="sim-card-title">${b.icon} ${b.name}</div>
+         <div class="sim-card-sub"><span class="synergy-bonus-val">+${(b.bonus*100).toFixed(1)}%</span> bonus active (${b.count} stocks held) — ${b.desc||''}</div></div>`
+      ).join('');
+    }
+  }
+
+  // Fundamentals for selected stock (only if insight skill unlocked)
+  const fundEl = document.getElementById('sim-fundamentals');
+  if (fundEl) {
+    const s = STOCKS[G.selectedSym];
+    if (SKILL_TREE.insight.level > 0) {
+      const mkBar = (v, col) => `<span class="fund-bar"><span class="fund-fill" style="width:${(v*100).toFixed(0)}%;background:${col}"></span></span>`;
+      fundEl.innerHTML = `
+        <div class="sim-card" style="font-size:0.7em">
+          <div class="fund-row"><span>📦 Production</span><span>${mkBar(s.production,'var(--blue)')} ${(s.production*100).toFixed(0)}%</span></div>
+          <div class="fund-row"><span>📈 Demand</span><span>${mkBar(s.demand,'var(--green)')} ${(s.demand*100).toFixed(0)}%</span></div>
+          <div class="fund-row"><span>📉 Supply</span><span>${mkBar(s.supply,'var(--orange)')} ${(s.supply*100).toFixed(0)}%</span></div>
+          ${SKILL_TREE.insight.level >= 2 ? `<div class="fund-row"><span>🧠 Sentiment</span><span style="color:${s.sentiment>0?'var(--green)':'var(--red)'}">${s.sentiment>0?'+':''}${(s.sentiment*100).toFixed(0)}%</span></div>` : ''}
+          ${SKILL_TREE.insight.level >= 3 && s.crashMemory>0.05 ? `<div class="fund-row"><span>💥 Crash Memory</span><span style="color:var(--red)">${(s.crashMemory*100).toFixed(0)}%</span></div>` : ''}
+        </div>`;
+    } else {
+      fundEl.innerHTML = `<div style="color:var(--text-dim);font-size:0.7em;padding:4px 0">🔒 Unlock <strong>Market Insight</strong> skill to view fundamentals.</div>`;
+    }
+  }
+
+  // Conditions
+  const condEl = document.getElementById('sim-conditions');
+  if (condEl) {
+    const { bonus } = calcSynergyBonus();
+    condEl.innerHTML = `
+      <div class="sim-card" style="font-size:0.7em">
+        <div class="fund-row"><span>📊 Market Mode</span><span style="color:${G.emergencyDay?'var(--red)':'var(--green)'}">${G.emergencyDay?'🚨 Emergency':'✅ Normal'}</span></div>
+        <div class="fund-row"><span>💼 Portfolio Synergy</span><span class="synergy-bonus-val">+${(bonus*100).toFixed(1)}%</span></div>
+        <div class="fund-row"><span>🧬 Skill Level</span><span style="color:var(--gold)">${Object.values(SKILL_TREE).reduce((a,s)=>a+s.level,0)} / ${Object.values(SKILL_TREE).reduce((a,s)=>a+s.max,0)}</span></div>
+        <div class="fund-row"><span>💎 Skill Points</span><span style="color:var(--gold)">${getAvailableSkillPts()} available</span></div>
+      </div>`;
+  }
+
+  // Update condition bar synergy
+  const synEl = document.getElementById('mkt-synergy');
+  if (synEl) { const {bonus}=calcSynergyBonus(); synEl.textContent=`+${(bonus*100).toFixed(1)}%`; synEl.style.color=bonus>0?'var(--green)':'var(--text-dim)'; }
 }
 
 /* ─── UTILITIES ─────────────────────────────────── */
@@ -1692,7 +2699,12 @@ function elapsed() {
 function buy(sym) {
   const s   = STOCKS[sym];
   const qty = getQty(sym);
-  const cost = s.price * qty;
+  let cost  = s.price * qty;
+
+  // Trading Edge skill: tiny cost rebate (0.3% per level)
+  const feesLvl = SKILL_TREE.fees ? (SKILL_TREE.fees.level || 0) : 0;
+  if (feesLvl > 0) cost = cost * (1 - feesLvl * 0.003);
+
   if (cost > G.cash) { flash('❌ Not enough cash!', '#ff1744'); return; }
   G.cash -= cost;
   G.portfolio[sym] = (G.portfolio[sym] || 0) + qty;
@@ -1700,32 +2712,85 @@ function buy(sym) {
   G.trades++;
   G.tradeTimes.push(Date.now());
   if (cost > G.biggestTrade) G.biggestTrade = cost;
+
+  // Track hold time for timing bonus
+  if (!G.holdTimers) G.holdTimers = {};
+  if (!G.holdTimers[sym]) G.holdTimers[sym] = Date.now();
+
+  // XP: earn 1 per trade
+  gainXP(1);
+
+  // Skill pts: 1 per 10 trades
+  const newSP = Math.floor(G.trades / 10);
+  if (typeof G.skillPts !== 'undefined' && newSP > G.skillPts) {
+    G.skillPts = newSP;
+    flash(`🌲 Skill point earned! (${G.skillPts} total)`, 'var(--gold)');
+    buildSkillModal();
+  }
+
   snd.buy();
   refreshUI();
   checkAchs();
   saveGame();
   pushLBScore();
-  flash(`✅ Bought ${qty}× ${sym} @ ${$$(s.price)}`, '#00e676');
+  const rebateNote = feesLvl > 0 ? ` (${(feesLvl*0.3).toFixed(1)}% fee rebate)` : '';
+  flash(`✅ Bought ${qty}× ${sym} @ ${$$(s.price)}${rebateNote}`, '#00e676');
 }
+
 function sell(sym) {
   const s    = STOCKS[sym];
   const qty  = getQty(sym);
   const have = G.portfolio[sym] || 0;
   if (have < qty) { flash(`❌ Only own ${have} share${have!==1?'s':''} of ${sym}`, '#ff1744'); return; }
-  const proceeds = s.price * qty;
+
+  let proceeds = s.price * qty;
+
+  // Synergy multiplier applied to gains only
+  const { bonus } = calcSynergyBonus();
+  const costPerShare = G.costBasis[sym] ? G.costBasis[sym] / have : 0;
+  const gainPerShare = s.price - costPerShare;
+  if (gainPerShare > 0 && bonus > 0) {
+    proceeds += gainPerShare * qty * bonus; // bonus on the gain portion
+  }
+
+  // Timing Mastery skill: long-hold bonus
+  if (G.holdTimers && G.holdTimers[sym]) {
+    const heldSec = (Date.now() - G.holdTimers[sym]) / 1000;
+    const timingLvl = SKILL_TREE.timing ? (SKILL_TREE.timing.level || 0) : 0;
+    if (heldSec > 30 && timingLvl > 0) {
+      const holdBonus = proceeds * timingLvl * 0.003;
+      proceeds += holdBonus;
+    }
+  }
+
   G.cash += proceeds;
   const ratio = (have - qty) / have;
   G.portfolio[sym]  = have - qty;
   G.costBasis[sym]  = (G.costBasis[sym] || 0) * ratio;
+  if (G.portfolio[sym] === 0 && G.holdTimers) delete G.holdTimers[sym];
+
   G.trades++;
   G.tradeTimes.push(Date.now());
   G.lastSellTime = Date.now();
+
+  // XP: earn 1 per trade + 1 extra for profitable sells
+  gainXP(gainPerShare > 0 ? 2 : 1);
+
+  // Skill pts
+  const newSP = Math.floor(G.trades / 10);
+  if (typeof G.skillPts !== 'undefined' && newSP > G.skillPts) {
+    G.skillPts = newSP;
+    flash(`🌲 Skill point earned! (${G.skillPts} total)`, 'var(--gold)');
+    buildSkillModal();
+  }
+
   snd.sell();
   refreshUI();
   checkAchs();
   saveGame();
   pushLBScore();
-  flash(`✅ Sold ${qty}× ${sym} @ ${$$(s.price)}`, '#00e676');
+  const synergyNote = bonus > 0 ? ` +${(bonus*100).toFixed(1)}% synergy` : '';
+  flash(`✅ Sold ${qty}× ${sym} @ ${$$(s.price)}${synergyNote}`, '#00e676');
 }
 function flash(msg, color) {
   const el = document.getElementById('flash');
@@ -1754,6 +2819,7 @@ function buildTable() {
       <td><span class="sect" id="sect-${sym}">${s.sector}</span></td>
       <td class="prc" id="prc-${sym}">${$$(s.price)}</td>
       <td class="chg" id="chg-${sym}">+0.00%</td>
+      <td class="r"   id="sig-${sym}"><span class="trend-lbl trend-neutral">—</span></td>
       <td class="own" id="own-${sym}">0</td>
       <td class="val" id="val-${sym}">—</td>
       <td><input type="number" class="qty" id="qty-${sym}" value="${CFG.defQty}" min="1" max="9999999"></td>
@@ -1796,6 +2862,23 @@ function refreshTable() {
     oEl.className   = 'own' + (owned>0?' has':'');
 
     vEl.textContent = owned > 0 ? $$(owned*s.price) : '—';
+
+    // ── Trend / Signal label ──
+    const sigEl = document.getElementById('sig-'+sym);
+    if (sigEl) {
+      const TREND_MAP = {
+        breakout:  { cls:'trend-breakout',  txt:'▲ BREAKOUT' },
+        downtrend: { cls:'trend-downtrend', txt:'▼ DOWNTREND' },
+        momentum:  { cls:'trend-momentum',  txt:'→ MOMENTUM' },
+        hype:      { cls:'trend-hype',      txt:'🔥 HYPE' },
+        neutral:   { cls:'trend-neutral',   txt:'·' },
+      };
+      const tm = TREND_MAP[s.trend] || TREND_MAP.neutral;
+      sigEl.innerHTML = `<span class="trend-lbl ${tm.cls}">${tm.txt}</span>`;
+    }
+
+    // ── Unusual volume alert row indicator ──
+    row.classList.toggle('alert-row', !!s.unusualVol);
 
     // Show/hide sector column
     if (sEl) sEl.parentElement.style.display = CFG.showSector ? '' : 'none';
@@ -2006,7 +3089,8 @@ function switchTab(name) {
   document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+name));
   if (name==='portfolio') refreshPortfolio();
-  if (name==='picks') refreshPicks();
+  if (name==='picks')     refreshPicks();
+  if (name==='intel')     refreshIntelTab();
 }
 
 /* ─── MASTER REFRESH ────────────────────────────── */
@@ -2016,57 +3100,72 @@ function refreshUI() {
   refreshChartHeader();
   drawChart();
   applyFilter();
-  // Refresh portfolio if that tab is active
   if (document.getElementById('tab-portfolio').classList.contains('active')) refreshPortfolio();
+  if (document.getElementById('tab-intel').classList.contains('active')) refreshIntelTab();
+  // Update skill pts in condition bar
+  const sp = document.getElementById('mkt-skillpts');
+  if (sp) sp.textContent = getAvailableSkillPts();
+  buildSkillModal();
 }
 
-/* ─── NEWS SYSTEM ───────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   📰 NEWS SYSTEM — updated
+   • Fires every 60–120s (normal), 15–30s (fast), 120–240s (slow)
+   • Max 3 items visible at a time (auto-replaces oldest)
+   • News directly affects sentiment
+═══════════════════════════════════════════════════════════ */
 function fireNews() {
   const ev = NEWS[Math.floor(Math.random()*NEWS.length)];
   G.newsCount++;
+
   if (ev.sym) {
     const s = STOCKS[ev.sym];
     if (!s) return;
-    s.prev  = s.price;
-    s.price = Math.max(0.01, s.price*(1+ev.imp));
+    s.prev    = s.price;
+    applyPrice(s, s.price * (1 + ev.imp));
     s.history.push(s.price);
-    if (s.history.length>60) s.history.shift();
+    if (s.history.length > 60) s.history.shift();
+    // Sentiment impact from news
+    s.sentiment += ev.imp * 2.5;
+    s.sentiment  = Math.max(-1, Math.min(1, s.sentiment));
   } else {
     for (const s of Object.values(STOCKS)) {
       s.prev  = s.price;
-      const v = 1+(Math.random()-0.5)*0.6;
-      s.price = Math.max(0.01, s.price*(1+ev.imp*v));
+      const v = 1 + (Math.random()-0.5)*0.6;
+      applyPrice(s, s.price * (1 + ev.imp * v));
       s.history.push(s.price);
-      if (s.history.length>60) s.history.shift();
+      if (s.history.length > 60) s.history.shift();
+      s.sentiment += ev.imp * 1.2;
+      s.sentiment  = Math.max(-1, Math.min(1, s.sentiment));
     }
   }
-  ev.type==='positive' ? snd.good() : snd.bad();
 
+  ev.type === 'positive' ? snd.good() : snd.bad();
+
+  // Add to ticker
   const ti = document.createElement('span');
-  ti.className = 'ti '+(ev.type==='positive'?'ti-up':'ti-down');
-  ti.textContent = '⚡ '+ev.txt;
+  ti.className = 'ti ' + (ev.type==='positive'?'ti-up':'ti-down');
+  ti.textContent = '⚡ ' + ev.txt;
   document.getElementById('ticker-inner').prepend(ti);
 
-  const feed = document.getElementById('news-list');
-  const now  = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const item = document.createElement('div');
-  item.className = 'news-item '+ev.type;
-  item.innerHTML = `<div class="news-time">${now}${ev.sym?' · <span style="font-weight:bold">'+ev.sym+'</span>':' · MACRO'}</div><div class="news-text">${ev.txt}</div>`;
-  feed.insertBefore(item, feed.firstChild);
-  while (feed.children.length > CFG.maxNews) feed.removeChild(feed.lastChild);
+  // Limited news feed (max 3 items)
+  addLimitedNewsItem(ev.txt, ev.sym, ev.type, null);
 
   refreshUI(); checkAchs();
 }
 
 function getNewsDelay() {
-  const ranges = { fast:[500,1000], normal:[1000,2000], slow:[2000,4000] };
+  // UPDATED: much longer delays per spec
+  const ranges = { fast:[15000,30000], normal:[60000,120000], slow:[120000,240000] };
   const [lo,hi] = ranges[CFG.newsFreq] || ranges.normal;
-  return lo + Math.random()*(hi-lo);
+  // Emergency day: much faster news
+  if (G.emergencyDay) return lo * 0.15 + Math.random() * lo * 0.15;
+  return lo + Math.random() * (hi - lo);
 }
 
 function scheduleNews() {
   clearTimeout(G.newsTimer);
-  G.newsTimer = setTimeout(()=>{ fireNews(); scheduleNews(); }, getNewsDelay());
+  G.newsTimer = setTimeout(() => { fireNews(); scheduleNews(); }, getNewsDelay());
 }
 
 /* ─── ACHIEVEMENTS ──────────────────────────────── */
@@ -2100,11 +3199,28 @@ function unlockAch(a) {
   snd.ach();
 }
 
-/* ─── GLOBAL LEADERBOARD (window.storage shared) ── */
+/* ─── GLOBAL LEADERBOARD — Firebase Realtime Database ────────
+   HOW TO SET UP YOUR PUBLIC LEADERBOARD:
+   1. Go to https://console.firebase.google.com
+   2. Create a new project (free Spark plan is fine)
+   3. Click "Build" → "Realtime Database" → "Create database"
+   4. In Rules tab, paste:
+        { "rules": { ".read": true, ".write": true } }
+   5. Copy your database URL (looks like https://YOUR-PROJECT-default-rtdb.firebaseio.com)
+   6. Paste it as FIREBASE_URL below (replace the placeholder)
+   That's it — all players on your GitHub Pages site share one leaderboard.
+   ─────────────────────────────────────────────────────────── */
+const FIREBASE_URL = 'https://stockblitz-cb418-default-rtdb.firebaseio.com/';
+const LB_FB_PATH   = '/stockblitz_lb.json';   // data lives at this REST path
+
+// Returns true if Firebase is actually configured (not the placeholder)
+function fbConfigured() {
+  return FIREBASE_URL && !FIREBASE_URL.includes('YOUR-PROJECT');
+}
+
 /* ─── PLAYER IDENTITY ────────────────────────────── */
 const PLAYER_ID_KEY   = 'stockblitz_pid';
 const PLAYER_NAME_KEY = 'stockblitz_pname';
-const LB_KEY          = 'sb_live_lb_v4'; // shared JSON: { playerId: {name,score,trades,ach,ts} }
 
 let PLAYER_ID   = '';
 let PLAYER_NAME = '';
@@ -2184,27 +3300,60 @@ function initPlayerBox() {
   };
 }
 
-/* ─── LIVE LEADERBOARD ───────────────────────────── */
+/* ─── LIVE LEADERBOARD — Firebase REST API ───────────────── */
 
+// Load all scores from Firebase (or local fallback if not configured)
 async function lbLoadAll() {
+  if (!fbConfigured()) return lbLocalLoad();
   try {
-    const result = await window.storage.get(LB_KEY, true);
-    return result ? JSON.parse(result.value) : {};
-  } catch { return {}; }
+    const res = await fetch(FIREBASE_URL + LB_FB_PATH, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Firebase fetch failed: ' + res.status);
+    const data = await res.json();
+    return data || {};
+  } catch(e) {
+    console.warn('Leaderboard fetch failed, using local fallback:', e.message);
+    return lbLocalLoad();
+  }
 }
 
+// Write a single player's score entry using Firebase REST PATCH
+// PATCH only updates the specific player key without overwriting others
 async function pushLBScore() {
+  const entry = {
+    name:   PLAYER_NAME,
+    score:  Math.round(totalVal() * 100) / 100,
+    trades: G.trades,
+    ach:    G.unlocked.size,
+    ts:     Date.now()
+  };
+  // Always write to local storage as backup
+  lbLocalSet(PLAYER_ID, entry);
+
+  if (!fbConfigured()) return; // skip remote if not set up
+
   try {
-    const all = await lbLoadAll();
-    all[PLAYER_ID] = {
-      name:   PLAYER_NAME,
-      score:  Math.round(totalVal() * 100) / 100,
-      trades: G.trades,
-      ach:    G.unlocked.size,
-      ts:     Date.now()
-    };
-    await window.storage.set(LB_KEY, JSON.stringify(all), true);
-  } catch(e) { /* silent fail — LB is best-effort */ }
+    // PATCH /stockblitz_lb/{PLAYER_ID}.json — only touches this player's key
+    await fetch(`${FIREBASE_URL}/stockblitz_lb/${PLAYER_ID}.json`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(entry)
+    });
+  } catch(e) {
+    // Silent fail — network issues shouldn't break gameplay
+  }
+}
+
+// ── Local fallback leaderboard (localStorage) ────────────
+const LB_LOCAL_KEY = 'sb_local_lb_v4';
+function lbLocalLoad() {
+  try { return JSON.parse(localStorage.getItem(LB_LOCAL_KEY)) || {}; } catch { return {}; }
+}
+function lbLocalSet(pid, entry) {
+  try {
+    const all = lbLocalLoad();
+    all[pid] = entry;
+    localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(all));
+  } catch(e) {}
 }
 
 async function showLB() {
@@ -2224,21 +3373,35 @@ function hideLB() {
 
 async function renderLB() {
   const list = document.getElementById('lb-list');
-  const all  = await lbLoadAll();
-  const now  = Date.now();
+  // Show loading only on first open (not on polls)
+  if (!list.dataset.loaded) {
+    list.innerHTML = '<div class="lb-loading">⏳ Loading scores…</div>';
+  }
 
-  // Convert to sorted array; mark active = played in last 10 minutes
+  const all = await lbLoadAll();
+  list.dataset.loaded = '1';
+  const now = Date.now();
+
+  // Show setup notice if Firebase isn't configured yet
+  const configNote = fbConfigured() ? '' :
+    '<div style="font-size:0.65em;color:var(--orange);text-align:center;padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px">' +
+    '⚙️ Firebase not configured — leaderboard is local only.<br>' +
+    'See the FIREBASE_URL comment in the source to enable public scores.</div>';
+
   const entries = Object.entries(all)
     .map(([id, e]) => ({ ...e, id, active: (now - (e.ts||0)) < 10*60*1000 }))
-    .sort((a,b) => b.score - a.score);
+    .sort((a,b) => b.score - a.score)
+    .slice(0, 25); // top 25 only
 
   if (entries.length === 0) {
-    list.innerHTML = '<div class="lb-empty">No players yet — you\'ll be the first! 🚀<br><small style="color:var(--text-dim)">Scores appear automatically as you play.</small></div>';
+    list.innerHTML = configNote +
+      '<div class="lb-empty">No scores yet — be the first! 🚀<br>' +
+      '<small style="color:var(--text-dim)">Scores update automatically as you play.</small></div>';
     return;
   }
 
   const medals = ['🥇','🥈','🥉'];
-  list.innerHTML = entries.map((e, i) => {
+  list.innerHTML = configNote + entries.map((e, i) => {
     const isYou    = e.id === PLAYER_ID;
     const rowCls   = isYou ? 'lb-row lb-row-you' : e.active ? 'lb-row' : 'lb-row lb-inactive';
     const dot      = e.active ? '<span class="lb-online-dot"></span>' : '';
@@ -2247,8 +3410,8 @@ async function renderLB() {
     const ago      = e.ts ? timeAgo(e.ts) : '';
     return `
       <div class="${rowCls}">
-        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
-        <span class="lb-name">${dot}${e.name||'Anon'}${youBadge}${achBadge}</span>
+        <span class="lb-rank">${medals[i] || '#'+(i+1)}</span>
+        <span class="lb-name">${dot}${e.name || 'Anon'}${youBadge}${achBadge}</span>
         <span class="lb-score">${$$(e.score)}</span>
         <span class="lb-date">${ago}</span>
       </div>`;
@@ -2257,7 +3420,7 @@ async function renderLB() {
 
 function timeAgo(ts) {
   const s = Math.floor((Date.now()-ts)/1000);
-  if (s < 60)  return s + 's ago';
+  if (s < 60)   return s + 's ago';
   if (s < 3600) return Math.floor(s/60) + 'm ago';
   return Math.floor(s/3600) + 'h ago';
 }
@@ -2896,38 +4059,83 @@ function gameLoop() {
   tickPrices();
   refreshUI();
   checkAchs();
+
   // HODL achievement — reset timer if sold recently
   if (G.lastSellTime > 0 && Date.now()-G.lastSellTime < 1000) G.holdStart = Date.now();
+
+  // Refresh Intel tab if active (throttled — every 3rd tick)
+  if (G.tickCount % 3 === 0 &&
+      document.getElementById('tab-intel').classList.contains('active')) {
+    refreshIntelTab();
+  }
+  // Refresh skill points display in settings
+  if (G.tickCount % 5 === 0) {
+    const sp = document.getElementById('mkt-skillpts');
+    if (sp) sp.textContent = getAvailableSkillPts();
+  }
+
+  // ── Random event triggers (checked every tick, fire rarely) ──
+
+  // Emergency market day: ~0.05% per tick ≈ once per ~33 min at 1s tick
+  if (!G.emergencyDay && G.tickCount - (G.lastEmergencyTick||0) > 600
+      && Math.random() < 0.0005) {
+    triggerEmergencyDay();
+  }
+
+  // Company scandal: ~0.02% per tick ≈ once per ~80 min
+  if (Math.random() < 0.0002) triggerScandal();
+
+  // Hype wave: ~0.08% per tick ≈ once per ~20 min
+  if (Math.random() < 0.0008) triggerHypeWave();
+
+  // Multi-stage event: ~0.15% per tick ≈ once per ~10 min
+  if (ACTIVE_EVENTS.length < 2 && Math.random() < 0.0015) launchStagedEvent();
 }
 
 /* ─── INITIALIZATION ────────────────────────────── */
 async function init() {
-  // Player identity — must come first so name is ready
+  // Player identity first — name needed for welcome message
   initPlayer();
 
-  // Load saved game BEFORE building UI so prices/portfolio are restored
+  // Load saved game BEFORE building UI so prices/portfolio restore correctly
   const hasSave = loadGame();
 
   buildTable();
   buildAchs();
   applySavedUnlocks();
 
+  // Initialize new simulation state that might not exist in old saves
+  if (!G.holdTimers)  G.holdTimers  = {};
+  if (!G.skillPts)    G.skillPts    = 0;
+  if (!G.skillSpent)  G.skillSpent  = 0;
+  if (G.xp === undefined) G.xp = 0;
+  if (!G.skills) { G.skills = {}; SKILL_DEFS.forEach(s => { G.skills[s.id] = 0; }); }
+  // Sync SKILL_TREE from G.skills so old skill-tree code still works
+  Object.keys(SKILL_TREE).forEach(id => {
+    if (G.skills[id] !== undefined) SKILL_TREE[id].level = G.skills[id];
+  });
+
+  // Build skill tree UI inside settings
+  buildSkillModal();
+
   // Size canvas
   const canvas = document.getElementById('chart');
-  const resizeCanvas = () => { canvas.width = document.getElementById('tab-chart').clientWidth - 24; drawChart(); };
+  const resizeCanvas = () => {
+    canvas.width = document.getElementById('tab-chart').clientWidth - 24;
+    drawChart();
+  };
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // Welcome news
-  const feed = document.getElementById('news-list');
-  const w = document.createElement('div');
-  w.className = 'news-item neutral';
-  w.innerHTML = hasSave
-    ? `<div class="news-time">--:--:--</div><div class="news-text">💾 Welcome back, <strong>${PLAYER_NAME}</strong>! Cash: ${$$(G.cash)}</div>`
-    : `<div class="news-time">--:--:--</div><div class="news-text">🚀 Welcome, <strong>${PLAYER_NAME}</strong>! StockBlitz is live — 48 stocks trading now.</div>`;
-  feed.appendChild(w);
+  // Welcome news (limited feed = max 3 items)
+  addLimitedNewsItem(
+    hasSave
+      ? `💾 Welcome back, <strong>${PLAYER_NAME}</strong>! Restored: ${$$(G.cash)} cash.`
+      : `🚀 Welcome, <strong>${PLAYER_NAME}</strong>! StockBlitz v3 — 48 stocks, simulation engine online.`,
+    null, 'neutral', null
+  );
 
-  // Wire buttons
+  // Wire header buttons
   document.getElementById('btn-lb').onclick       = showLB;
   document.getElementById('btn-settings').onclick = showSettings;
   document.getElementById('btn-panic').onclick     = togglePanic;
@@ -2936,9 +4144,15 @@ async function init() {
   document.getElementById('btn-settings-close').onclick = hideSettings;
 
   // Close modals on backdrop click
-  document.getElementById('lb-modal-bg').onclick       = e => { if(e.target===document.getElementById('lb-modal-bg')) hideLB(); };
-  document.getElementById('settings-modal-bg').onclick = e => { if(e.target===document.getElementById('settings-modal-bg')) hideSettings(); };
-  document.getElementById('tutorial-bg').onclick       = e => { if(e.target===document.getElementById('tutorial-bg')) hideTutorial(); };
+  ['lb-modal-bg','settings-modal-bg','tutorial-bg'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      if (e.target.id === id) {
+        if (id === 'lb-modal-bg')       hideLB();
+        if (id === 'settings-modal-bg') hideSettings();
+        if (id === 'tutorial-bg')       hideTutorial();
+      }
+    });
+  });
 
   // Tab buttons
   document.querySelectorAll('.rp-tab').forEach(btn => {
@@ -2948,38 +4162,42 @@ async function init() {
   // Player name popup
   initPlayerBox();
 
-  // Settings
+  // Settings + restore saved config values into UI
   initSettings();
   applySavedSettings();
 
-  // Filters
+  // Sector filter buttons + search + sort headers
   initFilters();
 
-  // Tutorial
+  // Tutorial step wiring
   initTutorial();
 
+  // Initial UI render
   refreshUI();
   refreshPicks();
+  refreshIntelTab();
 
-  // Start game loop
+  // Start 1-second game loop
   G.loopTimer = setInterval(gameLoop, CFG.tickSpeed);
 
-  // Start news
-  setTimeout(()=>{ fireNews(); scheduleNews(); }, 8000+Math.random()*7000);
+  // Schedule first news event (8–15s delay so market has time to move first)
+  setTimeout(() => { fireNews(); scheduleNews(); }, 8000 + Math.random() * 7000);
 
-  // Push initial score to live leaderboard
+  // Push initial score to live global leaderboard
   pushLBScore();
 
-  // Show tutorial on first visit
+  // Show tutorial overlay on very first visit
   try {
-    if (!localStorage.getItem('stockblitz_tutdone')) setTimeout(showTutorial, 600);
+    if (!localStorage.getItem('stockblitz_tutdone')) setTimeout(showTutorial, 800);
   } catch(e) {}
 
-  console.log('%c📈 StockBlitz 2.0', 'color:#00e676;font-size:16px;font-weight:bold');
+  console.log('%c📈 StockBlitz v3', 'color:#00e676;font-size:16px;font-weight:bold;');
+  console.log('%cSystems: Fundamentals · Interconnections · Supply Chains · Sentiment · Trends · Staged Events · Scandals · Hype · Skill Tree · Synergy', 'color:#5a6a78');
   console.log('%cPlayer:', PLAYER_NAME, '| ID:', PLAYER_ID);
 }
 
 window.addEventListener('load', init);
+
 </script>
 </body>
 </html>
