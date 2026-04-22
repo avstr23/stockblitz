@@ -127,6 +127,9 @@ body {
   font-family: 'Impact', 'Arial Black', sans-serif;
   flex-shrink: 0;
   user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .stat-box {
@@ -186,20 +189,180 @@ body {
 /* ─── MAIN LAYOUT ───────────────────────────────────────── */
 #main {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  min-height: calc(100vh - 115px);
+  grid-template-columns: 1fr 6px 320px;
+  /* grid children in HTML order: left-panel | resize-handle | right-panel */
+  height: calc(100vh - 115px); /* fixed height so panels don't grow past viewport */
+  overflow: hidden;
 }
 
 /* ─── LEFT PANEL ────────────────────────────────────────── */
 #left-panel {
-  border-right: 1px solid var(--border);
+  border-right: none; /* handle acts as the border */
   padding: 10px 12px;
   overflow-x: auto;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0; /* allow grid cell to shrink */
 }
 
+/* ─── RESIZE HANDLE ─────────────────────────────────────── */
+#resize-handle {
+  background: var(--border);
+  cursor: col-resize;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#resize-handle:hover,
+#resize-handle.dragging {
+  background: rgba(var(--accent-rgb), 0.35);
+}
+#resize-handle::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 36px;
+  background: rgba(var(--accent-rgb), 0.6);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#resize-handle:hover::after,
+#resize-handle.dragging::after { opacity: 1; }
+
+/* ─── RIGHT PANEL ───────────────────────────────────────── */
+#right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ─── CHART ZOOM CONTROLS ────────────────────────────────── */
+#chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+.zoom-btn {
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 0.62em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.12s;
+}
+.zoom-btn:hover  { border-color: var(--accent); color: var(--accent); }
+.zoom-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb),0.1); }
+#chart-zoom-label {
+  font-size: 0.6em;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+/* ─── TRADE HISTORY TAB ──────────────────────────────────── */
+#tab-history { overflow: hidden; flex-direction: column; min-height: 0; }
+#history-header {
+  padding: 8px 12px 5px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+#history-filter {
+  display: flex;
+  gap: 3px;
+}
+.hist-filter-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 2px 7px;
+  font-family: var(--mono);
+  font-size: 0.6em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.12s;
+}
+.hist-filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb),0.08); }
+#history-list { overflow-y: auto; flex: 1; min-height: 0; padding: 4px 8px; }
+#history-stats {
+  padding: 6px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg2);
+}
+.hstat { text-align: center; }
+.hstat-label { font-size: 0.55em; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+.hstat-val   { font-size: 0.8em; font-weight: bold; margin-top: 1px; }
+.hist-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.025);
+  font-size: 0.68em;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-left: 2px solid transparent;
+}
+.hist-row:hover { background: rgba(255,255,255,0.025); }
+.hist-row.buy  { border-left-color: var(--green); }
+.hist-row.sell { border-left-color: var(--red); }
+.hist-action { width: 30px; font-weight: bold; font-size: 0.9em; }
+.hist-action.buy  { color: var(--green); }
+.hist-action.sell { color: var(--red); }
+.hist-sym  { font-weight: bold; color: var(--text-hi); width: 42px; }
+.hist-qty  { color: var(--text-dim); width: 28px; text-align: right; }
+.hist-at   { color: var(--text-dim); font-size: 0.85em; flex: 1; text-align: right; }
+.hist-total { font-weight: bold; color: var(--text-hi); width: 60px; text-align: right; }
+.hist-pnl  { width: 52px; text-align: right; font-weight: bold; font-size: 0.88em; }
+.hist-pnl.up   { color: var(--green); }
+.hist-pnl.down { color: var(--red); }
+.hist-time { color: var(--text-dim); font-size: 0.8em; white-space: nowrap; }
+.hist-empty { text-align: center; color: var(--text-dim); font-size: 0.75em; padding: 30px 0; }
+
+/* ─── NAME VALIDATION UI ─────────────────────────────────── */
+#name-status {
+  font-size: 0.65em;
+  margin-top: 3px;
+  min-height: 14px;
+  transition: color 0.2s;
+}
+#name-status.ok    { color: var(--green); }
+#name-status.err   { color: var(--red); }
+#name-status.check { color: var(--text-dim); }
+
+/* ─── SYNC STATUS INDICATOR ──────────────────────────────── */
+#sync-indicator {
+  font-size: 0.6em;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sync-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+}
+.sync-dot.syncing { animation: pulse-live 0.8s ease-in-out infinite; }
+.sync-dot.offline { background: var(--red); animation: none; }
+
+/* ─── LEFT PANEL ────────────────────────────────────────── */
 #panel-controls {
   display: flex;
   align-items: center;
@@ -359,12 +522,6 @@ td {
 .flash-r { animation: flash-r 0.55s ease-out; }
 
 /* ─── RIGHT PANEL ───────────────────────────────────────── */
-#right-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 /* Tab system */
 #rp-tabs {
   display: flex;
@@ -391,24 +548,32 @@ td {
 .rp-tab:hover { color: var(--text); }
 .rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-.tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.tab-content {
+  display: none;
+  flex: 1;          /* fill remaining height of right-panel */
+  min-height: 0;    /* critical: allows flex child to shrink below content size */
+  overflow: hidden;
+  flex-direction: column;
+}
 .tab-content.active { display: flex; }
 
 /* Chart tab */
 #tab-chart {
   padding: 10px 12px;
   flex-direction: column;
+  overflow: hidden;
 }
 #chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 #chart-sym  { font-size: 1em; font-weight: bold; }
 #chart-prc  { font-size: 0.92em; font-weight: bold; }
-#chart-meta { font-size: 0.6em; color: var(--text-dim); margin-bottom: 6px; }
-canvas#chart { display: block; width: 100%; border-radius: 3px; }
+#chart-meta { font-size: 0.6em; color: var(--text-dim); margin-bottom: 4px; }
+canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; }
 
 /* Portfolio tab */
 #tab-portfolio {
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 #port-summary {
   padding: 10px 12px 6px;
@@ -421,7 +586,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 .port-stat { background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; padding: 5px 8px; }
 .port-stat-label { font-size: 0.56em; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
 .port-stat-val { font-size: 0.85em; font-weight: bold; margin-top: 1px; }
-#port-list { overflow-y: auto; flex: 1; padding: 8px 12px; }
+#port-list { overflow-y: auto; flex: 1; min-height: 0; padding: 8px 12px; }
 .port-empty { text-align: center; color: var(--text-dim); font-size: 0.75em; padding: 30px 0; }
 .port-row {
   background: var(--bg3);
@@ -442,7 +607,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 .port-pnl.down { color: var(--red); }
 
 /* News tab */
-#tab-news { overflow-y: auto; padding: 8px 12px; }
+#tab-news { overflow-y: auto; padding: 8px 12px; min-height: 0; }
 .news-item {
   padding: 5px 0 5px 8px;
   border-bottom: 1px solid rgba(255,255,255,0.03);
@@ -456,7 +621,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 .news-text { color: var(--text); margin-top: 1px; line-height: 1.3; }
 
 /* Achievements tab */
-#tab-ach { overflow-y: auto; padding: 8px 12px; }
+#tab-ach { overflow-y: auto; padding: 8px 12px; min-height: 0; }
 .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .ach-item {
   background: var(--bg3);
@@ -696,7 +861,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 .btn-danger:hover { background: var(--red); color: #fff; box-shadow: var(--glow-r); }
 
 /* ─── PICKS TAB ──────────────────────────────────────────── */
-#tab-picks { overflow-y: auto; padding: 8px 12px; flex-direction: column; }
+#tab-picks { overflow-y: auto; padding: 8px 12px; flex-direction: column; min-height: 0; }
 .picks-header {
   padding: 8px 0 6px;
   font-size: 0.62em; text-transform: uppercase; letter-spacing: 1.5px;
@@ -861,7 +1026,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 }
 
 /* Intel tab */
-#tab-intel { overflow-y:auto; padding:6px 10px; flex-direction:column; }
+#tab-intel { overflow-y:auto; padding:6px 10px; flex-direction:column; min-height: 0; }
 .intel-sec { margin-bottom:10px; }
 .intel-sec-title {
   font-size:0.58em; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-dim);
@@ -1037,7 +1202,14 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 
   <!-- HEADER -->
   <div id="header">
-    <div id="logo">📈 STOCKBLITZ</div>
+    <div id="logo">
+      <!-- Drop your logo file (logo.png / logo.svg) next to this HTML file.
+           It will appear here automatically. If no file found, the text logo shows. -->
+      <img id="site-logo" src="logo.png" alt=""
+           onerror="this.style.display='none';document.getElementById('logo-text').style.display='inline'"
+           style="height:32px;width:auto;vertical-align:middle;margin-right:6px">
+      <span id="logo-text" style="display:none">📈 STOCKBLITZ</span>
+    </div>
     <div class="stat-box">
       <div class="stat-label">Cash</div>
       <div class="stat-value" id="s-cash">$1000.00</div>
@@ -1066,6 +1238,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
       <div id="player-name-edit">
         <label>Your trader name</label>
         <input id="player-name-input" type="text" maxlength="16" autocomplete="off" placeholder="Enter name…">
+        <div id="name-status" class="check"></div>
         <div class="pne-btns">
           <button id="pne-save">✓ Save</button>
           <button id="pne-regen" title="Random name">🎲</button>
@@ -1099,7 +1272,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
   <!-- MAIN GRID -->
   <div id="main">
 
-    <!-- LEFT: STOCK TABLE -->
+    <!-- LEFT: STOCK TABLE (column 1) -->
     <div id="left-panel">
       <div id="panel-controls">
         <div class="panel-title">📊 Live Market — <span id="stock-count">48</span> Stocks</div>
@@ -1144,12 +1317,16 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
       </table>
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- RESIZE HANDLE (column 2 — drag to resize) -->
+    <div id="resize-handle" title="Drag to resize panels"></div>
+
+    <!-- RIGHT PANEL (column 3) -->
     <div id="right-panel">
       <!-- Tabs -->
       <div id="rp-tabs">
         <button class="rp-tab active" data-tab="chart">⚡ Chart</button>
         <button class="rp-tab" data-tab="portfolio">💼 Portfolio</button>
+        <button class="rp-tab" data-tab="history">📋 History</button>
         <button class="rp-tab" data-tab="picks">🎯 Best Buys</button>
         <button class="rp-tab" data-tab="intel">🧠 Intel</button>
         <button class="rp-tab" data-tab="news">📰 News</button>
@@ -1158,12 +1335,29 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
 
       <!-- CHART TAB -->
       <div class="tab-content active" id="tab-chart">
-        <div class="panel-title" style="margin-bottom:6px">⚡ Price Chart (60s window)</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="panel-title">⚡ Price Chart</div>
+          <div id="sync-indicator">
+            <span class="sync-dot" id="sync-dot"></span>
+            <span id="sync-label">Syncing…</span>
+          </div>
+        </div>
         <div id="chart-header">
           <span id="chart-sym">TECH</span>
           <span id="chart-prc">$0.00</span>
         </div>
         <div id="chart-meta">Select a stock to view chart</div>
+        <!-- Zoom controls -->
+        <div id="chart-controls">
+          <span style="font-size:0.6em;color:var(--text-dim)">ZOOM:</span>
+          <button class="zoom-btn" data-zoom="20">20s</button>
+          <button class="zoom-btn active" data-zoom="60">60s</button>
+          <button class="zoom-btn" data-zoom="120">120s</button>
+          <button class="zoom-btn" data-zoom="240">240s</button>
+          <button class="zoom-btn" id="zoom-out-btn" title="Zoom out">−</button>
+          <button class="zoom-btn" id="zoom-in-btn"  title="Zoom in">+</button>
+          <span id="chart-zoom-label">showing 60 ticks</span>
+        </div>
         <canvas id="chart" height="120"></canvas>
       </div>
 
@@ -1188,6 +1382,35 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; }
           </div>
         </div>
         <div id="port-list"><div class="port-empty">No positions yet.<br>Buy some stocks to get started! 📈</div></div>
+      </div>
+
+      <!-- TRADE HISTORY TAB -->
+      <div class="tab-content" id="tab-history">
+        <div id="history-header">
+          <div class="panel-title">📋 Trade History</div>
+          <div id="history-filter">
+            <button class="hist-filter-btn active" data-hfilter="all">All</button>
+            <button class="hist-filter-btn" data-hfilter="buy">Buys</button>
+            <button class="hist-filter-btn" data-hfilter="sell">Sells</button>
+          </div>
+        </div>
+        <div id="history-list">
+          <div class="hist-empty">No trades yet.<br>Make your first trade to see history! 📈</div>
+        </div>
+        <div id="history-stats">
+          <div class="hstat">
+            <div class="hstat-label">Total Trades</div>
+            <div class="hstat-val" id="hs-total">0</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-label">Realized P&L</div>
+            <div class="hstat-val" id="hs-pnl">$0.00</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-label">Win Rate</div>
+            <div class="hstat-val" id="hs-winrate">—</div>
+          </div>
+        </div>
       </div>
 
       <!-- PICKS TAB -->
@@ -1528,6 +1751,8 @@ const G = {
   newsTimer:   null,
   loopTimer:   null,
   lbPollTimer: null,
+  tradeHistory: [],      // [{ts, action, sym, qty, price, total, pnl}]
+  chartZoom:   60,       // how many history ticks to show (30/60/120)
 };
 
 /* ─── ACCENT COLORS MAP ──────────────────────────── */
@@ -1540,80 +1765,85 @@ const ACCENT_MAP = {
   red:    { color:'#ff5252', rgb:'255,82,82' },
 };
 
-/* ─── 48 STOCK DEFINITIONS ──────────────────────── */
+/* ─── 48 STOCK DEFINITIONS ──────────────────────────────────
+   vol  = per-tick standard deviation (1 tick = 1 second).
+          Tuned so a stock moves ≈ ±5-15% over a 10-min session.
+   drift= 0 on ALL stocks. Positive drift causes exponential
+          runaway prices. News events create the upside excitement.
+   ──────────────────────────────────────────────────────────── */
 const STOCKS = {
   /* ── TECH (10) ── */
-  TECH:  { name:'TechNova Corp',          price:142.50, vol:0.025, drift:0.001,   color:'#29b6f6', sector:'Tech' },
-  SEMI:  { name:'Silicon Chip Co',        price: 98.40, vol:0.030, drift:0.0015,  color:'#4fc3f7', sector:'Tech' },
-  APPL:  { name:'AppleSeed Devices',      price:187.20, vol:0.018, drift:0.001,   color:'#81d4fa', sector:'Tech' },
-  GOOG:  { name:'Googleplex AI',          price:175.80, vol:0.020, drift:0.0008,  color:'#4dd0e1', sector:'Tech' },
-  META:  { name:'Metaverse Corp',         price: 52.60, vol:0.032, drift:0.001,   color:'#26c6da', sector:'Tech' },
-  MSFT:  { name:'MicroSoft Systems',      price:415.30, vol:0.015, drift:0.0008,  color:'#00bcd4', sector:'Tech' },
-  NFLX:  { name:'NetFlix Media',          price:632.40, vol:0.022, drift:0.0005,  color:'#f44336', sector:'Tech' },
-  SPOT:  { name:'Spotwave Music',         price: 78.90, vol:0.025, drift:0.0005,  color:'#1db954', sector:'Tech' },
-  UBER:  { name:'UberDrive Mobility',     price: 43.20, vol:0.028, drift:0.0003,  color:'#607d8b', sector:'Tech' },
-  AIRB:  { name:'AirBase Rentals',        price:128.60, vol:0.023, drift:0.0006,  color:'#ff5a5f', sector:'Tech' },
+  TECH:  { name:'TechNova Corp',       price:142.50, vol:0.012, drift:0, color:'#29b6f6', sector:'Tech' },
+  SEMI:  { name:'Silicon Chip Co',     price: 98.40, vol:0.014, drift:0, color:'#4fc3f7', sector:'Tech' },
+  APPL:  { name:'AppleSeed Devices',   price:187.20, vol:0.009, drift:0, color:'#81d4fa', sector:'Tech' },
+  GOOG:  { name:'Googleplex AI',       price:175.80, vol:0.010, drift:0, color:'#4dd0e1', sector:'Tech' },
+  META:  { name:'Metaverse Corp',      price: 52.60, vol:0.015, drift:0, color:'#26c6da', sector:'Tech' },
+  MSFT:  { name:'MicroSoft Systems',   price:415.30, vol:0.008, drift:0, color:'#00bcd4', sector:'Tech' },
+  NFLX:  { name:'NetFlix Media',       price:632.40, vol:0.011, drift:0, color:'#f44336', sector:'Tech' },
+  SPOT:  { name:'Spotwave Music',      price: 78.90, vol:0.012, drift:0, color:'#1db954', sector:'Tech' },
+  UBER:  { name:'UberDrive Mobility',  price: 43.20, vol:0.013, drift:0, color:'#607d8b', sector:'Tech' },
+  AIRB:  { name:'AirBase Rentals',     price:128.60, vol:0.011, drift:0, color:'#ff5a5f', sector:'Tech' },
 
   /* ── FINANCE (6) ── */
-  BANK:  { name:'FirstNation Bank',       price: 88.40, vol:0.012, drift:0.0003,  color:'#66bb6a', sector:'Finance' },
-  GOLD:  { name:'GoldStar Finance',       price:210.70, vol:0.015, drift:0.0004,  color:'#ffd600', sector:'Finance' },
-  INSUR: { name:'SafeNet Insurance',      price: 66.30, vol:0.010, drift:0.0002,  color:'#81c784', sector:'Finance' },
-  COIN:  { name:'CryptoCoin Exchange',    price: 24.80, vol:0.080, drift:0.002,   color:'#f7931a', sector:'Finance' },
-  PAYM:  { name:'PayMax Payments',        price:154.20, vol:0.018, drift:0.0007,  color:'#42a5f5', sector:'Finance' },
-  HEDG:  { name:'HedgeFund Alpha',        price:312.50, vol:0.020, drift:0.0005,  color:'#7e57c2', sector:'Finance' },
+  BANK:  { name:'FirstNation Bank',    price: 88.40, vol:0.007, drift:0, color:'#66bb6a', sector:'Finance' },
+  GOLD:  { name:'GoldStar Finance',    price:210.70, vol:0.008, drift:0, color:'#ffd600', sector:'Finance' },
+  INSUR: { name:'SafeNet Insurance',   price: 66.30, vol:0.006, drift:0, color:'#81c784', sector:'Finance' },
+  COIN:  { name:'CryptoCoin Exchange', price: 24.80, vol:0.035, drift:0, color:'#f7931a', sector:'Finance' },
+  PAYM:  { name:'PayMax Payments',     price:154.20, vol:0.009, drift:0, color:'#42a5f5', sector:'Finance' },
+  HEDG:  { name:'HedgeFund Alpha',     price:312.50, vol:0.010, drift:0, color:'#7e57c2', sector:'Finance' },
 
   /* ── ENERGY (5) ── */
-  ENERGY:{ name:'SolarBlast Energy',      price: 62.30, vol:0.016, drift:0.001,   color:'#80cbc4', sector:'Energy' },
-  OIL:   { name:'PetroMax Oil',           price: 94.60, vol:0.020, drift:0.0002,  color:'#8d6e63', sector:'Energy' },
-  NUKE:  { name:'NuclearPower Inc',       price: 48.20, vol:0.012, drift:0.0003,  color:'#26a69a', sector:'Energy' },
-  WIND:  { name:'WindFarm Global',        price: 38.70, vol:0.014, drift:0.0008,  color:'#80deea', sector:'Energy' },
-  GAS:   { name:'GasLine Corp',           price: 57.40, vol:0.016, drift:0.0001,  color:'#a5d6a7', sector:'Energy' },
+  ENERGY:{ name:'SolarBlast Energy',   price: 62.30, vol:0.008, drift:0, color:'#80cbc4', sector:'Energy' },
+  OIL:   { name:'PetroMax Oil',        price: 94.60, vol:0.010, drift:0, color:'#8d6e63', sector:'Energy' },
+  NUKE:  { name:'NuclearPower Inc',    price: 48.20, vol:0.007, drift:0, color:'#26a69a', sector:'Energy' },
+  WIND:  { name:'WindFarm Global',     price: 38.70, vol:0.008, drift:0, color:'#80deea', sector:'Energy' },
+  GAS:   { name:'GasLine Corp',        price: 57.40, vol:0.008, drift:0, color:'#a5d6a7', sector:'Energy' },
 
   /* ── HEALTH (5) ── */
-  PHARMA:{ name:'MediCure Labs',          price:108.75, vol:0.028, drift:0.0005,  color:'#ef9a9a', sector:'Health' },
-  GENE:  { name:'GenomeX Bio',            price: 34.60, vol:0.045, drift:0.001,   color:'#f48fb1', sector:'Health' },
-  HOSP:  { name:'HealthPlus Hospitals',   price: 72.80, vol:0.014, drift:0.0004,  color:'#f8bbd0', sector:'Health' },
-  VACC:  { name:'VaccTech Sciences',      price: 58.40, vol:0.035, drift:0.0008,  color:'#ec407a', sector:'Health' },
-  FIT:   { name:'FitLife Wellness',       price: 28.90, vol:0.022, drift:0.0006,  color:'#ff80ab', sector:'Health' },
+  PHARMA:{ name:'MediCure Labs',       price:108.75, vol:0.013, drift:0, color:'#ef9a9a', sector:'Health' },
+  GENE:  { name:'GenomeX Bio',         price: 34.60, vol:0.020, drift:0, color:'#f48fb1', sector:'Health' },
+  HOSP:  { name:'HealthPlus Hospitals',price: 72.80, vol:0.007, drift:0, color:'#f8bbd0', sector:'Health' },
+  VACC:  { name:'VaccTech Sciences',   price: 58.40, vol:0.016, drift:0, color:'#ec407a', sector:'Health' },
+  FIT:   { name:'FitLife Wellness',    price: 28.90, vol:0.011, drift:0, color:'#ff80ab', sector:'Health' },
 
   /* ── FOOD (5) ── */
-  FOOD:  { name:'NomNom Foods',           price: 48.20, vol:0.013, drift:0.0002,  color:'#ffb74d', sector:'Food' },
-  CAFE:  { name:'BeanBrew Cafes',         price: 92.40, vol:0.015, drift:0.0004,  color:'#ff8f00', sector:'Food' },
-  BEER:  { name:'BrewCraft Beverages',    price: 56.70, vol:0.012, drift:0.0003,  color:'#ffa726', sector:'Food' },
-  FARM:  { name:'AgriGrow Farms',         price: 31.50, vol:0.010, drift:0.0002,  color:'#8bc34a', sector:'Food' },
-  SODA:  { name:'FizzPop Beverages',      price: 44.80, vol:0.011, drift:0.0002,  color:'#ffcc02', sector:'Food' },
+  FOOD:  { name:'NomNom Foods',        price: 48.20, vol:0.007, drift:0, color:'#ffb74d', sector:'Food' },
+  CAFE:  { name:'BeanBrew Cafes',      price: 92.40, vol:0.008, drift:0, color:'#ff8f00', sector:'Food' },
+  BEER:  { name:'BrewCraft Beverages', price: 56.70, vol:0.007, drift:0, color:'#ffa726', sector:'Food' },
+  FARM:  { name:'AgriGrow Farms',      price: 31.50, vol:0.006, drift:0, color:'#8bc34a', sector:'Food' },
+  SODA:  { name:'FizzPop Beverages',   price: 44.80, vol:0.006, drift:0, color:'#ffcc02', sector:'Food' },
 
   /* ── AUTO (5) ── */
-  AUTO:  { name:'VeloRide Motors',        price: 78.90, vol:0.017, drift:0,       color:'#ce93d8', sector:'Auto' },
-  EV:    { name:'ElectroRide EV',         price: 22.40, vol:0.055, drift:0.002,   color:'#b39ddb', sector:'Auto' },
-  SHIP:  { name:'OceanFreight Lines',     price: 44.60, vol:0.013, drift:0.0002,  color:'#80cbc4', sector:'Auto' },
-  SAIR:  { name:'Schultz Airlines',       price: 18.30, vol:0.030, drift:0.0001,  color:'#90caf9', sector:'Auto' },
-  TRUK:  { name:'HeavyLoad Trucks',       price: 67.80, vol:0.016, drift:0.0003,  color:'#bcaaa4', sector:'Auto' },
+  AUTO:  { name:'VeloRide Motors',     price: 78.90, vol:0.009, drift:0, color:'#ce93d8', sector:'Auto' },
+  EV:    { name:'ElectroRide EV',      price: 22.40, vol:0.025, drift:0, color:'#b39ddb', sector:'Auto' },
+  SHIP:  { name:'OceanFreight Lines',  price: 44.60, vol:0.007, drift:0, color:'#80cbc4', sector:'Auto' },
+  SAIR:  { name:'Schultz Airlines',    price: 18.30, vol:0.014, drift:0, color:'#90caf9', sector:'Auto' },
+  TRUK:  { name:'HeavyLoad Trucks',    price: 67.80, vol:0.008, drift:0, color:'#bcaaa4', sector:'Auto' },
 
   /* ── ENTERTAINMENT (5) ── */
-  GAME:  { name:'GameStrike Studios',     price: 82.40, vol:0.032, drift:0.001,   color:'#ff7043', sector:'Entertainment' },
-  STRM:  { name:'StreamVault Media',      price: 48.60, vol:0.025, drift:0.0008,  color:'#7c4dff', sector:'Entertainment' },
-  FILM:  { name:'HollywoodPix',           price: 36.90, vol:0.020, drift:0.0003,  color:'#f06292', sector:'Entertainment' },
-  SPORT: { name:'SportMax League',        price:124.50, vol:0.018, drift:0.0005,  color:'#42a5f5', sector:'Entertainment' },
-  CASIN: { name:'LuckyDraw Casinos',      price: 68.20, vol:0.035, drift:0.0004,  color:'#ffb300', sector:'Entertainment' },
+  GAME:  { name:'GameStrike Studios',  price: 82.40, vol:0.015, drift:0, color:'#ff7043', sector:'Entertainment' },
+  STRM:  { name:'StreamVault Media',   price: 48.60, vol:0.012, drift:0, color:'#7c4dff', sector:'Entertainment' },
+  FILM:  { name:'HollywoodPix',        price: 36.90, vol:0.010, drift:0, color:'#f06292', sector:'Entertainment' },
+  SPORT: { name:'SportMax League',     price:124.50, vol:0.009, drift:0, color:'#42a5f5', sector:'Entertainment' },
+  CASIN: { name:'LuckyDraw Casinos',   price: 68.20, vol:0.016, drift:0, color:'#ffb300', sector:'Entertainment' },
 
-  /* ── MEME / VOLATILE (4) ── */
-  MEME:  { name:'MoonShot Inc',           price: 11.50, vol:0.065, drift:0.003,   color:'#f48fb1', sector:'Meme' },
-  GILD:  { name:'Gilad Inc',        price:  4.20, vol:0.090, drift:0.002,   color:'#ff6f00', sector:'Meme' },
-  DOGE:  { name:'DogeRocket Ltd',         price:  0.85, vol:0.110, drift:0.001,   color:'#c6a740', sector:'Meme' },
-  PUMP:  { name:'PumpMax Token',          price:  2.10, vol:0.120, drift:0.004,   color:'#ff4081', sector:'Meme' },
+  /* ── MEME / VOLATILE (4) ── note: still wild, just not insane ── */
+  MEME:  { name:'MoonShot Inc',        price: 11.50, vol:0.030, drift:0, color:'#f48fb1', sector:'Meme' },
+  GILD:  { name:'Gilad Inc',           price:  4.20, vol:0.040, drift:0, color:'#ff6f00', sector:'Meme' },
+  DOGE:  { name:'DogeRocket Ltd',      price:  0.85, vol:0.045, drift:0, color:'#c6a740', sector:'Meme' },
+  PUMP:  { name:'PumpMax Token',       price:  2.10, vol:0.050, drift:0, color:'#ff4081', sector:'Meme' },
 
   /* ── RETAIL (4) ── */
-  SHOP:  { name:'ShopMart Global',        price:186.40, vol:0.016, drift:0.0007,  color:'#ff6f00', sector:'Retail' },
-  LUXE:  { name:'LuxeGoods Fashion',      price:342.80, vol:0.018, drift:0.0005,  color:'#e91e63', sector:'Retail' },
-  LAPW:  { name:'Lappen Co',           price: 72.30, vol:0.015, drift:0.0004,  color:'#ff5722', sector:'Retail' },
-  MART:  { name:'DiscountMart Corp',      price: 58.60, vol:0.012, drift:0.0003,  color:'#ffb74d', sector:'Retail' },
+  SHOP:  { name:'ShopMart Global',     price:186.40, vol:0.008, drift:0, color:'#ff6f00', sector:'Retail' },
+  LUXE:  { name:'LuxeGoods Fashion',   price:342.80, vol:0.009, drift:0, color:'#e91e63', sector:'Retail' },
+  LAPW:  { name:'Lappen Co',           price: 72.30, vol:0.008, drift:0, color:'#ff5722', sector:'Retail' },
+  MART:  { name:'DiscountMart Corp',   price: 58.60, vol:0.007, drift:0, color:'#ffb74d', sector:'Retail' },
 
   /* ── FUTURE / SPACE (4) ── */
-  SPACE: { name:'OrbitX Space',           price: 28.60, vol:0.045, drift:0.002,   color:'#9c27b0', sector:'Future' },
-  ROBO:  { name:'RoboTech AI',            price: 54.30, vol:0.038, drift:0.0015,  color:'#673ab7', sector:'Future' },
-  QUAN:  { name:'QuantumCore Systems',    price:112.40, vol:0.040, drift:0.002,   color:'#ab47bc', sector:'Future' },
-  PRNT:  { name:'3D PrintPro Corp',       price: 19.80, vol:0.032, drift:0.001,   color:'#7b1fa2', sector:'Future' },
+  SPACE: { name:'OrbitX Space',        price: 28.60, vol:0.022, drift:0, color:'#9c27b0', sector:'Future' },
+  ROBO:  { name:'RoboTech AI',         price: 54.30, vol:0.018, drift:0, color:'#673ab7', sector:'Future' },
+  QUAN:  { name:'QuantumCore Systems', price:112.40, vol:0.019, drift:0, color:'#ab47bc', sector:'Future' },
+  PRNT:  { name:'3D PrintPro Corp',    price: 19.80, vol:0.016, drift:0, color:'#7b1fa2', sector:'Future' },
 };
 
 const SYM_LIST = Object.keys(STOCKS);
@@ -1771,7 +2001,7 @@ const STAGED_TEMPLATES = [
     phases:[
       { label:'Rumor',        txt:'🤫 Leaked docs hint at MediCure Phase 3 trial results incoming…',           sym:'PHARMA', imp:0.020, type:'positive' },
       { label:'Results',      txt:'📋 Phase 3 trial shows promising early data — analysts watching',           sym:'PHARMA', imp:0.055, type:'positive' },
-      { label:'FDA Verdict',  txt:'💊 BREAKTHROUGH: MediCure receives FDA fast-track approval!',              sym:'PHARMA', imp:0.120, type:'positive' },
+      { label:'FDA Verdict',  txt:'💊 BREAKTHROUGH: MediCure receives FDA fast-track approval!',              sym:'PHARMA', imp: 0.08, type:'positive' },
     ], phaseDelay:30000
   },
   {
@@ -1779,7 +2009,7 @@ const STAGED_TEMPLATES = [
     phases:[
       { label:'Rumor',        txt:'🤫 Unverified: SEC reportedly examining CryptoCoin trading activity…',     sym:'COIN',   imp:-0.03, type:'negative' },
       { label:'Confirmation', txt:'⚠️ SEC subpoenas CryptoCoin Exchange for trading records',                 sym:'COIN',   imp:-0.06, type:'negative' },
-      { label:'Reaction',     txt:'🚨 TRADING HALTED: CryptoCoin Exchange frozen by regulators!',             sym:'COIN',   imp:-0.18, type:'negative' },
+      { label:'Reaction',     txt:'🚨 TRADING HALTED: CryptoCoin Exchange frozen by regulators!',             sym:'COIN',   imp: -0.10, type:'negative' },
     ], phaseDelay:20000
   },
   {
@@ -1787,7 +2017,7 @@ const STAGED_TEMPLATES = [
     phases:[
       { label:'Rumor',        txt:'🤫 Leaked budget draft may include $5B EV incentive program…',             sym:'EV',     imp:0.030, type:'positive' },
       { label:'Announcement', txt:'📋 Government confirms EV subsidy bill advancing through congress',        sym:'EV',     imp:0.060, type:'positive' },
-      { label:'Signed',       txt:'🎉 SIGNED INTO LAW: $5B EV subsidy bill — ElectroRide surges!',           sym:'EV',     imp:0.130, type:'positive' },
+      { label:'Signed',       txt:'🎉 SIGNED INTO LAW: $5B EV subsidy bill — ElectroRide surges!',           sym:'EV',     imp: 0.08, type:'positive' },
     ], phaseDelay:28000
   },
   {
@@ -1795,7 +2025,7 @@ const STAGED_TEMPLATES = [
     phases:[
       { label:'Rumor',        txt:'🤫 Anonymous tip: possible accounting irregularities at FirstNation Bank…',sym:'BANK',   imp:-0.02, type:'negative' },
       { label:'Investigation',txt:'⚖️ Regulators open formal investigation into FirstNation Bank',            sym:'BANK',   imp:-0.05, type:'negative' },
-      { label:'Fallout',      txt:'🚨 FRAUD CONFIRMED: FirstNation Bank CFO arrested — stock in freefall!',  sym:'BANK',   imp:-0.14, type:'negative' },
+      { label:'Fallout',      txt:'🚨 FRAUD CONFIRMED: FirstNation Bank CFO arrested — stock in freefall!',  sym:'BANK',   imp: -0.10, type:'negative' },
     ], phaseDelay:22000
   },
   {
@@ -1803,23 +2033,23 @@ const STAGED_TEMPLATES = [
     phases:[
       { label:'Bid Confirmed',txt:'🤫 OrbitX Space shortlisted for classified $20B NASA moon contract',       sym:'SPACE',  imp:0.040, type:'positive' },
       { label:'Finalist',     txt:'📋 OrbitX Space selected as final two bidders — decision imminent',        sym:'SPACE',  imp:0.080, type:'positive' },
-      { label:'Win',          txt:'🌙 HISTORIC WIN: OrbitX Space awarded $20B NASA Artemis contract!',        sym:'SPACE',  imp:0.180, type:'positive' },
+      { label:'Win',          txt:'🌙 HISTORIC WIN: OrbitX Space awarded $20B NASA Artemis contract!',        sym:'SPACE',  imp: 0.08, type:'positive' },
     ], phaseDelay:26000
   },
 ];
 
 /* ─── COMPANY SCANDAL TEMPLATES ────────────────────────── */
 const SCANDAL_EVENTS = [
-  { sym:'TECH',   txt:'💀 SCANDAL: TechNova CEO arrested for insider trading — shares halted', imp:-0.18 },
-  { sym:'BANK',   txt:'💀 FRAUD ALERT: FirstNation Bank hides $3B in bad loans — panic selling', imp:-0.22 },
-  { sym:'PHARMA', txt:'💀 DATA BREACH: MediCure patient records exposed — massive lawsuits filed', imp:-0.15 },
-  { sym:'COIN',   txt:'💀 RUG PULL: CryptoCoin Exchange founder vanishes with funds', imp:-0.35 },
-  { sym:'MEME',   txt:'💀 CEO TWEETS MELTDOWN: MoonShot Inc leadership in total chaos', imp:-0.25 },
-  { sym:'AUTO',   txt:'💀 RECALL: VeloRide motors linked to 12 fatalities — federal probe opens', imp:-0.20 },
-  { sym:'APPL',   txt:'💀 LEAK: AppleSeed supplier exposed using child labor — boycott viral', imp:-0.12 },
-  { sym:'GOOG',   txt:'💀 ANTITRUST: Court orders Googleplex AI breakup — historic ruling', imp:-0.14 },
-  { sym:'EV',     txt:'💀 FIRE HAZARD: ElectroRide EV mass recall — 50,000 vehicles spontaneously ignite', imp:-0.28 },
-  { sym:'SPACE',  txt:'💀 DISASTER: OrbitX Space rocket explosion kills crew — stock obliterated', imp:-0.30 },
+  { sym:'TECH',   txt:'💀 SCANDAL: TechNova CEO arrested for insider trading — shares halted', imp: -0.10 },
+  { sym:'BANK',   txt:'💀 FRAUD ALERT: FirstNation Bank hides $3B in bad loans — panic selling', imp: -0.10 },
+  { sym:'PHARMA', txt:'💀 DATA BREACH: MediCure patient records exposed — massive lawsuits filed', imp: -0.10 },
+  { sym:'COIN',   txt:'💀 RUG PULL: CryptoCoin Exchange founder vanishes with funds', imp: -0.10 },
+  { sym:'MEME',   txt:'💀 CEO TWEETS MELTDOWN: MoonShot Inc leadership in total chaos', imp: -0.10 },
+  { sym:'AUTO',   txt:'💀 RECALL: VeloRide motors linked to 12 fatalities — federal probe opens', imp: -0.10 },
+  { sym:'APPL',   txt:'💀 LEAK: AppleSeed supplier exposed using child labor — boycott viral', imp: -0.10 },
+  { sym:'GOOG',   txt:'💀 ANTITRUST: Court orders Googleplex AI breakup — historic ruling', imp: -0.10 },
+  { sym:'EV',     txt:'💀 FIRE HAZARD: ElectroRide EV mass recall — 50,000 vehicles spontaneously ignite', imp: -0.10 },
+  { sym:'SPACE',  txt:'💀 DISASTER: OrbitX Space rocket explosion kills crew — stock obliterated', imp: -0.10 },
 ];
 
 /* ─── HYPE WAVE TEMPLATES ──────────────────────────────── */
@@ -1884,39 +2114,39 @@ function checkSpeedRun() {
 /* ─── NEWS POOL ─────────────────────────────────── */
 const NEWS = [
   /* TECH */
-  { txt:'TechNova unveils revolutionary AI chip 🤖',         sym:'TECH',  imp: 0.09, type:'positive' },
+  { txt:'TechNova unveils revolutionary AI chip 🤖',         sym:'TECH',  imp:  0.06, type:'positive' },
   { txt:'TechNova faces massive data breach lawsuit 🔓',     sym:'TECH',  imp:-0.07, type:'negative' },
   { txt:'TechNova posts record quarterly revenue 📈',         sym:'TECH',  imp: 0.06, type:'positive' },
   { txt:'DOJ opens antitrust probe into TechNova ⚖️',        sym:'TECH',  imp:-0.05, type:'negative' },
   /* SEMI */
-  { txt:'Silicon Chip Co lands $10B defense contract 🛡️',    sym:'SEMI',  imp: 0.12, type:'positive' },
+  { txt:'Silicon Chip Co lands $10B defense contract 🛡️',    sym:'SEMI',  imp:  0.06, type:'positive' },
   { txt:'Silicon Chip Co factory destroyed in earthquake 🌎',sym:'SEMI',  imp:-0.10, type:'negative' },
-  { txt:'Silicon Chip announces 2nm breakthrough 🔬',         sym:'SEMI',  imp: 0.08, type:'positive' },
+  { txt:'Silicon Chip announces 2nm breakthrough 🔬',         sym:'SEMI',  imp:  0.06, type:'positive' },
   /* APPL */
-  { txt:'AppleSeed unveils foldable smartwatch 📱',           sym:'APPL',  imp: 0.07, type:'positive' },
+  { txt:'AppleSeed unveils foldable smartwatch 📱',           sym:'APPL',  imp:  0.06, type:'positive' },
   { txt:'AppleSeed hit with $3B EU antitrust fine 💸',        sym:'APPL',  imp:-0.05, type:'negative' },
   { txt:'AppleSeed Vision Pro 2 sells out globally 🥽',       sym:'APPL',  imp: 0.06, type:'positive' },
   /* GOOG */
-  { txt:'Googleplex AI beats GPT-5 on every benchmark 🏆',   sym:'GOOG',  imp: 0.08, type:'positive' },
+  { txt:'Googleplex AI beats GPT-5 on every benchmark 🏆',   sym:'GOOG',  imp:  0.06, type:'positive' },
   { txt:'Googleplex loses landmark privacy lawsuit 👨‍⚖️',       sym:'GOOG',  imp:-0.06, type:'negative' },
-  { txt:'Googleplex launches Quantum Search Engine 🔍',       sym:'GOOG',  imp: 0.07, type:'positive' },
+  { txt:'Googleplex launches Quantum Search Engine 🔍',       sym:'GOOG',  imp:  0.06, type:'positive' },
   /* META */
-  { txt:'Metaverse Corp hits 2 billion VR users 🥽',          sym:'META',  imp: 0.10, type:'positive' },
+  { txt:'Metaverse Corp hits 2 billion VR users 🥽',          sym:'META',  imp:  0.06, type:'positive' },
   { txt:'Metaverse Corp teen safety scandal erupts 😱',       sym:'META',  imp:-0.09, type:'negative' },
   /* MSFT */
   { txt:'MicroSoft Systems launches AI OS for business 💼',   sym:'MSFT',  imp: 0.06, type:'positive' },
   { txt:'MicroSoft Systems major cloud outage — 6 hours 🌩️', sym:'MSFT',  imp:-0.04, type:'negative' },
   /* NFLX */
-  { txt:'NetFlix Media smashes subscriber record 🎬',         sym:'NFLX',  imp: 0.08, type:'positive' },
+  { txt:'NetFlix Media smashes subscriber record 🎬',         sym:'NFLX',  imp:  0.06, type:'positive' },
   { txt:'NetFlix Media loses top studio deal to rival 📺',    sym:'NFLX',  imp:-0.07, type:'negative' },
   /* SPOT */
-  { txt:'Spotwave Music signs Taylor Swifton exclusive 🎵',   sym:'SPOT',  imp: 0.09, type:'positive' },
+  { txt:'Spotwave Music signs Taylor Swifton exclusive 🎵',   sym:'SPOT',  imp:  0.06, type:'positive' },
   { txt:'Spotwave Music faces massive royalty lawsuit 🎸',    sym:'SPOT',  imp:-0.06, type:'negative' },
   /* UBER */
-  { txt:'UberDrive launches autonomous robot taxis 🤖',       sym:'UBER',  imp: 0.10, type:'positive' },
+  { txt:'UberDrive launches autonomous robot taxis 🤖',       sym:'UBER',  imp:  0.06, type:'positive' },
   { txt:'UberDrive banned in 12 major cities 🚫',             sym:'UBER',  imp:-0.08, type:'negative' },
   /* AIRB */
-  { txt:'AirBase Rentals hits $100B bookings milestone 🏡',   sym:'AIRB',  imp: 0.07, type:'positive' },
+  { txt:'AirBase Rentals hits $100B bookings milestone 🏡',   sym:'AIRB',  imp:  0.06, type:'positive' },
   { txt:'AirBase Rentals sued by 10,000 hosts over fees 😠',  sym:'AIRB',  imp:-0.05, type:'negative' },
   /* BANK */
   { txt:'FirstNation Bank raises dividend by 15% 💰',         sym:'BANK',  imp: 0.05, type:'positive' },
@@ -1926,136 +2156,136 @@ const NEWS = [
   { txt:'GoldStar Finance acquires rival for $8B 🏆',         sym:'GOLD',  imp: 0.06, type:'positive' },
   { txt:'GoldStar Finance under SEC investigation 🔎',        sym:'GOLD',  imp:-0.06, type:'negative' },
   /* COIN */
-  { txt:'CryptoCoin Exchange launches Bitcoin ETF 🪙',        sym:'COIN',  imp: 0.22, type:'positive' },
-  { txt:'CryptoCoin Exchange hacked — $2B stolen 😱',         sym:'COIN',  imp:-0.28, type:'negative' },
-  { txt:'CryptoCoin Exchange gets banking license 🏦',        sym:'COIN',  imp: 0.18, type:'positive' },
-  { txt:'Regulators freeze CryptoCoin Exchange assets 🔒',    sym:'COIN',  imp:-0.20, type:'negative' },
+  { txt:'CryptoCoin Exchange launches Bitcoin ETF 🪙',        sym:'COIN',  imp:  0.06, type:'positive' },
+  { txt:'CryptoCoin Exchange hacked — $2B stolen 😱',         sym:'COIN',  imp: -0.10, type:'negative' },
+  { txt:'CryptoCoin Exchange gets banking license 🏦',        sym:'COIN',  imp:  0.06, type:'positive' },
+  { txt:'Regulators freeze CryptoCoin Exchange assets 🔒',    sym:'COIN',  imp: -0.10, type:'negative' },
   /* PAYM */
-  { txt:'PayMax Payments partners with all major banks 💳',   sym:'PAYM',  imp: 0.07, type:'positive' },
+  { txt:'PayMax Payments partners with all major banks 💳',   sym:'PAYM',  imp:  0.06, type:'positive' },
   { txt:'PayMax Payments suffers 3-day system outage 🔴',     sym:'PAYM',  imp:-0.06, type:'negative' },
   /* HEDG */
-  { txt:'HedgeFund Alpha posts 40% annual return 📈',         sym:'HEDG',  imp: 0.08, type:'positive' },
+  { txt:'HedgeFund Alpha posts 40% annual return 📈',         sym:'HEDG',  imp:  0.06, type:'positive' },
   { txt:'HedgeFund Alpha loses $5B in single bad bet 😬',     sym:'HEDG',  imp:-0.09, type:'negative' },
   /* ENERGY */
-  { txt:'SolarBlast wins $8B government energy deal ☀️',      sym:'ENERGY',imp: 0.10, type:'positive' },
+  { txt:'SolarBlast wins $8B government energy deal ☀️',      sym:'ENERGY',imp:  0.06, type:'positive' },
   { txt:'SolarBlast\'s largest plant destroyed in storm 🌪️',  sym:'ENERGY',imp:-0.07, type:'negative' },
-  { txt:'SolarBlast breaks world solar efficiency record 🔬', sym:'ENERGY',imp: 0.07, type:'positive' },
+  { txt:'SolarBlast breaks world solar efficiency record 🔬', sym:'ENERGY',imp:  0.06, type:'positive' },
   /* OIL */
-  { txt:'PetroMax Oil strikes massive new field 🛢️',          sym:'OIL',   imp: 0.09, type:'positive' },
-  { txt:'PetroMax Oil tanker disaster — $4B cleanup bill 🌊', sym:'OIL',   imp:-0.11, type:'negative' },
+  { txt:'PetroMax Oil strikes massive new field 🛢️',          sym:'OIL',   imp:  0.06, type:'positive' },
+  { txt:'PetroMax Oil tanker disaster — $4B cleanup bill 🌊', sym:'OIL',   imp: -0.10, type:'negative' },
   { txt:'OPEC cuts boost PetroMax margins sharply 📊',        sym:'OIL',   imp: 0.06, type:'positive' },
   /* NUKE */
-  { txt:'NuclearPower Inc gets 20-year government contract ⚛️',sym:'NUKE', imp: 0.10, type:'positive' },
+  { txt:'NuclearPower Inc gets 20-year government contract ⚛️',sym:'NUKE', imp:  0.06, type:'positive' },
   { txt:'NuclearPower Inc reactor safety scare 🚨',           sym:'NUKE',  imp:-0.09, type:'negative' },
   /* WIND */
-  { txt:'WindFarm Global wins offshore mega contract 🌬️',     sym:'WIND',  imp: 0.08, type:'positive' },
+  { txt:'WindFarm Global wins offshore mega contract 🌬️',     sym:'WIND',  imp:  0.06, type:'positive' },
   { txt:'WindFarm Global blades fail in storm 🌪️',            sym:'WIND',  imp:-0.06, type:'negative' },
   /* GAS */
-  { txt:'GasLine Corp pipeline approved through 8 states 🔧', sym:'GAS',   imp: 0.07, type:'positive' },
+  { txt:'GasLine Corp pipeline approved through 8 states 🔧', sym:'GAS',   imp:  0.06, type:'positive' },
   { txt:'GasLine Corp pipeline explodes — lawsuits filed 💥', sym:'GAS',   imp:-0.10, type:'negative' },
   /* PHARMA */
-  { txt:'MediCure Labs announces cancer cure breakthrough 💊', sym:'PHARMA',imp: 0.16, type:'positive' },
-  { txt:'MediCure drug fails Phase 3 clinical trial 💉',      sym:'PHARMA',imp:-0.11, type:'negative' },
-  { txt:'FDA fast-tracks MediCure\'s new treatment 🏥',       sym:'PHARMA',imp: 0.09, type:'positive' },
+  { txt:'MediCure Labs announces cancer cure breakthrough 💊', sym:'PHARMA',imp:  0.06, type:'positive' },
+  { txt:'MediCure drug fails Phase 3 clinical trial 💉',      sym:'PHARMA',imp: -0.10, type:'negative' },
+  { txt:'FDA fast-tracks MediCure\'s new treatment 🏥',       sym:'PHARMA',imp:  0.06, type:'positive' },
   /* GENE */
-  { txt:'GenomeX Bio patents revolutionary gene therapy 🧬',  sym:'GENE',  imp: 0.20, type:'positive' },
-  { txt:'GenomeX Bio trial results disappoint analysts 😞',   sym:'GENE',  imp:-0.14, type:'negative' },
-  { txt:'GenomeX Bio licensed by 50 hospitals globally 🌐',   sym:'GENE',  imp: 0.12, type:'positive' },
+  { txt:'GenomeX Bio patents revolutionary gene therapy 🧬',  sym:'GENE',  imp:  0.06, type:'positive' },
+  { txt:'GenomeX Bio trial results disappoint analysts 😞',   sym:'GENE',  imp: -0.10, type:'negative' },
+  { txt:'GenomeX Bio licensed by 50 hospitals globally 🌐',   sym:'GENE',  imp:  0.06, type:'positive' },
   /* HOSP */
-  { txt:'HealthPlus Hospitals opens 100th location 🏥',       sym:'HOSP',  imp: 0.07, type:'positive' },
+  { txt:'HealthPlus Hospitals opens 100th location 🏥',       sym:'HOSP',  imp:  0.06, type:'positive' },
   { txt:'HealthPlus Hospitals sued over billing fraud 💸',    sym:'HOSP',  imp:-0.08, type:'negative' },
   /* VACC */
-  { txt:'VaccTech Sciences develops flu vaccine for all strains 💉',sym:'VACC',imp:0.14, type:'positive' },
-  { txt:'VaccTech Sciences recall after adverse reactions 🚨',sym:'VACC',  imp:-0.15, type:'negative' },
+  { txt:'VaccTech Sciences develops flu vaccine for all strains 💉',sym:'VACC',imp: 0.08, type:'positive' },
+  { txt:'VaccTech Sciences recall after adverse reactions 🚨',sym:'VACC',  imp: -0.10, type:'negative' },
   /* FIT */
-  { txt:'FitLife Wellness partners with Apple Health ⌚',     sym:'FIT',   imp: 0.09, type:'positive' },
+  { txt:'FitLife Wellness partners with Apple Health ⌚',     sym:'FIT',   imp:  0.06, type:'positive' },
   { txt:'FitLife Wellness fitness trackers recalled 📵',      sym:'FIT',   imp:-0.07, type:'negative' },
   /* FOOD */
   { txt:'NomNom Foods wins World\'s Best Burger 🍔',          sym:'FOOD',  imp: 0.06, type:'positive' },
   { txt:'NomNom Foods issues nationwide recall 🤢',           sym:'FOOD',  imp:-0.09, type:'negative' },
-  { txt:'NomNom Foods expands into 30 new countries 🌍',      sym:'FOOD',  imp: 0.07, type:'positive' },
+  { txt:'NomNom Foods expands into 30 new countries 🌍',      sym:'FOOD',  imp:  0.06, type:'positive' },
   /* CAFE */
   { txt:'BeanBrew Cafes opens 500th store — global expansion ☕',sym:'CAFE',imp:0.08, type:'positive' },
   { txt:'BeanBrew Cafes hit by barista union strike 🪧',      sym:'CAFE',  imp:-0.05, type:'negative' },
   /* BEER */
-  { txt:'BrewCraft Beverages lands deal with 10,000 pubs 🍺', sym:'BEER',  imp: 0.07, type:'positive' },
+  { txt:'BrewCraft Beverages lands deal with 10,000 pubs 🍺', sym:'BEER',  imp:  0.06, type:'positive' },
   { txt:'BrewCraft Beverages product contamination scare 🚨', sym:'BEER',  imp:-0.08, type:'negative' },
   /* FARM */
-  { txt:'AgriGrow Farms unveils AI-powered crop yields 🌾',   sym:'FARM',  imp: 0.08, type:'positive' },
+  { txt:'AgriGrow Farms unveils AI-powered crop yields 🌾',   sym:'FARM',  imp:  0.06, type:'positive' },
   { txt:'AgriGrow Farms hit by drought — crop failure 🏜️',   sym:'FARM',  imp:-0.09, type:'negative' },
   /* SODA */
-  { txt:'FizzPop Beverages launches zero-sugar global line 🥤',sym:'SODA', imp: 0.07, type:'positive' },
+  { txt:'FizzPop Beverages launches zero-sugar global line 🥤',sym:'SODA', imp:  0.06, type:'positive' },
   { txt:'FizzPop Beverages banned in 3 countries 🚫',         sym:'SODA',  imp:-0.06, type:'negative' },
   /* AUTO */
-  { txt:'VeloRide Motors unveils flying electric car ✈️',     sym:'AUTO',  imp: 0.07, type:'positive' },
+  { txt:'VeloRide Motors unveils flying electric car ✈️',     sym:'AUTO',  imp:  0.06, type:'positive' },
   { txt:'VeloRide Motors recalls 500,000 vehicles 🔧',        sym:'AUTO',  imp:-0.08, type:'negative' },
   { txt:'VeloRide Motors workers launch nationwide strike 🪧',sym:'AUTO',  imp:-0.05, type:'negative' },
   /* EV */
-  { txt:'ElectroRide EV outsells gas cars for first time! ⚡',sym:'EV',    imp: 0.18, type:'positive' },
-  { txt:'ElectroRide EV batteries explode — mass recall 🔥',  sym:'EV',    imp:-0.16, type:'negative' },
-  { txt:'ElectroRide EV government grants $5B subsidy 💵',    sym:'EV',    imp: 0.14, type:'positive' },
+  { txt:'ElectroRide EV outsells gas cars for first time! ⚡',sym:'EV',    imp:  0.06, type:'positive' },
+  { txt:'ElectroRide EV batteries explode — mass recall 🔥',  sym:'EV',    imp: -0.10, type:'negative' },
+  { txt:'ElectroRide EV government grants $5B subsidy 💵',    sym:'EV',    imp:  0.06, type:'positive' },
   /* SHIP */
-  { txt:'OceanFreight Lines wins 5-year Amazon contract 📦',  sym:'SHIP',  imp: 0.08, type:'positive' },
+  { txt:'OceanFreight Lines wins 5-year Amazon contract 📦',  sym:'SHIP',  imp:  0.06, type:'positive' },
   { txt:'OceanFreight Lines blockade halts global trade 🚢',  sym:'SHIP',  imp:-0.07, type:'negative' },
   /* AERO */
-  { txt:'SkyHigh Airlines announces supersonic fleet 🛫',     sym:'AERO',  imp: 0.10, type:'positive' },
-  { txt:'SkyHigh Airlines two crashes — fleet grounded 🚨',   sym:'AERO',  imp:-0.20, type:'negative' },
+  { txt:'SkyHigh Airlines announces supersonic fleet 🛫',     sym:'AERO',  imp:  0.06, type:'positive' },
+  { txt:'SkyHigh Airlines two crashes — fleet grounded 🚨',   sym:'AERO',  imp: -0.10, type:'negative' },
   /* TRUK */
-  { txt:'HeavyLoad Trucks lands record $2B fleet order 🚛',   sym:'TRUK',  imp: 0.07, type:'positive' },
+  { txt:'HeavyLoad Trucks lands record $2B fleet order 🚛',   sym:'TRUK',  imp:  0.06, type:'positive' },
   { txt:'HeavyLoad Trucks hit by component shortage 📦',      sym:'TRUK',  imp:-0.06, type:'negative' },
   /* GAME */
-  { txt:'GameStrike Studios releases biggest-ever game 🎮',   sym:'GAME',  imp: 0.12, type:'positive' },
+  { txt:'GameStrike Studios releases biggest-ever game 🎮',   sym:'GAME',  imp:  0.06, type:'positive' },
   { txt:'GameStrike Studios plagiarism lawsuit hits hard 😤', sym:'GAME',  imp:-0.08, type:'negative' },
   /* STRM */
-  { txt:'StreamVault Media surges past 400M subscribers 📡',  sym:'STRM',  imp: 0.09, type:'positive' },
+  { txt:'StreamVault Media surges past 400M subscribers 📡',  sym:'STRM',  imp:  0.06, type:'positive' },
   { txt:'StreamVault Media content licensing deal collapses', sym:'STRM',  imp:-0.07, type:'negative' },
   /* FILM */
-  { txt:'HollywoodPix blockbuster earns $2B in first week 🎬',sym:'FILM',  imp: 0.11, type:'positive' },
+  { txt:'HollywoodPix blockbuster earns $2B in first week 🎬',sym:'FILM',  imp:  0.06, type:'positive' },
   { txt:'HollywoodPix box office flop loses $500M 💸',        sym:'FILM',  imp:-0.09, type:'negative' },
   /* SPORT */
-  { txt:'SportMax League signs $10B broadcast deal 📺',       sym:'SPORT', imp: 0.09, type:'positive' },
+  { txt:'SportMax League signs $10B broadcast deal 📺',       sym:'SPORT', imp:  0.06, type:'positive' },
   { txt:'SportMax League doping scandal rocks league 😡',     sym:'SPORT', imp:-0.07, type:'negative' },
   /* CASIN */
-  { txt:'LuckyDraw Casinos opens mega-resort in Macau 🎰',   sym:'CASIN', imp: 0.10, type:'positive' },
-  { txt:'LuckyDraw Casinos gaming license revoked 🃏',        sym:'CASIN', imp:-0.12, type:'negative' },
+  { txt:'LuckyDraw Casinos opens mega-resort in Macau 🎰',   sym:'CASIN', imp:  0.06, type:'positive' },
+  { txt:'LuckyDraw Casinos gaming license revoked 🃏',        sym:'CASIN', imp: -0.10, type:'negative' },
   /* MEME */
-  { txt:'MoonShot Inc goes viral — Twitter melts down 🐦',    sym:'MEME',  imp: 0.22, type:'positive' },
-  { txt:'MoonShot CEO tweets "see you on Mars" 💀',           sym:'MEME',  imp:-0.18, type:'negative' },
-  { txt:'Celebrity megastar invests in MoonShot Inc 🌟',      sym:'MEME',  imp: 0.16, type:'positive' },
-  { txt:'SEC opens fraud investigation on MoonShot 👮',       sym:'MEME',  imp:-0.13, type:'negative' },
+  { txt:'MoonShot Inc goes viral — Twitter melts down 🐦',    sym:'MEME',  imp:  0.06, type:'positive' },
+  { txt:'MoonShot CEO tweets "see you on Mars" 💀',           sym:'MEME',  imp: -0.10, type:'negative' },
+  { txt:'Celebrity megastar invests in MoonShot Inc 🌟',      sym:'MEME',  imp:  0.06, type:'positive' },
+  { txt:'SEC opens fraud investigation on MoonShot 👮',       sym:'MEME',  imp: -0.10, type:'negative' },
   /* APE */
-  { txt:'Ape Capital Inc goes viral on Reddit 🦍',            sym:'APE',   imp: 0.30, type:'positive' },
-  { txt:'Ape Capital Inc loses all treasury funds 💀',        sym:'APE',   imp:-0.25, type:'negative' },
+  { txt:'Ape Capital Inc goes viral on Reddit 🦍',            sym:'APE',   imp:  0.06, type:'positive' },
+  { txt:'Ape Capital Inc loses all treasury funds 💀',        sym:'APE',   imp: -0.10, type:'negative' },
   /* DOGE */
-  { txt:'DogeRocket goes parabolic — moon mission! 🚀',       sym:'DOGE',  imp: 0.40, type:'positive' },
-  { txt:'DogeRocket Ltd founder arrested for fraud 👮',       sym:'DOGE',  imp:-0.35, type:'negative' },
+  { txt:'DogeRocket goes parabolic — moon mission! 🚀',       sym:'DOGE',  imp:  0.06, type:'positive' },
+  { txt:'DogeRocket Ltd founder arrested for fraud 👮',       sym:'DOGE',  imp: -0.10, type:'negative' },
   /* PUMP */
-  { txt:'PumpMax Token trending #1 on X worldwide 🔥',        sym:'PUMP',  imp: 0.45, type:'positive' },
-  { txt:'PumpMax Token rug pull — devs vanish 😱',            sym:'PUMP',  imp:-0.40, type:'negative' },
+  { txt:'PumpMax Token trending #1 on X worldwide 🔥',        sym:'PUMP',  imp:  0.06, type:'positive' },
+  { txt:'PumpMax Token rug pull — devs vanish 😱',            sym:'PUMP',  imp: -0.10, type:'negative' },
   /* SHOP */
-  { txt:'ShopMart Global opens 1,000th store 🛒',             sym:'SHOP',  imp: 0.07, type:'positive' },
+  { txt:'ShopMart Global opens 1,000th store 🛒',             sym:'SHOP',  imp:  0.06, type:'positive' },
   { txt:'ShopMart Global faces worker strike in 50 stores 🪧',sym:'SHOP',  imp:-0.05, type:'negative' },
   /* LUXE */
-  { txt:'LuxeGoods Fashion named LVMH rival of the year 👑',  sym:'LUXE',  imp: 0.08, type:'positive' },
+  { txt:'LuxeGoods Fashion named LVMH rival of the year 👑',  sym:'LUXE',  imp:  0.06, type:'positive' },
   { txt:'LuxeGoods Fashion counterfeiting scandal 😬',        sym:'LUXE',  imp:-0.07, type:'negative' },
   /* WEAR */
-  { txt:'SportWear Co becomes kit sponsor for World Cup ⚽',  sym:'WEAR',  imp: 0.09, type:'positive' },
+  { txt:'SportWear Co becomes kit sponsor for World Cup ⚽',  sym:'WEAR',  imp:  0.06, type:'positive' },
   { txt:'SportWear Co sweatshop scandal goes viral 🚨',       sym:'WEAR',  imp:-0.10, type:'negative' },
   /* MART */
   { txt:'DiscountMart Corp posts record holiday sales 🎁',    sym:'MART',  imp: 0.06, type:'positive' },
   { txt:'DiscountMart Corp major supply chain failure 📦',    sym:'MART',  imp:-0.06, type:'negative' },
   /* SPACE */
-  { txt:'OrbitX Space launches first space hotel 🌌',         sym:'SPACE', imp: 0.18, type:'positive' },
-  { txt:'OrbitX Space rocket explodes during launch 💥',      sym:'SPACE', imp:-0.14, type:'negative' },
-  { txt:'OrbitX Space wins $15B NASA moon contract 🌙',       sym:'SPACE', imp: 0.16, type:'positive' },
+  { txt:'OrbitX Space launches first space hotel 🌌',         sym:'SPACE', imp:  0.06, type:'positive' },
+  { txt:'OrbitX Space rocket explodes during launch 💥',      sym:'SPACE', imp: -0.10, type:'negative' },
+  { txt:'OrbitX Space wins $15B NASA moon contract 🌙',       sym:'SPACE', imp:  0.06, type:'positive' },
   /* ROBO */
-  { txt:'RoboTech AI robots now handle 20% of US jobs 🤖',    sym:'ROBO',  imp: 0.12, type:'positive' },
+  { txt:'RoboTech AI robots now handle 20% of US jobs 🤖',    sym:'ROBO',  imp:  0.06, type:'positive' },
   { txt:'RoboTech AI data centers hacked — critical breach 🔓',sym:'ROBO', imp:-0.10, type:'negative' },
   /* QUAN */
-  { txt:'QuantumCore cracks 1000-qubit barrier 🌀',           sym:'QUAN',  imp: 0.20, type:'positive' },
-  { txt:'QuantumCore Systems loses DARPA contract 📉',        sym:'QUAN',  imp:-0.12, type:'negative' },
+  { txt:'QuantumCore cracks 1000-qubit barrier 🌀',           sym:'QUAN',  imp:  0.06, type:'positive' },
+  { txt:'QuantumCore Systems loses DARPA contract 📉',        sym:'QUAN',  imp: -0.10, type:'negative' },
   /* PRNT */
-  { txt:'3D PrintPro Corp prints first human organ 🫀',       sym:'PRNT',  imp: 0.15, type:'positive' },
+  { txt:'3D PrintPro Corp prints first human organ 🫀',       sym:'PRNT',  imp:  0.06, type:'positive' },
   { txt:'3D PrintPro Corp patent invalidated in court ⚖️',    sym:'PRNT',  imp:-0.09, type:'negative' },
   /* MACRO */
   { txt:'FLASH CRASH: Global recession fears spike 📉',        sym:null,    imp:-0.07, type:'negative' },
@@ -2064,7 +2294,7 @@ const NEWS = [
   { txt:'Trade deal signed — global markets rally 🤝',         sym:null,    imp: 0.04, type:'positive' },
   { txt:'SUPER BULL RUN: All sectors surge today 🟢',          sym:null,    imp: 0.06, type:'positive' },
   { txt:'BLACK MONDAY: Panic selling grips all markets 🔴',    sym:null,    imp:-0.06, type:'negative' },
-  { txt:'AI revolution declared — tech stocks moon 🌕',       sym:null,    imp: 0.08, type:'positive' },
+  { txt:'AI revolution declared — tech stocks moon 🌕',       sym:null,    imp:  0.06, type:'positive' },
   { txt:'Energy crisis deepens — markets rattle 🛢️',         sym:null,    imp:-0.03, type:'negative' },
 ];
 
@@ -2124,32 +2354,39 @@ function applyPrice(s, newPrice) {
 }
 
 function tickPrices() {
-  G.tickCount++;
+  // Derive tick from shared market clock so all clients stay in lockstep
+  if (marketStartMs) {
+    G.tickCount = getMarketTick();
+  } else {
+    G.tickCount++;
+  }
 
   // ── Step 1: Evolve hidden fundamentals ──
   tickFundamentals();
 
-  // ── Step 2: Compute base change per stock ──
+  // ── Step 2: Compute base change per stock using SEEDED PRNG ──
+  //    Same tick + symIdx → same random numbers on every client = identical prices
   const changes = {};
+  let   symIdx  = 0;
   for (const [sym, s] of Object.entries(STOCKS)) {
     s.prev = s.price;
+    const si = symIdx++;   // deterministic sym index for seeding
 
-    // Base random (Box-Muller stays intact)
-    let chg = randNormal() * s.vol + s.drift;
+    // Base random: seeded Box-Muller — identical across all clients at this tick
+    let chg = seededNormal(G.tickCount, si, 0) * s.vol + s.drift;
 
-    // Emergency day: amplify volatility
+    // Emergency day: amplify volatility (also seeded)
     if (G.emergencyDay) {
       chg *= (1.5 + G.emergencyIntensity);
-      chg += randNormal() * 0.04 * G.emergencyIntensity;
+      chg += seededNormal(G.tickCount, si, 2) * 0.04 * G.emergencyIntensity;
     }
 
-    // Hype wave: strong upward pressure
+    // Hype wave: strong upward pressure (seeded for determinism)
     if (s.hypeActive) {
-      chg += 0.012 + Math.random() * 0.018;
+      chg += 0.012 + mulberry32(mkSeed(G.tickCount, si, 4)) * 0.018;
     }
 
     // Fundamentals influence (demand vs supply vs production)
-    // Kept deliberately small — major driver should stay random noise, not drift
     const demandPressure  = (s.demand  - s.supply) * 0.15;
     const productionBoost = (s.production - 0.5)   * 0.04;
     chg += (demandPressure + productionBoost) * 0.001;
@@ -2159,7 +2396,7 @@ function tickPrices() {
 
     // Market memory: recently crashed stocks are more volatile
     if (s.crashMemory > 0.1) {
-      chg += randNormal() * s.crashMemory * 0.025;
+      chg += seededNormal(G.tickCount, si, 6) * s.crashMemory * 0.025;
     }
 
     // Timing skill bonus: positions held 30s+ get tiny return boost
@@ -2170,8 +2407,9 @@ function tickPrices() {
       }
     }
 
-    // Random spike/crash (2% chance — preserved from original)
-    if (Math.random() < 0.02) chg += (Math.random() - 0.42) * 0.14;
+    // Random spike/crash (1% chance — small nudge, not a crater)
+    if (mulberry32(mkSeed(G.tickCount, si, 8)) < 0.01)
+      chg += (mulberry32(mkSeed(G.tickCount, si, 9)) - 0.5) * 0.04;
 
     changes[sym] = chg;
   }
@@ -2182,53 +2420,62 @@ function tickPrices() {
   // ── Step 4: Supply chain propagation ──
   applySupplyChain(changes);
 
-  // ── Step 5: Commit prices & update histories ──
+  // ── Step 5: Commit prices with strong mean reversion ──────
+  // Mean reversion keeps prices within a realistic band around startP.
+  // It kicks in gently from 1.15× and gets progressively stronger.
+  // There is NO positive drift — only news events should move prices up.
   for (const [sym, s] of Object.entries(STOCKS)) {
     let finalChg = changes[sym] || 0;
 
-    // ── MEAN REVERSION: gentle force pulling price back toward startP ──
-    // The further a stock drifts from its starting price, the stronger the pull.
-    // This prevents prices from compounding into billions over long sessions.
+    // ── MEAN REVERSION ───────────────────────────────────────
     const ratio = s.price / s.startP;
-    if (ratio > 2.5) {
-      // Above 2.5x start: increasingly strong reversion (~0.3% per unit above 2.5x)
-      finalChg -= (ratio - 2.5) * 0.003;
-    } else if (ratio < 0.15) {
-      // Below 15% of start: floor reversion so stocks don't die completely
-      finalChg += (0.15 - ratio) * 0.04;
+
+    if (ratio > 1.15) {
+      // Above +15%: apply a restoring force proportional to how far above
+      // Force increases steeply so prices stay in a ±30% band most of the time
+      const excess = ratio - 1.0;
+      finalChg -= excess * 0.012;            // gentle at 1.15x, strong at 1.5x
+    } else if (ratio < 0.85) {
+      // Below -15%: symmetric floor reversion
+      const deficit = 1.0 - ratio;
+      finalChg += deficit * 0.012;
     }
 
-    // ── SOFT CAP: absolute ceiling at 20x starting price ──
-    // If already at cap, force a downward correction this tick.
-    const CAP_MULT = 20;
-    if (s.price > s.startP * CAP_MULT) {
-      finalChg = -0.02 - Math.random() * 0.03; // forced pullback
+    // ── HARD BOUNDS ──────────────────────────────────────────
+    // Absolute ceiling: 2× startP (price doubles at most)
+    if (s.price > s.startP * 2.0) {
+      finalChg = Math.min(finalChg, -0.01 - Math.random() * 0.01);
     }
+    // Absolute floor: 20% of startP
+    if (s.price < s.startP * 0.20) {
+      finalChg = Math.max(finalChg,  0.01 + Math.random() * 0.01);
+    }
+
+    // Clamp any single-tick move to ±8% max (was ±14%)
+    finalChg = Math.max(-0.08, Math.min(0.08, finalChg));
 
     // Commit
     s.price = Math.max(0.01, s.price * (1 + finalChg));
 
-    // Hard floor: never drop below 0.5% of starting price
-    s.price = Math.max(s.startP * 0.005, s.price);
+    // Apply hard bounds
+    s.price = Math.max(s.startP * 0.20, Math.min(s.startP * 2.0, s.price));
 
     s.history.push(s.price);
-    if (s.history.length > 60) s.history.shift();
+    if (s.history.length > 240) s.history.shift();
 
-    // Market memory: track significant crashes
-    if (finalChg < -0.045) {
-      s.crashMemory = Math.min(1, s.crashMemory + 0.6);
+    // Market memory: track crashes
+    if (finalChg < -0.03) {
+      s.crashMemory = Math.min(1, s.crashMemory + 0.4);
     }
-    // Memory decays toward 0 (faster for strong companies)
-    s.crashMemory *= (0.99 - s.recoveryRate * 0.005);
+    s.crashMemory *= 0.98;
 
     // Hype wave decay after 30 ticks
     if (s.hypeActive && G.tickCount > s.hypeTick + 30) {
       s.hypeActive = false;
-      const hypeRow = document.getElementById('mkt-hype-row');
-      if (hypeRow) hypeRow.style.display = 'none';
+      const hr = document.getElementById('mkt-hype-row');
+      if (hr) hr.style.display = 'none';
     }
 
-    // Volume history (track magnitude of moves for unusual detection)
     s.volHistory.push(Math.abs(finalChg));
     if (s.volHistory.length > 20) s.volHistory.shift();
   }
@@ -2256,12 +2503,12 @@ function tickPrices() {
 
 /* ─── FUNDAMENTALS TICK ─────────────────────────────────── */
 function tickFundamentals() {
-  for (const s of Object.values(STOCKS)) {
-    // Slowly drift with mean reversion (realistic market cycles)
-    s.production += (0.7 - s.production) * 0.008 + randNormal() * 0.018;
-    s.demand     += (0.6 - s.demand)     * 0.008 + randNormal() * 0.015;
-    s.supply     += (0.5 - s.supply)     * 0.006 + randNormal() * 0.012;
-
+  let fi = 0; // fund call counter for seeding
+  for (const [sym, s] of Object.entries(STOCKS)) {
+    const si = SYM_LIST.indexOf(sym);
+    s.production += (0.7 - s.production) * 0.008 + seededNormal(G.tickCount, si, 20 + fi++) * 0.018;
+    s.demand     += (0.6 - s.demand)     * 0.008 + seededNormal(G.tickCount, si, 20 + fi++) * 0.015;
+    s.supply     += (0.5 - s.supply)     * 0.006 + seededNormal(G.tickCount, si, 20 + fi++) * 0.012;
     s.production = Math.max(0.05, Math.min(1.0, s.production));
     s.demand     = Math.max(0.05, Math.min(1.0, s.demand));
     s.supply     = Math.max(0.05, Math.min(1.0, s.supply));
@@ -2463,7 +2710,7 @@ function advanceEventPhase(event) {
     s.prev    = s.price;
     applyPrice(s, s.price * (1 + phase.imp));
     s.history.push(s.price);
-    if (s.history.length > 60) s.history.shift();
+    if (s.history.length > 240) s.history.shift();
     // Apply sentiment shock
     s.sentiment += phase.imp > 0 ? 0.4 : -0.4;
   }
@@ -2544,7 +2791,7 @@ function triggerScandal() {
   s.prev   = s.price;
   applyPrice(s, s.price * (1 + ev.imp));
   s.history.push(s.price);
-  if (s.history.length > 60) s.history.shift();
+  if (s.history.length > 240) s.history.shift();
   s.sentiment += ev.imp * 3; // huge sentiment hit
   s.crashMemory = Math.min(1, s.crashMemory + 0.8);
 
@@ -2729,6 +2976,8 @@ function buy(sym) {
   }
 
   snd.buy();
+  // Record in trade history
+  recordTrade('buy', sym, qty, s.price, null);
   refreshUI();
   checkAchs();
   saveGame();
@@ -2785,6 +3034,9 @@ function sell(sym) {
   }
 
   snd.sell();
+  // Record in trade history with realized P&L
+  const realizedPnl = gainPerShare * qty + (bonus > 0 ? gainPerShare * qty * bonus : 0);
+  recordTrade('sell', sym, qty, s.price, realizedPnl);
   refreshUI();
   checkAchs();
   saveGame();
@@ -2942,7 +3194,9 @@ function drawChart() {
   const canvas = document.getElementById('chart');
   const ctx    = canvas.getContext('2d');
   const s      = STOCKS[G.selectedSym];
-  const hist   = s.history;
+  // Slice to the zoom window — take last N ticks
+  const zoomN  = G.chartZoom || 60;
+  const hist   = s.history.slice(-zoomN);
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
 
@@ -3091,6 +3345,7 @@ function switchTab(name) {
   if (name==='portfolio') refreshPortfolio();
   if (name==='picks')     refreshPicks();
   if (name==='intel')     refreshIntelTab();
+  if (name==='history')   refreshHistory();
 }
 
 /* ─── MASTER REFRESH ────────────────────────────── */
@@ -3124,7 +3379,7 @@ function fireNews() {
     s.prev    = s.price;
     applyPrice(s, s.price * (1 + ev.imp));
     s.history.push(s.price);
-    if (s.history.length > 60) s.history.shift();
+    if (s.history.length > 240) s.history.shift();
     // Sentiment impact from news
     s.sentiment += ev.imp * 2.5;
     s.sentiment  = Math.max(-1, Math.min(1, s.sentiment));
@@ -3134,7 +3389,7 @@ function fireNews() {
       const v = 1 + (Math.random()-0.5)*0.6;
       applyPrice(s, s.price * (1 + ev.imp * v));
       s.history.push(s.price);
-      if (s.history.length > 60) s.history.shift();
+      if (s.history.length > 240) s.history.shift();
       s.sentiment += ev.imp * 1.2;
       s.sentiment  = Math.max(-1, Math.min(1, s.sentiment));
     }
@@ -3148,8 +3403,13 @@ function fireNews() {
   ti.textContent = '⚡ ' + ev.txt;
   document.getElementById('ticker-inner').prepend(ti);
 
-  // Limited news feed (max 3 items)
+  // Push to Firebase so all clients see this news event
+  pushNewsEvent(ev, ev.txt);
+
+  // Also apply locally right away (don't wait for poll)
   addLimitedNewsItem(ev.txt, ev.sym, ev.type, null);
+  // Mark as seen so we don't re-apply when we poll
+  lastNewsReadTs = Date.now();
 
   refreshUI(); checkAchs();
 }
@@ -3199,23 +3459,90 @@ function unlockAch(a) {
   snd.ach();
 }
 
-/* ─── GLOBAL LEADERBOARD — Firebase Realtime Database ────────
-   HOW TO SET UP YOUR PUBLIC LEADERBOARD:
-   1. Go to https://console.firebase.google.com
-   2. Create a new project (free Spark plan is fine)
-   3. Click "Build" → "Realtime Database" → "Create database"
-   4. In Rules tab, paste:
-        { "rules": { ".read": true, ".write": true } }
-   5. Copy your database URL (looks like https://YOUR-PROJECT-default-rtdb.firebaseio.com)
-   6. Paste it as FIREBASE_URL below (replace the placeholder)
-   That's it — all players on your GitHub Pages site share one leaderboard.
-   ─────────────────────────────────────────────────────────── */
-const FIREBASE_URL = 'https://stockblitz-cb418-default-rtdb.firebaseio.com/';
-const LB_FB_PATH   = '/stockblitz_lb.json';   // data lives at this REST path
+/* ════════════════════════════════════════════════════════════
+   🔥 FIREBASE SETUP — Complete Step-by-Step Guide
+   ════════════════════════════════════════════════════════════
 
-// Returns true if Firebase is actually configured (not the placeholder)
+   StockBlitz uses Firebase Realtime Database for THREE things:
+     1. Shared market clock  → all players get identical prices
+     2. Live news events     → news fires globally for everyone
+     3. Leaderboard          → everyone's scores in one place
+
+   ALL of this uses Firebase's free Spark plan. No billing needed.
+
+   ── STEP 1: Create a Firebase Project ──────────────────────
+   a) Go to: https://console.firebase.google.com
+   b) Click "Add Project"
+   c) Name it anything, e.g. "stockblitz-game"
+   d) Click Continue → disable Google Analytics (optional) → Create Project
+   e) Wait ~30 seconds for it to be created
+
+   ── STEP 2: Create the Realtime Database ───────────────────
+   a) In the left sidebar: Build → Realtime Database
+   b) Click "Create Database"
+   c) Choose any region (United States is fine)
+   d) Click Next → select "Start in TEST mode" → Enable
+      (Test mode allows reads and writes without authentication — perfect for a game)
+
+   ── STEP 3: Copy Your Database URL ─────────────────────────
+   a) At the top of the Database page you'll see a URL like:
+        https://stockblitz-game-default-rtdb.firebaseio.com
+   b) Copy the ENTIRE URL including https:// and .com
+
+   ── STEP 4: Paste Your URL Below ───────────────────────────
+   Find the line:  const FIREBASE_URL = 'https://YOUR-PROJECT...'
+   Replace it with your real URL, for example:
+        const FIREBASE_URL = 'https://stockblitz-game-default-rtdb.firebaseio.com';
+
+   ── STEP 5: Set Database Rules ─────────────────────────────
+   a) In the Firebase console, click the "Rules" tab (inside Realtime Database)
+   b) Delete everything there and paste this exactly:
+        {
+          "rules": {
+            ".read": true,
+            ".write": true
+          }
+        }
+   c) Click "Publish"
+   ⚠️  These rules let anyone read/write — fine for a public game.
+       For a more locked-down version you can restrict by path later.
+
+   ── STEP 6: Deploy to GitHub Pages ─────────────────────────
+   a) Put your stockblitz HTML file in a GitHub repo
+   b) Go to repo Settings → Pages
+   c) Under "Source" select: Deploy from a branch
+   d) Branch: main  Folder: / (root)  → Save
+   e) Your game will be live at: https://YOURNAME.github.io/REPONAME/
+
+   ── STEP 7: Add Your Logo ───────────────────────────────────
+   a) Name your logo file exactly: logo.png  (or logo.svg)
+   b) Put it in the SAME folder as your HTML file on GitHub
+   c) Commit and push — the logo appears automatically in the header
+   d) If the file is missing, the text "📈 STOCKBLITZ" shows instead
+
+   ── HOW THE SYNC WORKS ──────────────────────────────────────
+   • Firebase stores ONE value: the market "start time" (a timestamp)
+   • All clients read this and compute:
+       currentTick = floor((Date.now() - startTime) / 1000)
+   • All price calculations use a seeded random number generator
+     keyed to (tick + stockIndex) — same inputs = same outputs
+   • Result: EVERYONE sees IDENTICAL prices with NO host needed
+   • News events are pushed to Firebase so they fire globally
+
+   ── TROUBLESHOOTING ─────────────────────────────────────────
+   • "Local Mode" in sync dot → Firebase URL not set correctly
+   • Prices differ between players → check the Rules are published
+   • CORS errors in console → make sure you copied the full URL
+   • Leaderboard empty → Firebase not configured (local-only mode)
+   ════════════════════════════════════════════════════════════ */
+
+// ⬇️  PASTE YOUR FIREBASE URL HERE (replace the placeholder)
+const FIREBASE_URL = 'https://YOUR-PROJECT-default-rtdb.firebaseio.com';
+const LB_FB_PATH   = '/stockblitz_lb.json';
+
+/** Returns true only when FIREBASE_URL has been properly configured */
 function fbConfigured() {
-  return FIREBASE_URL && !FIREBASE_URL.includes('YOUR-PROJECT');
+  return !!(FIREBASE_URL && !FIREBASE_URL.includes('YOUR-PROJECT'));
 }
 
 /* ─── PLAYER IDENTITY ────────────────────────────── */
@@ -3254,14 +3581,29 @@ function initPlayer() {
   updateNameDisplay();
 }
 
-function setPlayerName(name) {
-  name = (name || '').trim().slice(0,16);
-  if (!name) return;
+/** Async: validate name (format + profanity + uniqueness), then save */
+async function setPlayerName(name) {
+  name = (name || '').trim();
+
+  // Step 1: format + profanity check (instant)
+  const fmt = isValidNameFormat(name);
+  if (!fmt.ok) { setNameStatus(fmt.msg, 'err'); return false; }
+
+  setNameStatus('Checking availability…', 'check');
+
+  // Step 2: uniqueness check via Firebase (async)
+  const taken = await isNameTaken(name, PLAYER_ID);
+  if (taken) { setNameStatus('❌ Name already taken — try another', 'err'); return false; }
+
+  // All good — commit
   PLAYER_NAME = name;
   try { localStorage.setItem(PLAYER_NAME_KEY, PLAYER_NAME); } catch(e) {}
   updateNameDisplay();
   pushLBScore();
-  flash(`✅ Name set to: ${PLAYER_NAME}`, 'var(--accent)');
+  setNameStatus('✓ Name saved!', 'ok');
+  setTimeout(() => setNameStatus('', 'check'), 2500);
+  flash(`✅ Trader name: ${PLAYER_NAME}`, 'var(--accent)');
+  return true;
 }
 
 function updateNameDisplay() {
@@ -3279,23 +3621,31 @@ function initPlayerBox() {
   box.addEventListener('click', e => {
     e.stopPropagation();
     popup.classList.toggle('open');
-    if (popup.classList.contains('open')) inp.focus();
+    if (popup.classList.contains('open')) { inp.focus(); setNameStatus('', 'check'); }
   });
-
   document.addEventListener('click', () => popup.classList.remove('open'));
   popup.addEventListener('click', e => e.stopPropagation());
 
-  document.getElementById('pne-save').onclick = () => {
-    setPlayerName(inp.value);
-    popup.classList.remove('open');
+  // Live format validation as user types (no network call yet)
+  inp.addEventListener('input', () => {
+    const v = inp.value.trim();
+    if (!v) { setNameStatus('', 'check'); return; }
+    const fmt = isValidNameFormat(v);
+    setNameStatus(fmt.ok ? '✓ Looks good' : fmt.msg, fmt.ok ? 'ok' : 'err');
+  });
+
+  document.getElementById('pne-save').onclick = async () => {
+    const ok = await setPlayerName(inp.value);
+    if (ok) popup.classList.remove('open');
   };
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { setPlayerName(inp.value); popup.classList.remove('open'); }
+  inp.addEventListener('keydown', async e => {
+    if (e.key === 'Enter')  { const ok = await setPlayerName(inp.value); if (ok) popup.classList.remove('open'); }
     if (e.key === 'Escape') popup.classList.remove('open');
   });
   document.getElementById('pne-regen').onclick = e => {
     e.stopPropagation();
     inp.value = generateName();
+    setNameStatus('✓ Looks good', 'ok');
     inp.focus();
   };
 }
@@ -3651,7 +4001,8 @@ function saveGame() {
       newsCount:   G.newsCount,
       unlocked:    [...G.unlocked],
       sessionStart:G.sessionStart,
-      stockPrices: Object.fromEntries(SYM_LIST.map(s=>[s, STOCKS[s].price])),
+      stockPrices:  Object.fromEntries(SYM_LIST.map(s=>[s, STOCKS[s].price])),
+      tradeHistory: G.tradeHistory.slice(0, 500),
       cfg: {
         soundOn:    CFG.soundOn,
         volume:     CFG.volume,
@@ -3683,6 +4034,7 @@ function loadGame() {
     G.startVal     = data.startVal     ?? 1000;
     G.biggestTrade = data.biggestTrade ?? 0;
     G.newsCount    = data.newsCount    ?? 0;
+    G.tradeHistory = data.tradeHistory ?? [];
     G.unlocked     = new Set(data.unlocked ?? []);
     G.sessionStart = data.sessionStart ?? Date.now();
 
@@ -4054,9 +4406,377 @@ function initTutorial() {
   document.getElementById('tut-btn-skip').onclick = hideTutorial;
 }
 
+/* ══════════════════════════════════════════════════════════
+   GLOBAL PRICE SYNC — Deterministic Seeded Simulation
+   No host needed. All clients independently compute identical
+   prices by using a seeded PRNG keyed to the shared market tick.
+══════════════════════════════════════════════════════════ */
+
+/* ─── SEEDED PRNG (mulberry32) ────────────────────────── */
+function mulberry32(seed) {
+  seed |= 0;
+  seed = (seed + 0x6D2B79F5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function mkSeed(tick, symIdx, n) {
+  let h = 2166136261;
+  h = (Math.imul(h ^ (tick & 0xFFFF),   16777619)) >>> 0;
+  h = (Math.imul(h ^ (symIdx & 0xFF),   16777619)) >>> 0;
+  h = (Math.imul(h ^ (n & 0xFF),        16777619)) >>> 0;
+  return h;
+}
+function seededNormal(tick, symIdx, n) {
+  const u1 = mulberry32(mkSeed(tick, symIdx, n))     || 1e-10;
+  const u2 = mulberry32(mkSeed(tick, symIdx, n + 1)) || 1e-10;
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+/* ─── MARKET CLOCK ────────────────────────────────────── */
+let marketStartMs = null;
+function getMarketTick() {
+  if (!marketStartMs) return G.tickCount;
+  return Math.floor((Date.now() - marketStartMs) / 1000);
+}
+
+const MARKET_START_PATH = '/stockblitz_v5_market/startMs.json';
+
+async function loadOrCreateMarketStart() {
+  if (!fbConfigured()) {
+    marketStartMs = G.sessionStart;
+    updateSyncDot('offline');
+    return;
+  }
+  updateSyncDot('syncing');
+  try {
+    const res  = await fetch(FIREBASE_URL + MARKET_START_PATH, { cache: 'no-store' });
+    const data = res.ok ? await res.json() : null;
+    if (data && typeof data === 'number' && data > 1_000_000_000_000) {
+      marketStartMs = data;
+      updateSyncDot('online');
+    } else {
+      const now = Date.now();
+      await fetch(FIREBASE_URL + MARKET_START_PATH, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(now)
+      });
+      marketStartMs = now;
+      updateSyncDot('online');
+    }
+    G.tickCount = getMarketTick();
+  } catch(e) {
+    console.warn('Market start load failed, using local clock:', e.message);
+    marketStartMs = G.sessionStart;
+    updateSyncDot('offline');
+  }
+}
+
+function updateSyncDot(state) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot || !lbl) return;
+  const map = {
+    online:  { bg: 'var(--green)', txt: 'Global Sync \u2713' },
+    syncing: { bg: 'var(--blue)',  txt: 'Connecting\u2026' },
+    offline: { bg: 'var(--red)',   txt: 'Local Mode' },
+  };
+  const s = map[state] || map.offline;
+  dot.style.background = s.bg;
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : '');
+  lbl.textContent = s.txt;
+}
+
+/* ─── NEWS SYNC via Firebase ──────────────────────────── */
+const NEWS_FEED_PATH = '/stockblitz_v5_market/news.json';
+let   lastNewsReadTs = 0;
+
+async function pushNewsEvent(ev, txt) {
+  if (!fbConfigured()) return;
+  try {
+    const key = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    await fetch(`${FIREBASE_URL}/stockblitz_v5_market/news/${key}.json`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ ts: Date.now(), sym: ev.sym||null, imp: ev.imp, type: ev.type, txt })
+    });
+  } catch(e) {}
+}
+
+async function pollNewsEvents() {
+  if (!fbConfigured()) return;
+  try {
+    const res = await fetch(FIREBASE_URL + NEWS_FEED_PATH, { cache: 'no-store' });
+    if (!res.ok) return;
+    const all = await res.json();
+    if (!all) return;
+    const newEvts = Object.values(all)
+      .filter(e => e && e.ts > lastNewsReadTs && e.ts > Date.now() - 60000);
+    if (!newEvts.length) return;
+    newEvts.sort((a,b) => a.ts - b.ts);
+    for (const ev of newEvts) applyNewsEvent(ev);
+    lastNewsReadTs = Math.max(...newEvts.map(e => e.ts));
+  } catch(e) {}
+}
+
+function applyNewsEvent(ev) {
+  if (ev.sym && STOCKS[ev.sym]) {
+    const s = STOCKS[ev.sym];
+    s.prev = s.price;
+    applyPrice(s, s.price * (1 + ev.imp));
+    s.history.push(s.price);
+    if (s.history.length > 240) s.history.shift();
+    if (s.sentiment !== undefined)
+      s.sentiment = Math.max(-1, Math.min(1, s.sentiment + ev.imp * 2.5));
+  } else {
+    for (const s of Object.values(STOCKS)) {
+      s.prev = s.price;
+      const v = 1 + (mulberry32(mkSeed(ev.ts & 0xFFFF, 0, 99)) - 0.5) * 0.6;
+      applyPrice(s, s.price * (1 + ev.imp * v));
+      s.history.push(s.price);
+      if (s.history.length > 240) s.history.shift();
+      s.sentiment = Math.max(-1, Math.min(1, (s.sentiment||0) + ev.imp * 1.2));
+    }
+  }
+  ev.type === 'positive' ? snd.good() : snd.bad();
+  const ti = document.createElement('span');
+  ti.className = 'ti ' + (ev.type==='positive' ? 'ti-up' : 'ti-down');
+  ti.textContent = '\u26a1 ' + ev.txt;
+  document.getElementById('ticker-inner').prepend(ti);
+  addLimitedNewsItem(ev.txt, ev.sym, ev.type, null);
+  refreshUI(); checkAchs();
+}
+
+/* ─── ZOOM SYSTEM ────────────────────────────────────────── */
+const ZOOM_LEVELS = [10, 20, 30, 60, 120, 240];
+let   G_zoomIdx   = ZOOM_LEVELS.indexOf(60); // default 60
+
+function setZoom(ticks) {
+  G.chartZoom = Math.max(10, Math.min(240, ticks));
+  // Find closest zoom level index for +/- buttons
+  G_zoomIdx = ZOOM_LEVELS.reduce((best, v, i) =>
+    Math.abs(v - G.chartZoom) < Math.abs(ZOOM_LEVELS[best] - G.chartZoom) ? i : best, 0);
+  // Update button active states
+  document.querySelectorAll('.zoom-btn[data-zoom]').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.zoom) === G.chartZoom);
+  });
+  const lbl = document.getElementById('chart-zoom-label');
+  if (lbl) lbl.textContent = `${G.chartZoom}s window`;
+  drawChart();
+}
+
+function initZoomControls() {
+  document.querySelectorAll('.zoom-btn[data-zoom]').forEach(b => {
+    b.addEventListener('click', () => setZoom(parseInt(b.dataset.zoom)));
+  });
+  document.getElementById('zoom-out-btn').addEventListener('click', () => {
+    G_zoomIdx = Math.min(ZOOM_LEVELS.length - 1, G_zoomIdx + 1);
+    setZoom(ZOOM_LEVELS[G_zoomIdx]);
+  });
+  document.getElementById('zoom-in-btn').addEventListener('click', () => {
+    G_zoomIdx = Math.max(0, G_zoomIdx - 1);
+    setZoom(ZOOM_LEVELS[G_zoomIdx]);
+  });
+  setZoom(60); // initial
+}
+
+/* ─── RESIZABLE PANELS ───────────────────────────────────── */
+function initResizeHandle() {
+  const handle = document.getElementById('resize-handle');
+  const main   = document.getElementById('main');
+  let dragging = false;
+  let startX   = 0;
+  let startLeft = 0;
+
+  function getLeftWidth() {
+    const cols = getComputedStyle(main).gridTemplateColumns.split(' ').map(parseFloat);
+    return cols[0]; // first column = left panel
+  }
+
+  handle.addEventListener('mousedown', e => {
+    dragging  = true;
+    startX    = e.clientX;
+    startLeft = getLeftWidth();
+    handle.classList.add('dragging');
+    document.body.style.cursor    = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx       = e.clientX - startX;
+    const totalW   = main.clientWidth;
+    const minLeft  = 360;
+    const minRight = 200;
+    let newLeft    = Math.max(minLeft, Math.min(totalW - minRight - 6, startLeft + dx));
+    let newRight   = totalW - newLeft - 6;
+    main.style.gridTemplateColumns = `${newLeft}px 6px ${newRight}px`;
+    // Resize the chart canvas
+    const canvas = document.getElementById('chart');
+    const chartTab = document.getElementById('tab-chart');
+    if (canvas && chartTab) {
+      canvas.width = chartTab.clientWidth - 24;
+      drawChart();
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor    = '';
+    document.body.style.userSelect = '';
+  });
+
+  // Touch support
+  handle.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    handle.dispatchEvent(new MouseEvent('mousedown', { clientX: touch.clientX }));
+  }, { passive: true });
+}
+
+/* ─── TRADE HISTORY ──────────────────────────────────────── */
+let G_histFilter = 'all'; // 'all' | 'buy' | 'sell'
+
+function recordTrade(action, sym, qty, price, pnl) {
+  G.tradeHistory.unshift({
+    ts:     Date.now(),
+    action, sym, qty, price,
+    total:  price * qty,
+    pnl:    action === 'sell' ? (pnl || 0) : null
+  });
+  // Cap at 500 entries
+  if (G.tradeHistory.length > 500) G.tradeHistory.length = 500;
+}
+
+function refreshHistory() {
+  const list    = document.getElementById('history-list');
+  if (!list) return;
+  const entries = G_histFilter === 'all'
+    ? G.tradeHistory
+    : G.tradeHistory.filter(e => e.action === G_histFilter);
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="hist-empty">${G_histFilter === 'all' ? 'No trades yet.<br>Make your first trade to see history! 📈' : `No ${G_histFilter}s recorded yet.`}</div>`;
+  } else {
+    list.innerHTML = entries.slice(0, 200).map(e => {
+      const time     = new Date(e.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const s        = STOCKS[e.sym];
+      const symColor = s ? s.color : 'var(--text-hi)';
+      const pnlHtml  = e.pnl != null
+        ? `<span class="hist-pnl ${e.pnl >= 0 ? 'up' : 'down'}">${e.pnl >= 0 ? '+' : ''}${$$(e.pnl)}</span>`
+        : '<span class="hist-pnl" style="color:var(--text-dim)">—</span>';
+      return `
+        <div class="hist-row ${e.action}" onclick="selectSym('${e.sym}');switchTab('chart')">
+          <span class="hist-action ${e.action}">${e.action === 'buy' ? 'BUY' : 'SELL'}</span>
+          <span class="hist-sym" style="color:${symColor}">${e.sym}</span>
+          <span class="hist-qty">${e.qty}×</span>
+          <span class="hist-at">@ ${$$(e.price)}</span>
+          <span class="hist-total">${$$(e.total)}</span>
+          ${pnlHtml}
+          <span class="hist-time">${time}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // Update stats bar
+  const sells     = G.tradeHistory.filter(e => e.action === 'sell' && e.pnl != null);
+  const totalPnl  = sells.reduce((a,e) => a + e.pnl, 0);
+  const wins      = sells.filter(e => e.pnl > 0).length;
+  const winRate   = sells.length > 0 ? Math.round((wins / sells.length) * 100) + '%' : '—';
+
+  const totEl = document.getElementById('hs-total');
+  const pnlEl = document.getElementById('hs-pnl');
+  const wrEl  = document.getElementById('hs-winrate');
+  if (totEl) totEl.textContent = G.tradeHistory.length;
+  if (pnlEl) {
+    pnlEl.textContent = (totalPnl >= 0 ? '+' : '') + $$(totalPnl);
+    pnlEl.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  if (wrEl) {
+    wrEl.textContent = winRate;
+    wrEl.style.color = wins > 0 ? 'var(--green)' : 'var(--text-dim)';
+  }
+}
+
+function initHistoryFilters() {
+  document.querySelectorAll('.hist-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      G_histFilter = btn.dataset.hfilter;
+      document.querySelectorAll('.hist-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      refreshHistory();
+    });
+  });
+}
+
+/* ─── USERNAME VALIDATION ────────────────────────────────── */
+
+// Profanity blocklist — a representative set of the most common slurs/explicit terms.
+// This is not exhaustive but catches the obvious cases.
+const BAD_WORDS = [
+  'fuck','shit','ass','bitch','cunt','dick','cock','pussy','nigger','nigga',
+  'faggot','fag','whore','slut','bastard','damn','hell','piss','retard',
+  'kike','spic','chink','gook','wetback','tranny','dyke','coon','jizz',
+  'cum','anal','rape','nazi','hitler','sex','porn','nude','naked'
+];
+
+function containsProfanity(name) {
+  const lower = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return BAD_WORDS.some(word => lower.includes(word));
+}
+
+function isValidNameFormat(name) {
+  name = name.trim();
+  if (name.length < 2)  return { ok: false, msg: 'Name must be at least 2 characters' };
+  if (name.length > 16) return { ok: false, msg: 'Name must be 16 characters or less' };
+  if (!/^[a-zA-Z0-9_ -]+$/.test(name)) return { ok: false, msg: 'Letters, numbers, spaces, _ and - only' };
+  if (containsProfanity(name)) return { ok: false, msg: '❌ That name is not allowed' };
+  return { ok: true };
+}
+
+/** Check if name is already taken in Firebase (case-insensitive) */
+async function isNameTaken(name, excludeId) {
+  if (!fbConfigured()) {
+    // Fall back to local LB
+    const local = lbLocalLoad();
+    return Object.entries(local).some(([id, e]) =>
+      id !== excludeId && e.name && e.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+  try {
+    const res  = await fetch(FIREBASE_URL + LB_FB_PATH + '?shallow=true', { cache: 'no-store' });
+    if (!res.ok) return false;
+    const keys = await res.json();
+    if (!keys) return false;
+    // Fetch each player record to check names (only need a shallow list of keys first)
+    // Instead, fetch all and check (LB is small — typically <100 entries)
+    const fullRes = await fetch(FIREBASE_URL + LB_FB_PATH, { cache: 'no-store' });
+    const all     = fullRes.ok ? await fullRes.json() : {};
+    return Object.entries(all || {}).some(([id, e]) =>
+      id !== excludeId && e.name && e.name.toLowerCase() === name.toLowerCase()
+    );
+  } catch(e) { return false; }
+}
+
+/** Set name status display */
+function setNameStatus(msg, cls) {
+  const el = document.getElementById('name-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className   = cls; // 'ok', 'err', or 'check'
+}
+
 /* ─── GAME LOOP ─────────────────────────────────── */
 function gameLoop() {
+  // All clients run the same deterministic simulation — no host needed
   tickPrices();
+
+  // Poll Firebase for news events every 8 ticks
+  if (G.tickCount % 8 === 0) pollNewsEvents();
+
   refreshUI();
   checkAchs();
 
@@ -4067,6 +4787,11 @@ function gameLoop() {
   if (G.tickCount % 3 === 0 &&
       document.getElementById('tab-intel').classList.contains('active')) {
     refreshIntelTab();
+  }
+  // Refresh History tab if active (every 5 ticks)
+  if (G.tickCount % 5 === 0 &&
+      document.getElementById('tab-history').classList.contains('active')) {
+    refreshHistory();
   }
   // Refresh skill points display in settings
   if (G.tickCount % 5 === 0) {
@@ -4100,22 +4825,24 @@ async function init() {
   // Load saved game BEFORE building UI so prices/portfolio restore correctly
   const hasSave = loadGame();
 
+  // Ensure tradeHistory exists (old saves won't have it)
+  if (!G.tradeHistory) G.tradeHistory = [];
+
   buildTable();
   buildAchs();
   applySavedUnlocks();
 
-  // Initialize new simulation state that might not exist in old saves
+  // Initialize simulation state (handles old saves gracefully)
   if (!G.holdTimers)  G.holdTimers  = {};
   if (!G.skillPts)    G.skillPts    = 0;
   if (!G.skillSpent)  G.skillSpent  = 0;
   if (G.xp === undefined) G.xp = 0;
   if (!G.skills) { G.skills = {}; SKILL_DEFS.forEach(s => { G.skills[s.id] = 0; }); }
-  // Sync SKILL_TREE from G.skills so old skill-tree code still works
   Object.keys(SKILL_TREE).forEach(id => {
     if (G.skills[id] !== undefined) SKILL_TREE[id].level = G.skills[id];
   });
 
-  // Build skill tree UI inside settings
+  // Build skill tree UI
   buildSkillModal();
 
   // Size canvas
@@ -4127,11 +4854,11 @@ async function init() {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // Welcome news (limited feed = max 3 items)
+  // Welcome news
   addLimitedNewsItem(
     hasSave
       ? `💾 Welcome back, <strong>${PLAYER_NAME}</strong>! Restored: ${$$(G.cash)} cash.`
-      : `🚀 Welcome, <strong>${PLAYER_NAME}</strong>! StockBlitz v3 — 48 stocks, simulation engine online.`,
+      : `🚀 Welcome, <strong>${PLAYER_NAME}</strong>! StockBlitz — 48 stocks, global sync online.`,
     null, 'neutral', null
   );
 
@@ -4143,7 +4870,7 @@ async function init() {
   document.getElementById('btn-lb-close').onclick  = hideLB;
   document.getElementById('btn-settings-close').onclick = hideSettings;
 
-  // Close modals on backdrop click
+  // Close modals on backdrop
   ['lb-modal-bg','settings-modal-bg','tutorial-bg'].forEach(id => {
     document.getElementById(id).addEventListener('click', e => {
       if (e.target.id === id) {
@@ -4159,18 +4886,33 @@ async function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Player name popup
+  // Player name popup (with validation)
   initPlayerBox();
 
-  // Settings + restore saved config values into UI
+  // Settings UI
   initSettings();
   applySavedSettings();
 
-  // Sector filter buttons + search + sort headers
+  // Sector filters, search, sort
   initFilters();
 
-  // Tutorial step wiring
+  // Tutorial
   initTutorial();
+
+  // ── NEW: Zoom controls ──
+  initZoomControls();
+
+  // ── NEW: Resizable panels ──
+  initResizeHandle();
+
+  // ── NEW: History filter buttons ──
+  initHistoryFilters();
+
+  // ── GLOBAL SYNC: Load shared market start time from Firebase ──
+  // This ensures all clients use the same tick counter → identical prices
+  await loadOrCreateMarketStart();
+  // Poll for news events every 8 seconds (also done inside gameLoop)
+  setInterval(pollNewsEvents, 8000);
 
   // Initial UI render
   refreshUI();
@@ -4180,23 +4922,23 @@ async function init() {
   // Start 1-second game loop
   G.loopTimer = setInterval(gameLoop, CFG.tickSpeed);
 
-  // Schedule first news event (8–15s delay so market has time to move first)
+  // Schedule first news event (8–15s after load)
   setTimeout(() => { fireNews(); scheduleNews(); }, 8000 + Math.random() * 7000);
 
-  // Push initial score to live global leaderboard
+  // Push initial score to leaderboard
   pushLBScore();
 
-  // Show tutorial overlay on very first visit
+  // Show tutorial on very first visit
   try {
     if (!localStorage.getItem('stockblitz_tutdone')) setTimeout(showTutorial, 800);
   } catch(e) {}
 
-  console.log('%c📈 StockBlitz v3', 'color:#00e676;font-size:16px;font-weight:bold;');
-  console.log('%cSystems: Fundamentals · Interconnections · Supply Chains · Sentiment · Trends · Staged Events · Scandals · Hype · Skill Tree · Synergy', 'color:#5a6a78');
-  console.log('%cPlayer:', PLAYER_NAME, '| ID:', PLAYER_ID);
+  console.log('%c📈 StockBlitz v5', 'color:#00e676;font-size:16px;font-weight:bold;');
+  console.log(`%cSync: ${fbConfigured() ? 'Firebase' : 'Local'} | Player: ${PLAYER_NAME} | Tick: ${G.tickCount}`, 'color:#5a6a78');
 }
 
 window.addEventListener('load', init);
+
 
 </script>
 </body>
