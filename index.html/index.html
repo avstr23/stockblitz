@@ -5,6 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockBlitz Terminal</title>
 <style>
+/* ─── ADMIN CONSOLE ──────────────────────────────────────────────────── */
+#admin-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+#admin-bg.open { display: flex; }
+
+#admin-box {
+  background: #07090d;
+  border: 1px solid #00e676;
+  border-radius: 8px;
+  width: 560px;
+  max-width: 94vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 40px rgba(0,230,118,0.25), 0 0 80px rgba(0,230,118,0.08);
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+}
+
+#admin-titlebar {
+  background: #0a1a0a;
+  border-bottom: 1px solid #00e676;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+#admin-title {
+  color: #00e676;
+  font-size: 0.78em;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0,230,118,0.5);
+}
+#admin-close-btn {
+  background: transparent;
+  border: 1px solid rgba(0,230,118,0.3);
+  color: #00e676;
+  width: 22px; height: 22px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 0.8em;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+  font-family: 'Courier New', monospace;
+}
+#admin-close-btn:hover { background: rgba(0,230,118,0.15); }
+
+#admin-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 4px;
+  min-height: 120px;
+  max-height: 340px;
+  font-size: 0.72em;
+  line-height: 1.6;
+  color: #b8c5d0;
+}
+#admin-output::-webkit-scrollbar { width: 3px; }
+#admin-output::-webkit-scrollbar-thumb { background: #1d2d3f; }
+
+.adm-line { padding: 1px 0; }
+.adm-ok   { color: #00e676; }
+.adm-err  { color: #ff1744; }
+.adm-info { color: #29b6f6; }
+.adm-warn { color: #ffd600; }
+.adm-echo { color: #5a6a78; }
+.adm-sep  { color: #1d2d3f; letter-spacing: 1px; }
+
+#admin-input-row {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #1d2d3f;
+  padding: 8px 14px;
+  gap: 8px;
+  flex-shrink: 0;
+  background: #07090d;
+}
+#admin-prompt {
+  color: #00e676;
+  font-size: 0.78em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+#admin-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e8f0f8;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78em;
+  caret-color: #00e676;
+}
+#admin-input::placeholder { color: #2a3a4a; }
+
+#admin-cmd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 8px 14px;
+  border-top: 1px solid #1d2d3f;
+  flex-shrink: 0;
+}
+.adm-quick-btn {
+  background: rgba(0,230,118,0.05);
+  border: 1px solid rgba(0,230,118,0.15);
+  color: #5a6a78;
+  padding: 3px 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.6em;
+  cursor: pointer;
+  border-radius: 2px;
+  text-align: left;
+  transition: all 0.1s;
+}
+.adm-quick-btn:hover { border-color: rgba(0,230,118,0.5); color: #00e676; background: rgba(0,230,118,0.1); }
+.adm-quick-btn span { color: #29b6f6; }
+</style>
+
+<style>
 /* ============================================================
    STOCKBLITZ 2.0 — CSS
    Theme: Bloomberg Terminal meets Cyberpunk
@@ -1193,6 +1323,548 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 #panic-hint { position: fixed; bottom: 8px; right: 10px; font-size: 9px; color: #e0e0e0; font-family: Arial,sans-serif; user-select: none; }
 </style>
 </head>
+<div id="admin-bg">
+  <div id="admin-box">
+    <div id="admin-titlebar">
+      <div id="admin-title">⚡ Admin Console — StockBlitz</div>
+      <button id="admin-close-btn" title="Close (Esc)">✕</button>
+    </div>
+
+    <div id="admin-output">
+      <div class="adm-line adm-sep">────────────────────────────────────────────</div>
+      <div class="adm-line adm-info"> StockBlitz Admin Console — type <span style="color:#00e676">help</span> for commands</div>
+      <div class="adm-line adm-sep">────────────────────────────────────────────</div>
+    </div>
+
+    <div id="admin-input-row">
+      <span id="admin-prompt">root@stockblitz:~$</span>
+      <input id="admin-input" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+    </div>
+
+    <div id="admin-cmd-grid">
+      <button class="adm-quick-btn" onclick="adminRunQuick('cash 50000')"><span>cash</span> 50000</button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('cash 1000000')"><span>cash</span> 1000000</button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('stock TECH 100')"><span>stock</span> TECH 100</button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('stock MEME 500')"><span>stock</span> MEME 500</button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('maxskills')"><span>maxskills</span></button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('allach')"><span>allach</span></button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('price TECH 500')"><span>price</span> TECH 500</button>
+      <button class="adm-quick-btn" onclick="adminRunQuick('reset')"><span>reset</span></button>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════ END STEP 2 HTML ═══════════════════════════════════════ -->
+
+
+<!-- ═══════════════ STEP 3: PASTE THIS JS BLOCK just before             ═══
+═══            window.addEventListener('load', init);                    ═══
+════════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN CONSOLE
+   Trigger: type the sequence  0 6 2 3 1 1  while NOT in an input.
+   This is invisible — no hint is shown anywhere in the normal UI.
+═══════════════════════════════════════════════════════════════════ */
+
+(function() {
+
+  /* ── Key sequence detector ── */
+  const SECRET = '062311';
+  let   keyBuf = '';
+  let   keyTimer = null;
+
+  document.addEventListener('keydown', e => {
+    // Don't intercept if typing in an actual input / textarea / contenteditable
+    const tag = e.target.tagName;
+    const ed  = e.target.contentEditable === 'true';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || ed) return;
+
+    // Only care about digit keys
+    if (!/^[0-9]$/.test(e.key)) { keyBuf = ''; return; }
+
+    keyBuf += e.key;
+
+    // Keep only the last N chars (length of secret)
+    if (keyBuf.length > SECRET.length) keyBuf = keyBuf.slice(-SECRET.length);
+
+    // Reset timeout — if user pauses 3s, clear the buffer
+    clearTimeout(keyTimer);
+    keyTimer = setTimeout(() => { keyBuf = ''; }, 3000);
+
+    if (keyBuf === SECRET) {
+      keyBuf = '';
+      openAdminConsole();
+    }
+  });
+
+  /* ── Open / Close ── */
+  function openAdminConsole() {
+    document.getElementById('admin-bg').classList.add('open');
+    const inp = document.getElementById('admin-input');
+    inp.value = '';
+    inp.focus();
+    adminPrint('Console opened. Type <b>help</b> for a full command list.', 'info');
+  }
+
+  function closeAdminConsole() {
+    document.getElementById('admin-bg').classList.remove('open');
+  }
+
+  document.getElementById('admin-close-btn').addEventListener('click', closeAdminConsole);
+  document.getElementById('admin-bg').addEventListener('click', e => {
+    if (e.target.id === 'admin-bg') closeAdminConsole();
+  });
+  document.getElementById('admin-input').addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeAdminConsole(); return; }
+    if (e.key === 'Enter')  { runAdminCmd(e.target.value.trim()); e.target.value = ''; }
+    if (e.key === 'ArrowUp') {
+      // Command history
+      if (adminHistory.length > 0) {
+        adminHistIdx = Math.min(adminHistIdx + 1, adminHistory.length - 1);
+        e.target.value = adminHistory[adminHistIdx] || '';
+        e.preventDefault();
+      }
+    }
+    if (e.key === 'ArrowDown') {
+      adminHistIdx = Math.max(adminHistIdx - 1, -1);
+      e.target.value = adminHistIdx < 0 ? '' : (adminHistory[adminHistIdx] || '');
+      e.preventDefault();
+    }
+  });
+
+  /* ── Output helpers ── */
+  const adminHistory = [];
+  let   adminHistIdx = -1;
+
+  function adminPrint(msg, cls = '') {
+    const out = document.getElementById('admin-output');
+    const div = document.createElement('div');
+    div.className = 'adm-line' + (cls ? ' adm-' + cls : '');
+    div.innerHTML = msg;
+    out.appendChild(div);
+    out.scrollTop = out.scrollHeight;
+  }
+
+  function adminSep() {
+    adminPrint('────────────────────────────────────────────', 'sep');
+  }
+
+  /* ── Quick button helper (called from HTML onclick) ── */
+  window.adminRunQuick = function(cmd) {
+    document.getElementById('admin-input').value = cmd;
+    runAdminCmd(cmd);
+    document.getElementById('admin-input').value = '';
+    document.getElementById('admin-input').focus();
+  };
+
+  /* ── Command runner ── */
+  function runAdminCmd(raw) {
+    if (!raw) return;
+    adminHistory.unshift(raw);
+    adminHistIdx = -1;
+    if (adminHistory.length > 50) adminHistory.length = 50;
+
+    adminPrint('<span style="color:#5a6a78">$ ' + escHtml(raw) + '</span>', 'echo');
+
+    const parts = raw.trim().split(/\s+/);
+    const cmd   = parts[0].toLowerCase();
+    const args  = parts.slice(1);
+
+    switch (cmd) {
+
+      /* ── HELP ── */
+      case 'help':
+      case '?':
+        adminSep();
+        adminPrint('MONEY COMMANDS', 'info');
+        adminPrint('  <span style="color:#00e676">cash &lt;amount&gt;</span>       — set your cash to &lt;amount&gt;');
+        adminPrint('  <span style="color:#00e676">addcash &lt;amount&gt;</span>    — add &lt;amount&gt; to your cash');
+        adminPrint('  <span style="color:#00e676">rmcash &lt;amount&gt;</span>     — remove &lt;amount&gt; from cash');
+        adminSep();
+        adminPrint('STOCK COMMANDS', 'info');
+        adminPrint('  <span style="color:#00e676">stock &lt;SYM&gt; &lt;qty&gt;</span>    — give yourself &lt;qty&gt; shares of &lt;SYM&gt;');
+        adminPrint('  <span style="color:#00e676">rmstock &lt;SYM&gt; &lt;qty&gt;</span>  — remove &lt;qty&gt; shares of &lt;SYM&gt;');
+        adminPrint('  <span style="color:#00e676">clearstocks</span>         — remove all stock positions');
+        adminPrint('  <span style="color:#00e676">price &lt;SYM&gt; &lt;val&gt;</span>   — set stock price to &lt;val&gt;');
+        adminPrint('  <span style="color:#00e676">pump &lt;SYM&gt; &lt;pct&gt;</span>    — pump price by &lt;pct&gt;% (e.g. pump MEME 50)');
+        adminPrint('  <span style="color:#00e676">crash &lt;SYM&gt; &lt;pct&gt;</span>   — crash price by &lt;pct&gt;%');
+        adminPrint('  <span style="color:#00e676">pumpall &lt;pct&gt;</span>       — pump ALL stocks by &lt;pct&gt;%');
+        adminPrint('  <span style="color:#00e676">crashall &lt;pct&gt;</span>      — crash ALL stocks by &lt;pct&gt;%');
+        adminPrint('  <span style="color:#00e676">hype &lt;SYM&gt;</span>          — trigger hype wave on stock');
+        adminPrint('  <span style="color:#00e676">liststocks</span>          — show all stock symbols');
+        adminSep();
+        adminPrint('GAME STATE COMMANDS', 'info');
+        adminPrint('  <span style="color:#00e676">trades &lt;n&gt;</span>          — set trade count to &lt;n&gt;');
+        adminPrint('  <span style="color:#00e676">addtrades &lt;n&gt;</span>       — add &lt;n&gt; to trade count');
+        adminPrint('  <span style="color:#00e676">maxskills</span>           — max out all skill tree levels');
+        adminPrint('  <span style="color:#00e676">skill &lt;id&gt; &lt;lvl&gt;</span>   — set skill level (e.g. skill fees 3)');
+        adminPrint('  <span style="color:#00e676">skillpts &lt;n&gt;</span>        — set available skill points');
+        adminPrint('  <span style="color:#00e676">allach</span>              — unlock all achievements');
+        adminPrint('  <span style="color:#00e676">emergency</span>           — trigger emergency market day');
+        adminPrint('  <span style="color:#00e676">scandal &lt;SYM&gt;</span>       — trigger company scandal');
+        adminPrint('  <span style="color:#00e676">news</span>                — fire a random news event');
+        adminSep();
+        adminPrint('UTILITY', 'info');
+        adminPrint('  <span style="color:#00e676">status</span>              — show current game state');
+        adminPrint('  <span style="color:#00e676">reset</span>               — reset game (with confirmation)');
+        adminPrint('  <span style="color:#00e676">save</span>                — force save');
+        adminPrint('  <span style="color:#00e676">clear</span>               — clear console output');
+        adminPrint('  <span style="color:#00e676">exit / close</span>        — close admin console');
+        adminSep();
+        break;
+
+      /* ── CASH ── */
+      case 'cash': {
+        const n = parseFloat(args[0]);
+        if (isNaN(n)) { adminPrint('Usage: cash &lt;amount&gt;', 'err'); break; }
+        G.cash = Math.max(0, n);
+        refreshUI(); saveGame();
+        adminPrint(`✓ Cash set to ${$$(G.cash)}`, 'ok');
+        break;
+      }
+      case 'addcash': {
+        const n = parseFloat(args[0]);
+        if (isNaN(n)) { adminPrint('Usage: addcash &lt;amount&gt;', 'err'); break; }
+        G.cash = Math.max(0, G.cash + n);
+        refreshUI(); saveGame();
+        adminPrint(`✓ Added ${$$(n)} → cash now ${$$(G.cash)}`, 'ok');
+        break;
+      }
+      case 'rmcash': {
+        const n = parseFloat(args[0]);
+        if (isNaN(n)) { adminPrint('Usage: rmcash &lt;amount&gt;', 'err'); break; }
+        G.cash = Math.max(0, G.cash - n);
+        refreshUI(); saveGame();
+        adminPrint(`✓ Removed ${$$(n)} → cash now ${$$(G.cash)}`, 'ok');
+        break;
+      }
+
+      /* ── STOCK GIVE ── */
+      case 'stock': {
+        const sym = (args[0] || '').toUpperCase();
+        const qty = parseInt(args[1]);
+        if (!sym || isNaN(qty) || qty <= 0) { adminPrint('Usage: stock &lt;SYM&gt; &lt;qty&gt;', 'err'); break; }
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}. Try <b>liststocks</b>.`, 'err'); break; }
+        G.portfolio[sym]  = (G.portfolio[sym]  || 0) + qty;
+        // Set cost basis at current price so P&L starts at $0
+        G.costBasis[sym]  = (G.costBasis[sym]  || 0) + STOCKS[sym].price * qty;
+        refreshUI(); saveGame();
+        adminPrint(`✓ Gave ${qty}× <b>${sym}</b> (${STOCKS[sym].name}) @ ${$$(STOCKS[sym].price)} — now own ${G.portfolio[sym]}`, 'ok');
+        break;
+      }
+
+      /* ── STOCK REMOVE ── */
+      case 'rmstock': {
+        const sym = (args[0] || '').toUpperCase();
+        const qty = parseInt(args[1]);
+        if (!sym || isNaN(qty) || qty <= 0) { adminPrint('Usage: rmstock &lt;SYM&gt; &lt;qty&gt;', 'err'); break; }
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        const have = G.portfolio[sym] || 0;
+        const remove = Math.min(have, qty);
+        const ratio  = have > 0 ? (have - remove) / have : 0;
+        G.portfolio[sym] = have - remove;
+        G.costBasis[sym] = (G.costBasis[sym] || 0) * ratio;
+        refreshUI(); saveGame();
+        adminPrint(`✓ Removed ${remove}× ${sym} → now own ${G.portfolio[sym]}`, 'ok');
+        break;
+      }
+
+      /* ── CLEAR STOCKS ── */
+      case 'clearstocks': {
+        SYM_LIST.forEach(s => { G.portfolio[s] = 0; G.costBasis[s] = 0; });
+        refreshUI(); saveGame();
+        adminPrint('✓ All stock positions cleared', 'ok');
+        break;
+      }
+
+      /* ── PRICE SET ── */
+      case 'price': {
+        const sym = (args[0] || '').toUpperCase();
+        const val = parseFloat(args[1]);
+        if (!sym || isNaN(val) || val <= 0) { adminPrint('Usage: price &lt;SYM&gt; &lt;value&gt;', 'err'); break; }
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        STOCKS[sym].prev  = STOCKS[sym].price;
+        STOCKS[sym].price = val;
+        STOCKS[sym].history.push(val);
+        refreshUI();
+        adminPrint(`✓ ${sym} price set to ${$$(val)}`, 'ok');
+        break;
+      }
+
+      /* ── PUMP ── */
+      case 'pump': {
+        const sym = (args[0] || '').toUpperCase();
+        const pct = parseFloat(args[1]);
+        if (!sym || isNaN(pct)) { adminPrint('Usage: pump &lt;SYM&gt; &lt;pct&gt;', 'err'); break; }
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        const s   = STOCKS[sym];
+        const was = s.price;
+        s.prev  = s.price;
+        s.price = s.price * (1 + pct / 100);
+        s.history.push(s.price);
+        refreshUI();
+        adminPrint(`✓ Pumped ${sym} +${pct}%: ${$$(was)} → ${$$(s.price)}`, 'ok');
+        break;
+      }
+
+      /* ── CRASH ── */
+      case 'crash': {
+        const sym = (args[0] || '').toUpperCase();
+        const pct = parseFloat(args[1]);
+        if (!sym || isNaN(pct)) { adminPrint('Usage: crash &lt;SYM&gt; &lt;pct&gt;', 'err'); break; }
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        const s   = STOCKS[sym];
+        const was = s.price;
+        s.prev  = s.price;
+        s.price = Math.max(0.01, s.price * (1 - pct / 100));
+        s.history.push(s.price);
+        refreshUI();
+        adminPrint(`✓ Crashed ${sym} -${pct}%: ${$$(was)} → ${$$(s.price)}`, 'ok');
+        break;
+      }
+
+      /* ── PUMP ALL ── */
+      case 'pumpall': {
+        const pct = parseFloat(args[0]);
+        if (isNaN(pct)) { adminPrint('Usage: pumpall &lt;pct&gt;', 'err'); break; }
+        SYM_LIST.forEach(sym => {
+          const s = STOCKS[sym];
+          s.prev = s.price; s.price *= (1 + pct / 100); s.history.push(s.price);
+        });
+        refreshUI();
+        adminPrint(`✓ Pumped ALL stocks +${pct}%`, 'ok');
+        break;
+      }
+
+      /* ── CRASH ALL ── */
+      case 'crashall': {
+        const pct = parseFloat(args[0]);
+        if (isNaN(pct)) { adminPrint('Usage: crashall &lt;pct&gt;', 'err'); break; }
+        SYM_LIST.forEach(sym => {
+          const s = STOCKS[sym];
+          s.prev = s.price; s.price = Math.max(0.01, s.price * (1 - pct / 100)); s.history.push(s.price);
+        });
+        refreshUI();
+        adminPrint(`✓ Crashed ALL stocks -${pct}%`, 'ok');
+        break;
+      }
+
+      /* ── HYPE ── */
+      case 'hype': {
+        const sym = (args[0] || '').toUpperCase();
+        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        STOCKS[sym].hypeActive = true;
+        STOCKS[sym].hypeTick   = G.tickCount;
+        STOCKS[sym].sentiment  = 1;
+        adminPrint(`✓ Hype wave triggered on ${sym}`, 'ok');
+        // Fire the banner if the function exists
+        if (typeof triggerHypeWave === 'function') {
+          // We patch a fake event matching the stock
+          const banner = document.getElementById('hype-banner');
+          if (banner) { banner.textContent = `🔥 ADMIN PUMP: ${sym} activated — 🚀`; banner.classList.add('on'); setTimeout(()=>banner.classList.remove('on'),8000); }
+        }
+        break;
+      }
+
+      /* ── LIST STOCKS ── */
+      case 'liststocks': {
+        adminSep();
+        const sectors = {};
+        SYM_LIST.forEach(sym => {
+          const sec = STOCKS[sym].sector;
+          if (!sectors[sec]) sectors[sec] = [];
+          sectors[sec].push(sym);
+        });
+        Object.entries(sectors).forEach(([sec, syms]) => {
+          adminPrint(`<span style="color:#ffd600">${sec}</span>: ${syms.join(' · ')}`, '');
+        });
+        adminSep();
+        break;
+      }
+
+      /* ── TRADES ── */
+      case 'trades': {
+        const n = parseInt(args[0]);
+        if (isNaN(n) || n < 0) { adminPrint('Usage: trades &lt;n&gt;', 'err'); break; }
+        G.trades = n;
+        refreshUI(); saveGame();
+        adminPrint(`✓ Trade count set to ${n}`, 'ok');
+        break;
+      }
+      case 'addtrades': {
+        const n = parseInt(args[0]);
+        if (isNaN(n)) { adminPrint('Usage: addtrades &lt;n&gt;', 'err'); break; }
+        G.trades = Math.max(0, G.trades + n);
+        refreshUI(); saveGame();
+        adminPrint(`✓ Added ${n} trades → total ${G.trades}`, 'ok');
+        break;
+      }
+
+      /* ── MAX SKILLS ── */
+      case 'maxskills': {
+        Object.keys(SKILL_TREE).forEach(id => { SKILL_TREE[id].level = SKILL_TREE[id].max; });
+        if (typeof buildSkillModal === 'function') buildSkillModal();
+        refreshUI();
+        adminPrint('✓ All skills maxed out', 'ok');
+        Object.entries(SKILL_TREE).forEach(([id, s]) => adminPrint(`  ${s.icon} ${s.name} → Lv${s.level}`, ''));
+        break;
+      }
+
+      /* ── SKILL SET ── */
+      case 'skill': {
+        const id  = (args[0] || '').toLowerCase();
+        const lvl = parseInt(args[1]);
+        if (!SKILL_TREE[id]) { adminPrint(`Unknown skill: ${id}. Valid: ${Object.keys(SKILL_TREE).join(', ')}`, 'err'); break; }
+        if (isNaN(lvl) || lvl < 0 || lvl > SKILL_TREE[id].max) { adminPrint(`Level must be 0–${SKILL_TREE[id].max}`, 'err'); break; }
+        SKILL_TREE[id].level = lvl;
+        if (typeof buildSkillModal === 'function') buildSkillModal();
+        refreshUI();
+        adminPrint(`✓ ${SKILL_TREE[id].name} set to Lv${lvl}`, 'ok');
+        break;
+      }
+
+      /* ── SKILL POINTS ── */
+      case 'skillpts': {
+        const n = parseInt(args[0]);
+        if (isNaN(n) || n < 0) { adminPrint('Usage: skillpts &lt;n&gt;', 'err'); break; }
+        // We fake this by adjusting skillSpent downward so getAvailableSkillPts() returns n
+        const current = typeof calcSkillPoints === 'function' ? calcSkillPoints() : Math.floor(G.trades / 10);
+        G.skillSpent = Math.max(0, current - n);
+        if (typeof buildSkillModal === 'function') buildSkillModal();
+        adminPrint(`✓ Available skill points set to ~${getAvailableSkillPts()}`, 'ok');
+        break;
+      }
+
+      /* ── ALL ACHIEVEMENTS ── */
+      case 'allach': {
+        ACHIEVES.forEach(a => {
+          if (!G.unlocked.has(a.id)) {
+            G.unlocked.add(a.id);
+            const el = document.getElementById('ach-'+a.id);
+            if (el) el.classList.add('unlocked');
+          }
+        });
+        const cnt = document.getElementById('ach-count');
+        if (cnt) cnt.textContent = G.unlocked.size;
+        saveGame();
+        adminPrint(`✓ Unlocked all ${ACHIEVES.length} achievements`, 'ok');
+        break;
+      }
+
+      /* ── EMERGENCY ── */
+      case 'emergency': {
+        if (typeof triggerEmergencyDay === 'function') {
+          triggerEmergencyDay();
+          adminPrint('✓ Emergency market day triggered', 'warn');
+        } else {
+          adminPrint('triggerEmergencyDay() not found', 'err');
+        }
+        break;
+      }
+
+      /* ── SCANDAL ── */
+      case 'scandal': {
+        const sym = (args[0] || '').toUpperCase();
+        if (sym && !STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
+        if (typeof triggerScandal === 'function') {
+          // If a sym was given, temporarily override SCANDAL_EVENTS
+          if (sym && SCANDAL_EVENTS) {
+            const origFirst = SCANDAL_EVENTS[0];
+            const fake = { sym, txt: `💀 ADMIN SCANDAL: ${sym} — market in freefall!`, imp: -0.12 };
+            SCANDAL_EVENTS.unshift(fake);
+            triggerScandal();
+            SCANDAL_EVENTS.shift();
+          } else {
+            triggerScandal();
+          }
+          adminPrint(`✓ Scandal triggered${sym ? ' on ' + sym : ''}`, 'warn');
+        } else {
+          adminPrint('triggerScandal() not found', 'err');
+        }
+        break;
+      }
+
+      /* ── NEWS ── */
+      case 'news': {
+        if (typeof fireNews === 'function') { fireNews(); adminPrint('✓ Random news event fired', 'ok'); }
+        else adminPrint('fireNews() not found', 'err');
+        break;
+      }
+
+      /* ── STATUS ── */
+      case 'status': {
+        adminSep();
+        adminPrint('GAME STATE', 'info');
+        adminPrint(`  Cash:       ${$$(G.cash)}`);
+        adminPrint(`  Portfolio:  ${$$(typeof portVal === 'function' ? portVal() : 0)}`);
+        adminPrint(`  Total:      ${$$(typeof totalVal === 'function' ? totalVal() : G.cash)}`);
+        adminPrint(`  Trades:     ${G.trades}`);
+        adminPrint(`  Skill pts:  ${typeof getAvailableSkillPts === 'function' ? getAvailableSkillPts() : '?'} available`);
+        adminPrint(`  Tick:       ${G.tickCount}`);
+        adminPrint(`  Sync:       ${typeof marketStartMs !== 'undefined' && marketStartMs ? 'Firebase ✓' : 'Local'}`);
+        adminSep();
+        adminPrint('POSITIONS', 'info');
+        const owned = SYM_LIST.filter(s => (G.portfolio[s]||0) > 0);
+        if (owned.length === 0) adminPrint('  (none)');
+        owned.forEach(sym => adminPrint(`  ${sym.padEnd(6)} × ${G.portfolio[sym]}  @ ${$$(STOCKS[sym].price)}`));
+        adminSep();
+        adminPrint('SKILLS', 'info');
+        Object.entries(SKILL_TREE).forEach(([id, s]) =>
+          adminPrint(`  ${s.icon} ${s.name.padEnd(20)} Lv${s.level}/${s.max}`));
+        adminSep();
+        break;
+      }
+
+      /* ── RESET ── */
+      case 'reset': {
+        adminPrint('⚠ Type  <b>reset confirm</b>  to actually reset the game.', 'warn');
+        break;
+      }
+      case 'reset confirm': // fallthrough won't work here, handle below
+        break;
+
+      /* ── SAVE ── */
+      case 'save': {
+        if (typeof saveGame === 'function') { saveGame(); adminPrint('✓ Game saved', 'ok'); }
+        else adminPrint('saveGame() not found', 'err');
+        break;
+      }
+
+      /* ── CLEAR ── */
+      case 'clear': {
+        const out = document.getElementById('admin-output');
+        out.innerHTML = '';
+        break;
+      }
+
+      /* ── EXIT ── */
+      case 'exit':
+      case 'close':
+      case 'quit':
+        closeAdminConsole();
+        break;
+
+      /* ── UNKNOWN ── */
+      default: {
+        // Handle "reset confirm" which includes a space
+        if (raw.trim().toLowerCase() === 'reset confirm') {
+          if (typeof resetGame === 'function') { resetGame(); adminPrint('✓ Game reset to $1,000', 'warn'); }
+          else adminPrint('resetGame() not found', 'err');
+        } else {
+          adminPrint(`Unknown command: <b>${escHtml(cmd)}</b> — type <b>help</b> for the list`, 'err');
+        }
+      }
+    }
+  }
+
+  /* ── Escape HTML helper ── */
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+})();
+</script>
+
 <body>
 
 <!-- ================================================
@@ -3537,7 +4209,7 @@ function unlockAch(a) {
    ════════════════════════════════════════════════════════════ */
 
 // ⬇️  PASTE YOUR FIREBASE URL HERE (replace the placeholder)
-const FIREBASE_URL = 'https://stockblitz-cb418-default-rtdb.firebaseio.com/';
+const FIREBASE_URL = 'https://YOUR-PROJECT-default-rtdb.firebaseio.com';
 const LB_FB_PATH   = '/stockblitz_lb.json';
 
 /** Returns true only when FIREBASE_URL has been properly configured */
