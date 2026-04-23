@@ -5,136 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockBlitz Terminal</title>
 <style>
-/* ─── ADMIN CONSOLE ──────────────────────────────────────────────────── */
-#admin-bg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.88);
-  z-index: 9000;
-  align-items: center;
-  justify-content: center;
-}
-#admin-bg.open { display: flex; }
-
-#admin-box {
-  background: #07090d;
-  border: 1px solid #00e676;
-  border-radius: 8px;
-  width: 560px;
-  max-width: 94vw;
-  max-height: 88vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 40px rgba(0,230,118,0.25), 0 0 80px rgba(0,230,118,0.08);
-  font-family: 'Courier New', monospace;
-  overflow: hidden;
-}
-
-#admin-titlebar {
-  background: #0a1a0a;
-  border-bottom: 1px solid #00e676;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-#admin-title {
-  color: #00e676;
-  font-size: 0.78em;
-  font-weight: bold;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(0,230,118,0.5);
-}
-#admin-close-btn {
-  background: transparent;
-  border: 1px solid rgba(0,230,118,0.3);
-  color: #00e676;
-  width: 22px; height: 22px;
-  cursor: pointer;
-  border-radius: 3px;
-  font-size: 0.8em;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.12s;
-  font-family: 'Courier New', monospace;
-}
-#admin-close-btn:hover { background: rgba(0,230,118,0.15); }
-
-#admin-output {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 14px 4px;
-  min-height: 120px;
-  max-height: 340px;
-  font-size: 0.72em;
-  line-height: 1.6;
-  color: #b8c5d0;
-}
-#admin-output::-webkit-scrollbar { width: 3px; }
-#admin-output::-webkit-scrollbar-thumb { background: #1d2d3f; }
-
-.adm-line { padding: 1px 0; }
-.adm-ok   { color: #00e676; }
-.adm-err  { color: #ff1744; }
-.adm-info { color: #29b6f6; }
-.adm-warn { color: #ffd600; }
-.adm-echo { color: #5a6a78; }
-.adm-sep  { color: #1d2d3f; letter-spacing: 1px; }
-
-#admin-input-row {
-  display: flex;
-  align-items: center;
-  border-top: 1px solid #1d2d3f;
-  padding: 8px 14px;
-  gap: 8px;
-  flex-shrink: 0;
-  background: #07090d;
-}
-#admin-prompt {
-  color: #00e676;
-  font-size: 0.78em;
-  font-weight: bold;
-  white-space: nowrap;
-}
-#admin-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #e8f0f8;
-  font-family: 'Courier New', monospace;
-  font-size: 0.78em;
-  caret-color: #00e676;
-}
-#admin-input::placeholder { color: #2a3a4a; }
-
-#admin-cmd-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  padding: 8px 14px;
-  border-top: 1px solid #1d2d3f;
-  flex-shrink: 0;
-}
-.adm-quick-btn {
-  background: rgba(0,230,118,0.05);
-  border: 1px solid rgba(0,230,118,0.15);
-  color: #5a6a78;
-  padding: 3px 6px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.6em;
-  cursor: pointer;
-  border-radius: 2px;
-  text-align: left;
-  transition: all 0.1s;
-}
-.adm-quick-btn:hover { border-color: rgba(0,230,118,0.5); color: #00e676; background: rgba(0,230,118,0.1); }
-.adm-quick-btn span { color: #29b6f6; }
-</style>
-
-<style>
 /* ============================================================
    STOCKBLITZ 2.0 — CSS
    Theme: Bloomberg Terminal meets Cyberpunk
@@ -236,72 +106,80 @@ body {
 
 /* ─── HEADER ─────────────────────────────────────────────── */
 #header {
-  background: var(--bg2);
+  background: linear-gradient(180deg, #0b1019 0%, var(--bg2) 100%);
   border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
+  padding: 7px 14px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   position: sticky;
   top: 0;
   z-index: 200;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.5);
 }
 
 #logo {
-  font-size: 1.3em;
+  font-size: 1.15em;
   font-weight: 900;
   color: var(--accent);
   letter-spacing: 3px;
   text-shadow: var(--glow-g);
-  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-family: 'Impact','Arial Black',sans-serif;
   flex-shrink: 0;
   user-select: none;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  padding-right: 10px;
+  border-right: 1px solid var(--border);
+  margin-right: 3px;
 }
 
 .stat-box {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 4px 10px;
-  min-width: 105px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 5px 10px;
+  min-width: 90px;
   flex-shrink: 0;
+  transition: border-color 0.2s;
+  position: relative;
 }
-.stat-label { font-size: 0.58em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); line-height: 1; }
-.stat-value { font-size: 0.95em; font-weight: bold; color: var(--text-hi); margin-top: 2px; }
+.stat-box:hover { border-color: rgba(var(--accent-rgb),0.3); }
+.stat-label { font-size: 0.5em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); line-height: 1; }
+.stat-value { font-size: 0.88em; font-weight: bold; color: var(--text-hi); margin-top: 3px; font-variant-numeric: tabular-nums; }
 .stat-value.up   { color: var(--green); }
 .stat-value.down { color: var(--red); }
 
-.header-spacer { flex: 1; }
+.header-spacer { flex: 1; min-width: 4px; }
 
 .hdr-btn {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 5px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-dim);
+  padding: 5px 10px;
   font-family: var(--mono);
-  font-size: 0.72em;
+  font-size: 0.62em;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 5px;
   transition: all 0.15s;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  white-space: nowrap;
 }
-.hdr-btn:hover { border-color: var(--blue); color: var(--blue); }
-.hdr-btn.settings-btn:hover { border-color: var(--orange); color: var(--orange); }
+.hdr-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(41,182,246,0.07); }
+.hdr-btn.settings-btn:hover { border-color: var(--orange); color: var(--orange); background: rgba(255,152,0,0.07); }
 
 /* ─── NEWS TICKER ────────────────────────────────────────── */
 #ticker-bar {
-  background: #090e14;
-  border-bottom: 1px solid var(--border);
-  padding: 5px 0;
+  background: #060b11;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 4px 0;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -311,7 +189,7 @@ body {
   padding-left: 100%;
 }
 @keyframes scroll-ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
-.ti { margin: 0 28px; font-size: 0.72em; }
+.ti { margin: 0 22px; font-size: 0.68em; font-weight: 600; }
 .ti-up   { color: var(--green); }
 .ti-down { color: var(--red); }
 .ti-neu  { color: var(--blue); }
@@ -507,9 +385,13 @@ body {
 /* Sector Filter */
 #sector-bar {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   flex-wrap: wrap;
   align-items: center;
+  padding: 5px 8px;
+  background: rgba(255,255,255,0.015);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .sf-btn {
@@ -653,27 +535,23 @@ td {
 
 /* ─── RIGHT PANEL ───────────────────────────────────────── */
 /* Tab system */
-#rp-tabs {
-  display: flex;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  padding: 0 2px;
-  flex-shrink: 0;
-}
+#rp-tabs-placeholder { display: none; } /* old rule replaced by #rp-header layout */
 .rp-tab {
-  flex: 1;
+  flex-shrink: 0;
+  flex-grow: 0;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--text-dim);
   font-family: var(--mono);
-  font-size: 0.62em;
-  padding: 7px 4px;
+  font-size: 0.58em;
+  padding: 7px 8px;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.15s;
   text-align: center;
+  white-space: nowrap;
 }
 .rp-tab:hover { color: var(--text); }
 .rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -791,18 +669,20 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 /* ─── FLASH ──────────────────────────────────────────────── */
 #flash {
   position: fixed;
-  top: 68px; left: 50%;
+  top: 62px; left: 50%;
   transform: translateX(-50%);
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 7px 18px;
-  font-size: 0.8em;
+  background: rgba(7,9,13,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 7px 20px;
+  font-size: 0.76em;
   z-index: 999;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
   white-space: nowrap;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
 }
 
 /* ─── MODAL BASE ─────────────────────────────────────────── */
@@ -1036,6 +916,201 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
   padding: 8px 4px; line-height: 1.4; flex-shrink: 0;
   border-top: 1px solid var(--border); margin-top: 4px;
 }
+
+/* ─── RIGHT PANEL HEADER + TAB BAR ──────────────────────── */
+#rp-header {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+}
+#rp-logo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),0.08) 0%, transparent 100%);
+}
+#rp-logo img { height: 22px; width: auto; display: block; }
+#rp-logo-text {
+  font-size: 0.68em;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 2px;
+  font-family: 'Impact','Arial Black',sans-serif;
+  text-shadow: 0 0 10px rgba(var(--accent-rgb),0.5);
+  white-space: nowrap;
+}
+#rp-tabs {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 2px;
+  gap: 1px;
+}
+#rp-tabs::-webkit-scrollbar { display: none; }
+.rp-tab {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  text-align: center;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 7px 9px 5px;
+  line-height: 1;
+  min-width: 40px;
+}
+.rp-tab .ti { font-size: 1.1em; display: block; }
+.rp-tab .tl { font-size: 0.52em; text-transform: uppercase; letter-spacing: 0.8px; display: block; color: inherit; }
+.rp-tab:hover { color: var(--text-hi); background: rgba(255,255,255,0.03); }
+.rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(var(--accent-rgb),0.05); }
+
+/* ─── ORDERS TAB ─────────────────────────────────────────── */
+#tab-orders { flex-direction: column; overflow: hidden; min-height: 0; }
+#orders-form {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.orders-row { display: flex; gap: 5px; align-items: center; margin-bottom: 5px; flex-wrap: wrap; }
+.order-label { font-size: 0.6em; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; width: 100%; }
+.order-select, .order-input {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 7px; font-family: var(--mono); font-size: 0.7em; border-radius: 3px;
+  flex: 1; min-width: 0;
+}
+.order-select:focus, .order-input:focus { border-color: var(--accent); outline: none; }
+.order-type-btn {
+  flex: 1; padding: 4px 6px; font-size: 0.65em; font-family: var(--mono);
+  border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim);
+  cursor: pointer; border-radius: 3px; transition: all 0.12s; text-transform: uppercase;
+}
+.order-type-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb),0.08); }
+.btn-place-order {
+  width: 100%; padding: 6px; background: rgba(var(--accent-rgb),0.12);
+  border: 1px solid var(--accent); color: var(--accent); font-family: var(--mono);
+  font-size: 0.72em; cursor: pointer; border-radius: 3px; font-weight: bold;
+  transition: all 0.15s; text-transform: uppercase; letter-spacing: 1px;
+}
+.btn-place-order:hover { background: rgba(var(--accent-rgb),0.22); }
+#orders-list { overflow-y: auto; flex: 1; min-height: 0; padding: 4px 8px; }
+.order-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+  padding: 7px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;
+}
+.order-card.triggered { border-color: var(--green); background: rgba(0,230,118,0.04); }
+.order-card.cancelled { opacity: 0.4; }
+.oc-type { font-size: 0.58em; font-weight: bold; text-transform: uppercase;
+  padding: 2px 5px; border-radius: 3px; flex-shrink: 0; }
+.oc-type.limitBuy  { background: rgba(0,230,118,0.15); color: var(--green); }
+.oc-type.limitSell { background: rgba(255,23,68,0.12);  color: var(--red); }
+.oc-type.stopLoss  { background: rgba(255,152,0,0.12);  color: var(--orange); }
+.oc-sym  { font-weight: bold; font-size: 0.8em; flex-shrink: 0; }
+.oc-info { flex: 1; font-size: 0.65em; color: var(--text-dim); }
+.oc-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+  padding: 2px 6px; font-size: 0.6em; cursor: pointer; border-radius: 3px;
+  font-family: var(--mono); transition: all 0.12s; flex-shrink: 0; }
+.oc-cancel:hover { border-color: var(--red); color: var(--red); }
+.orders-empty { text-align: center; color: var(--text-dim); font-size: 0.72em; padding: 20px 0; }
+
+/* ─── CHAT TAB ───────────────────────────────────────────── */
+#tab-chat-room { flex-direction: column; overflow: hidden; min-height: 0; }
+#chat-messages { flex: 1; overflow-y: auto; min-height: 0; padding: 6px 10px; }
+#chat-input-row {
+  display: flex; gap: 5px; padding: 6px 10px;
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+#chat-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; font-family: var(--mono); font-size: 0.72em; border-radius: 4px;
+  resize: none; height: 34px; line-height: 1.3;
+}
+#chat-input:focus { border-color: var(--accent); outline: none; }
+#chat-send {
+  background: rgba(var(--accent-rgb),0.12); border: 1px solid var(--accent);
+  color: var(--accent); padding: 6px 12px; font-family: var(--mono); font-size: 0.68em;
+  cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.15s;
+  flex-shrink: 0;
+}
+#chat-send:hover { background: rgba(var(--accent-rgb),0.22); }
+.chat-msg {
+  padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.025);
+  font-size: 0.69em; line-height: 1.35;
+}
+.chat-msg:last-child { border-bottom: none; }
+.chat-name { font-weight: bold; margin-right: 5px; }
+.chat-name.admin { color: var(--gold); }
+.chat-name.admin::after { content: ' 👑'; }
+.chat-time { font-size: 0.8em; color: var(--text-dim); float: right; }
+.chat-text { color: var(--text); word-break: break-word; }
+.chat-system { color: var(--text-dim); font-style: italic; font-size: 0.88em; padding: 3px 0; }
+
+/* ─── PLAYER SEARCH TAB ──────────────────────────────────── */
+#tab-players { flex-direction: column; overflow: hidden; min-height: 0; }
+#player-search-bar {
+  padding: 8px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex; gap: 5px;
+}
+#player-search-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 5px 9px; font-family: var(--mono); font-size: 0.72em; border-radius: 3px;
+}
+#player-search-input:focus { border-color: var(--accent); outline: none; }
+#player-search-btn {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--accent);
+  padding: 5px 12px; font-family: var(--mono); font-size: 0.68em; cursor: pointer;
+  border-radius: 3px; font-weight: bold; transition: all 0.12s;
+}
+#player-search-btn:hover { border-color: var(--accent); background: rgba(var(--accent-rgb),0.08); }
+#player-results { overflow-y: auto; flex: 1; min-height: 0; padding: 6px 10px; }
+.player-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 5px;
+  padding: 10px 12px; margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s;
+}
+.player-card:hover { border-color: var(--accent); }
+.player-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.player-card-name { font-weight: bold; font-size: 0.85em; color: var(--text-hi); }
+.player-card-name.admin { color: var(--gold); }
+.player-card-name.admin::after { content: ' 👑'; }
+.player-card-score { font-size: 0.8em; font-weight: bold; color: var(--green); }
+.player-card-stats { display: flex; gap: 10px; font-size: 0.62em; color: var(--text-dim); flex-wrap: wrap; }
+.player-holdings { margin-top: 6px; font-size: 0.62em; border-top: 1px solid var(--border); padding-top: 5px; }
+.player-holding-sym { display: inline-block; margin-right: 6px; padding: 1px 5px;
+  background: var(--bg4); border-radius: 3px; margin-bottom: 3px; color: var(--text-dim); }
+.player-holding-sym b { color: var(--text); }
+
+/* ─── ADMIN PANEL ────────────────────────────────────────── */
+#admin-panel {
+  display: none; padding: 8px 12px; border-bottom: 2px solid var(--gold);
+  background: rgba(255,214,0,0.04); flex-shrink: 0;
+}
+#admin-panel.visible { display: block; }
+.admin-title { font-size: 0.62em; color: var(--gold); text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 6px; font-weight: bold; }
+.admin-row { display: flex; gap: 5px; align-items: center; margin-bottom: 5px; flex-wrap: wrap; }
+.admin-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--gold); color: var(--text);
+  padding: 4px 8px; font-family: var(--mono); font-size: 0.7em; border-radius: 3px; min-width: 60px;
+}
+.admin-btn {
+  background: rgba(255,214,0,0.12); border: 1px solid var(--gold); color: var(--gold);
+  padding: 4px 10px; font-family: var(--mono); font-size: 0.68em; cursor: pointer;
+  border-radius: 3px; font-weight: bold; transition: all 0.15s;
+}
+.admin-btn:hover { background: rgba(255,214,0,0.25); }
 
 /* ─── SAVE INDICATOR ─────────────────────────────────────── */
 #save-indicator {
@@ -1323,548 +1398,6 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 #panic-hint { position: fixed; bottom: 8px; right: 10px; font-size: 9px; color: #e0e0e0; font-family: Arial,sans-serif; user-select: none; }
 </style>
 </head>
-<div id="admin-bg">
-  <div id="admin-box">
-    <div id="admin-titlebar">
-      <div id="admin-title">⚡ Admin Console — StockBlitz</div>
-      <button id="admin-close-btn" title="Close (Esc)">✕</button>
-    </div>
-
-    <div id="admin-output">
-      <div class="adm-line adm-sep">────────────────────────────────────────────</div>
-      <div class="adm-line adm-info"> StockBlitz Admin Console — type <span style="color:#00e676">help</span> for commands</div>
-      <div class="adm-line adm-sep">────────────────────────────────────────────</div>
-    </div>
-
-    <div id="admin-input-row">
-      <span id="admin-prompt">root@stockblitz:~$</span>
-      <input id="admin-input" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
-    </div>
-
-    <div id="admin-cmd-grid">
-      <button class="adm-quick-btn" onclick="adminRunQuick('cash 50000')"><span>cash</span> 50000</button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('cash 1000000')"><span>cash</span> 1000000</button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('stock TECH 100')"><span>stock</span> TECH 100</button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('stock MEME 500')"><span>stock</span> MEME 500</button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('maxskills')"><span>maxskills</span></button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('allach')"><span>allach</span></button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('price TECH 500')"><span>price</span> TECH 500</button>
-      <button class="adm-quick-btn" onclick="adminRunQuick('reset')"><span>reset</span></button>
-    </div>
-  </div>
-</div>
-<!-- ═══════════════ END STEP 2 HTML ═══════════════════════════════════════ -->
-
-
-<!-- ═══════════════ STEP 3: PASTE THIS JS BLOCK just before             ═══
-═══            window.addEventListener('load', init);                    ═══
-════════════════════════════════════════════════════════════════════════ -->
-<script>
-/* ═══════════════════════════════════════════════════════════════════
-   ADMIN CONSOLE
-   Trigger: type the sequence  0 6 2 3 1 1  while NOT in an input.
-   This is invisible — no hint is shown anywhere in the normal UI.
-═══════════════════════════════════════════════════════════════════ */
-
-(function() {
-
-  /* ── Key sequence detector ── */
-  const SECRET = '062311';
-  let   keyBuf = '';
-  let   keyTimer = null;
-
-  document.addEventListener('keydown', e => {
-    // Don't intercept if typing in an actual input / textarea / contenteditable
-    const tag = e.target.tagName;
-    const ed  = e.target.contentEditable === 'true';
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || ed) return;
-
-    // Only care about digit keys
-    if (!/^[0-9]$/.test(e.key)) { keyBuf = ''; return; }
-
-    keyBuf += e.key;
-
-    // Keep only the last N chars (length of secret)
-    if (keyBuf.length > SECRET.length) keyBuf = keyBuf.slice(-SECRET.length);
-
-    // Reset timeout — if user pauses 3s, clear the buffer
-    clearTimeout(keyTimer);
-    keyTimer = setTimeout(() => { keyBuf = ''; }, 3000);
-
-    if (keyBuf === SECRET) {
-      keyBuf = '';
-      openAdminConsole();
-    }
-  });
-
-  /* ── Open / Close ── */
-  function openAdminConsole() {
-    document.getElementById('admin-bg').classList.add('open');
-    const inp = document.getElementById('admin-input');
-    inp.value = '';
-    inp.focus();
-    adminPrint('Console opened. Type <b>help</b> for a full command list.', 'info');
-  }
-
-  function closeAdminConsole() {
-    document.getElementById('admin-bg').classList.remove('open');
-  }
-
-  document.getElementById('admin-close-btn').addEventListener('click', closeAdminConsole);
-  document.getElementById('admin-bg').addEventListener('click', e => {
-    if (e.target.id === 'admin-bg') closeAdminConsole();
-  });
-  document.getElementById('admin-input').addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeAdminConsole(); return; }
-    if (e.key === 'Enter')  { runAdminCmd(e.target.value.trim()); e.target.value = ''; }
-    if (e.key === 'ArrowUp') {
-      // Command history
-      if (adminHistory.length > 0) {
-        adminHistIdx = Math.min(adminHistIdx + 1, adminHistory.length - 1);
-        e.target.value = adminHistory[adminHistIdx] || '';
-        e.preventDefault();
-      }
-    }
-    if (e.key === 'ArrowDown') {
-      adminHistIdx = Math.max(adminHistIdx - 1, -1);
-      e.target.value = adminHistIdx < 0 ? '' : (adminHistory[adminHistIdx] || '');
-      e.preventDefault();
-    }
-  });
-
-  /* ── Output helpers ── */
-  const adminHistory = [];
-  let   adminHistIdx = -1;
-
-  function adminPrint(msg, cls = '') {
-    const out = document.getElementById('admin-output');
-    const div = document.createElement('div');
-    div.className = 'adm-line' + (cls ? ' adm-' + cls : '');
-    div.innerHTML = msg;
-    out.appendChild(div);
-    out.scrollTop = out.scrollHeight;
-  }
-
-  function adminSep() {
-    adminPrint('────────────────────────────────────────────', 'sep');
-  }
-
-  /* ── Quick button helper (called from HTML onclick) ── */
-  window.adminRunQuick = function(cmd) {
-    document.getElementById('admin-input').value = cmd;
-    runAdminCmd(cmd);
-    document.getElementById('admin-input').value = '';
-    document.getElementById('admin-input').focus();
-  };
-
-  /* ── Command runner ── */
-  function runAdminCmd(raw) {
-    if (!raw) return;
-    adminHistory.unshift(raw);
-    adminHistIdx = -1;
-    if (adminHistory.length > 50) adminHistory.length = 50;
-
-    adminPrint('<span style="color:#5a6a78">$ ' + escHtml(raw) + '</span>', 'echo');
-
-    const parts = raw.trim().split(/\s+/);
-    const cmd   = parts[0].toLowerCase();
-    const args  = parts.slice(1);
-
-    switch (cmd) {
-
-      /* ── HELP ── */
-      case 'help':
-      case '?':
-        adminSep();
-        adminPrint('MONEY COMMANDS', 'info');
-        adminPrint('  <span style="color:#00e676">cash &lt;amount&gt;</span>       — set your cash to &lt;amount&gt;');
-        adminPrint('  <span style="color:#00e676">addcash &lt;amount&gt;</span>    — add &lt;amount&gt; to your cash');
-        adminPrint('  <span style="color:#00e676">rmcash &lt;amount&gt;</span>     — remove &lt;amount&gt; from cash');
-        adminSep();
-        adminPrint('STOCK COMMANDS', 'info');
-        adminPrint('  <span style="color:#00e676">stock &lt;SYM&gt; &lt;qty&gt;</span>    — give yourself &lt;qty&gt; shares of &lt;SYM&gt;');
-        adminPrint('  <span style="color:#00e676">rmstock &lt;SYM&gt; &lt;qty&gt;</span>  — remove &lt;qty&gt; shares of &lt;SYM&gt;');
-        adminPrint('  <span style="color:#00e676">clearstocks</span>         — remove all stock positions');
-        adminPrint('  <span style="color:#00e676">price &lt;SYM&gt; &lt;val&gt;</span>   — set stock price to &lt;val&gt;');
-        adminPrint('  <span style="color:#00e676">pump &lt;SYM&gt; &lt;pct&gt;</span>    — pump price by &lt;pct&gt;% (e.g. pump MEME 50)');
-        adminPrint('  <span style="color:#00e676">crash &lt;SYM&gt; &lt;pct&gt;</span>   — crash price by &lt;pct&gt;%');
-        adminPrint('  <span style="color:#00e676">pumpall &lt;pct&gt;</span>       — pump ALL stocks by &lt;pct&gt;%');
-        adminPrint('  <span style="color:#00e676">crashall &lt;pct&gt;</span>      — crash ALL stocks by &lt;pct&gt;%');
-        adminPrint('  <span style="color:#00e676">hype &lt;SYM&gt;</span>          — trigger hype wave on stock');
-        adminPrint('  <span style="color:#00e676">liststocks</span>          — show all stock symbols');
-        adminSep();
-        adminPrint('GAME STATE COMMANDS', 'info');
-        adminPrint('  <span style="color:#00e676">trades &lt;n&gt;</span>          — set trade count to &lt;n&gt;');
-        adminPrint('  <span style="color:#00e676">addtrades &lt;n&gt;</span>       — add &lt;n&gt; to trade count');
-        adminPrint('  <span style="color:#00e676">maxskills</span>           — max out all skill tree levels');
-        adminPrint('  <span style="color:#00e676">skill &lt;id&gt; &lt;lvl&gt;</span>   — set skill level (e.g. skill fees 3)');
-        adminPrint('  <span style="color:#00e676">skillpts &lt;n&gt;</span>        — set available skill points');
-        adminPrint('  <span style="color:#00e676">allach</span>              — unlock all achievements');
-        adminPrint('  <span style="color:#00e676">emergency</span>           — trigger emergency market day');
-        adminPrint('  <span style="color:#00e676">scandal &lt;SYM&gt;</span>       — trigger company scandal');
-        adminPrint('  <span style="color:#00e676">news</span>                — fire a random news event');
-        adminSep();
-        adminPrint('UTILITY', 'info');
-        adminPrint('  <span style="color:#00e676">status</span>              — show current game state');
-        adminPrint('  <span style="color:#00e676">reset</span>               — reset game (with confirmation)');
-        adminPrint('  <span style="color:#00e676">save</span>                — force save');
-        adminPrint('  <span style="color:#00e676">clear</span>               — clear console output');
-        adminPrint('  <span style="color:#00e676">exit / close</span>        — close admin console');
-        adminSep();
-        break;
-
-      /* ── CASH ── */
-      case 'cash': {
-        const n = parseFloat(args[0]);
-        if (isNaN(n)) { adminPrint('Usage: cash &lt;amount&gt;', 'err'); break; }
-        G.cash = Math.max(0, n);
-        refreshUI(); saveGame();
-        adminPrint(`✓ Cash set to ${$$(G.cash)}`, 'ok');
-        break;
-      }
-      case 'addcash': {
-        const n = parseFloat(args[0]);
-        if (isNaN(n)) { adminPrint('Usage: addcash &lt;amount&gt;', 'err'); break; }
-        G.cash = Math.max(0, G.cash + n);
-        refreshUI(); saveGame();
-        adminPrint(`✓ Added ${$$(n)} → cash now ${$$(G.cash)}`, 'ok');
-        break;
-      }
-      case 'rmcash': {
-        const n = parseFloat(args[0]);
-        if (isNaN(n)) { adminPrint('Usage: rmcash &lt;amount&gt;', 'err'); break; }
-        G.cash = Math.max(0, G.cash - n);
-        refreshUI(); saveGame();
-        adminPrint(`✓ Removed ${$$(n)} → cash now ${$$(G.cash)}`, 'ok');
-        break;
-      }
-
-      /* ── STOCK GIVE ── */
-      case 'stock': {
-        const sym = (args[0] || '').toUpperCase();
-        const qty = parseInt(args[1]);
-        if (!sym || isNaN(qty) || qty <= 0) { adminPrint('Usage: stock &lt;SYM&gt; &lt;qty&gt;', 'err'); break; }
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}. Try <b>liststocks</b>.`, 'err'); break; }
-        G.portfolio[sym]  = (G.portfolio[sym]  || 0) + qty;
-        // Set cost basis at current price so P&L starts at $0
-        G.costBasis[sym]  = (G.costBasis[sym]  || 0) + STOCKS[sym].price * qty;
-        refreshUI(); saveGame();
-        adminPrint(`✓ Gave ${qty}× <b>${sym}</b> (${STOCKS[sym].name}) @ ${$$(STOCKS[sym].price)} — now own ${G.portfolio[sym]}`, 'ok');
-        break;
-      }
-
-      /* ── STOCK REMOVE ── */
-      case 'rmstock': {
-        const sym = (args[0] || '').toUpperCase();
-        const qty = parseInt(args[1]);
-        if (!sym || isNaN(qty) || qty <= 0) { adminPrint('Usage: rmstock &lt;SYM&gt; &lt;qty&gt;', 'err'); break; }
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        const have = G.portfolio[sym] || 0;
-        const remove = Math.min(have, qty);
-        const ratio  = have > 0 ? (have - remove) / have : 0;
-        G.portfolio[sym] = have - remove;
-        G.costBasis[sym] = (G.costBasis[sym] || 0) * ratio;
-        refreshUI(); saveGame();
-        adminPrint(`✓ Removed ${remove}× ${sym} → now own ${G.portfolio[sym]}`, 'ok');
-        break;
-      }
-
-      /* ── CLEAR STOCKS ── */
-      case 'clearstocks': {
-        SYM_LIST.forEach(s => { G.portfolio[s] = 0; G.costBasis[s] = 0; });
-        refreshUI(); saveGame();
-        adminPrint('✓ All stock positions cleared', 'ok');
-        break;
-      }
-
-      /* ── PRICE SET ── */
-      case 'price': {
-        const sym = (args[0] || '').toUpperCase();
-        const val = parseFloat(args[1]);
-        if (!sym || isNaN(val) || val <= 0) { adminPrint('Usage: price &lt;SYM&gt; &lt;value&gt;', 'err'); break; }
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        STOCKS[sym].prev  = STOCKS[sym].price;
-        STOCKS[sym].price = val;
-        STOCKS[sym].history.push(val);
-        refreshUI();
-        adminPrint(`✓ ${sym} price set to ${$$(val)}`, 'ok');
-        break;
-      }
-
-      /* ── PUMP ── */
-      case 'pump': {
-        const sym = (args[0] || '').toUpperCase();
-        const pct = parseFloat(args[1]);
-        if (!sym || isNaN(pct)) { adminPrint('Usage: pump &lt;SYM&gt; &lt;pct&gt;', 'err'); break; }
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        const s   = STOCKS[sym];
-        const was = s.price;
-        s.prev  = s.price;
-        s.price = s.price * (1 + pct / 100);
-        s.history.push(s.price);
-        refreshUI();
-        adminPrint(`✓ Pumped ${sym} +${pct}%: ${$$(was)} → ${$$(s.price)}`, 'ok');
-        break;
-      }
-
-      /* ── CRASH ── */
-      case 'crash': {
-        const sym = (args[0] || '').toUpperCase();
-        const pct = parseFloat(args[1]);
-        if (!sym || isNaN(pct)) { adminPrint('Usage: crash &lt;SYM&gt; &lt;pct&gt;', 'err'); break; }
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        const s   = STOCKS[sym];
-        const was = s.price;
-        s.prev  = s.price;
-        s.price = Math.max(0.01, s.price * (1 - pct / 100));
-        s.history.push(s.price);
-        refreshUI();
-        adminPrint(`✓ Crashed ${sym} -${pct}%: ${$$(was)} → ${$$(s.price)}`, 'ok');
-        break;
-      }
-
-      /* ── PUMP ALL ── */
-      case 'pumpall': {
-        const pct = parseFloat(args[0]);
-        if (isNaN(pct)) { adminPrint('Usage: pumpall &lt;pct&gt;', 'err'); break; }
-        SYM_LIST.forEach(sym => {
-          const s = STOCKS[sym];
-          s.prev = s.price; s.price *= (1 + pct / 100); s.history.push(s.price);
-        });
-        refreshUI();
-        adminPrint(`✓ Pumped ALL stocks +${pct}%`, 'ok');
-        break;
-      }
-
-      /* ── CRASH ALL ── */
-      case 'crashall': {
-        const pct = parseFloat(args[0]);
-        if (isNaN(pct)) { adminPrint('Usage: crashall &lt;pct&gt;', 'err'); break; }
-        SYM_LIST.forEach(sym => {
-          const s = STOCKS[sym];
-          s.prev = s.price; s.price = Math.max(0.01, s.price * (1 - pct / 100)); s.history.push(s.price);
-        });
-        refreshUI();
-        adminPrint(`✓ Crashed ALL stocks -${pct}%`, 'ok');
-        break;
-      }
-
-      /* ── HYPE ── */
-      case 'hype': {
-        const sym = (args[0] || '').toUpperCase();
-        if (!STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        STOCKS[sym].hypeActive = true;
-        STOCKS[sym].hypeTick   = G.tickCount;
-        STOCKS[sym].sentiment  = 1;
-        adminPrint(`✓ Hype wave triggered on ${sym}`, 'ok');
-        // Fire the banner if the function exists
-        if (typeof triggerHypeWave === 'function') {
-          // We patch a fake event matching the stock
-          const banner = document.getElementById('hype-banner');
-          if (banner) { banner.textContent = `🔥 ADMIN PUMP: ${sym} activated — 🚀`; banner.classList.add('on'); setTimeout(()=>banner.classList.remove('on'),8000); }
-        }
-        break;
-      }
-
-      /* ── LIST STOCKS ── */
-      case 'liststocks': {
-        adminSep();
-        const sectors = {};
-        SYM_LIST.forEach(sym => {
-          const sec = STOCKS[sym].sector;
-          if (!sectors[sec]) sectors[sec] = [];
-          sectors[sec].push(sym);
-        });
-        Object.entries(sectors).forEach(([sec, syms]) => {
-          adminPrint(`<span style="color:#ffd600">${sec}</span>: ${syms.join(' · ')}`, '');
-        });
-        adminSep();
-        break;
-      }
-
-      /* ── TRADES ── */
-      case 'trades': {
-        const n = parseInt(args[0]);
-        if (isNaN(n) || n < 0) { adminPrint('Usage: trades &lt;n&gt;', 'err'); break; }
-        G.trades = n;
-        refreshUI(); saveGame();
-        adminPrint(`✓ Trade count set to ${n}`, 'ok');
-        break;
-      }
-      case 'addtrades': {
-        const n = parseInt(args[0]);
-        if (isNaN(n)) { adminPrint('Usage: addtrades &lt;n&gt;', 'err'); break; }
-        G.trades = Math.max(0, G.trades + n);
-        refreshUI(); saveGame();
-        adminPrint(`✓ Added ${n} trades → total ${G.trades}`, 'ok');
-        break;
-      }
-
-      /* ── MAX SKILLS ── */
-      case 'maxskills': {
-        Object.keys(SKILL_TREE).forEach(id => { SKILL_TREE[id].level = SKILL_TREE[id].max; });
-        if (typeof buildSkillModal === 'function') buildSkillModal();
-        refreshUI();
-        adminPrint('✓ All skills maxed out', 'ok');
-        Object.entries(SKILL_TREE).forEach(([id, s]) => adminPrint(`  ${s.icon} ${s.name} → Lv${s.level}`, ''));
-        break;
-      }
-
-      /* ── SKILL SET ── */
-      case 'skill': {
-        const id  = (args[0] || '').toLowerCase();
-        const lvl = parseInt(args[1]);
-        if (!SKILL_TREE[id]) { adminPrint(`Unknown skill: ${id}. Valid: ${Object.keys(SKILL_TREE).join(', ')}`, 'err'); break; }
-        if (isNaN(lvl) || lvl < 0 || lvl > SKILL_TREE[id].max) { adminPrint(`Level must be 0–${SKILL_TREE[id].max}`, 'err'); break; }
-        SKILL_TREE[id].level = lvl;
-        if (typeof buildSkillModal === 'function') buildSkillModal();
-        refreshUI();
-        adminPrint(`✓ ${SKILL_TREE[id].name} set to Lv${lvl}`, 'ok');
-        break;
-      }
-
-      /* ── SKILL POINTS ── */
-      case 'skillpts': {
-        const n = parseInt(args[0]);
-        if (isNaN(n) || n < 0) { adminPrint('Usage: skillpts &lt;n&gt;', 'err'); break; }
-        // We fake this by adjusting skillSpent downward so getAvailableSkillPts() returns n
-        const current = typeof calcSkillPoints === 'function' ? calcSkillPoints() : Math.floor(G.trades / 10);
-        G.skillSpent = Math.max(0, current - n);
-        if (typeof buildSkillModal === 'function') buildSkillModal();
-        adminPrint(`✓ Available skill points set to ~${getAvailableSkillPts()}`, 'ok');
-        break;
-      }
-
-      /* ── ALL ACHIEVEMENTS ── */
-      case 'allach': {
-        ACHIEVES.forEach(a => {
-          if (!G.unlocked.has(a.id)) {
-            G.unlocked.add(a.id);
-            const el = document.getElementById('ach-'+a.id);
-            if (el) el.classList.add('unlocked');
-          }
-        });
-        const cnt = document.getElementById('ach-count');
-        if (cnt) cnt.textContent = G.unlocked.size;
-        saveGame();
-        adminPrint(`✓ Unlocked all ${ACHIEVES.length} achievements`, 'ok');
-        break;
-      }
-
-      /* ── EMERGENCY ── */
-      case 'emergency': {
-        if (typeof triggerEmergencyDay === 'function') {
-          triggerEmergencyDay();
-          adminPrint('✓ Emergency market day triggered', 'warn');
-        } else {
-          adminPrint('triggerEmergencyDay() not found', 'err');
-        }
-        break;
-      }
-
-      /* ── SCANDAL ── */
-      case 'scandal': {
-        const sym = (args[0] || '').toUpperCase();
-        if (sym && !STOCKS[sym]) { adminPrint(`Unknown symbol: ${sym}`, 'err'); break; }
-        if (typeof triggerScandal === 'function') {
-          // If a sym was given, temporarily override SCANDAL_EVENTS
-          if (sym && SCANDAL_EVENTS) {
-            const origFirst = SCANDAL_EVENTS[0];
-            const fake = { sym, txt: `💀 ADMIN SCANDAL: ${sym} — market in freefall!`, imp: -0.12 };
-            SCANDAL_EVENTS.unshift(fake);
-            triggerScandal();
-            SCANDAL_EVENTS.shift();
-          } else {
-            triggerScandal();
-          }
-          adminPrint(`✓ Scandal triggered${sym ? ' on ' + sym : ''}`, 'warn');
-        } else {
-          adminPrint('triggerScandal() not found', 'err');
-        }
-        break;
-      }
-
-      /* ── NEWS ── */
-      case 'news': {
-        if (typeof fireNews === 'function') { fireNews(); adminPrint('✓ Random news event fired', 'ok'); }
-        else adminPrint('fireNews() not found', 'err');
-        break;
-      }
-
-      /* ── STATUS ── */
-      case 'status': {
-        adminSep();
-        adminPrint('GAME STATE', 'info');
-        adminPrint(`  Cash:       ${$$(G.cash)}`);
-        adminPrint(`  Portfolio:  ${$$(typeof portVal === 'function' ? portVal() : 0)}`);
-        adminPrint(`  Total:      ${$$(typeof totalVal === 'function' ? totalVal() : G.cash)}`);
-        adminPrint(`  Trades:     ${G.trades}`);
-        adminPrint(`  Skill pts:  ${typeof getAvailableSkillPts === 'function' ? getAvailableSkillPts() : '?'} available`);
-        adminPrint(`  Tick:       ${G.tickCount}`);
-        adminPrint(`  Sync:       ${typeof marketStartMs !== 'undefined' && marketStartMs ? 'Firebase ✓' : 'Local'}`);
-        adminSep();
-        adminPrint('POSITIONS', 'info');
-        const owned = SYM_LIST.filter(s => (G.portfolio[s]||0) > 0);
-        if (owned.length === 0) adminPrint('  (none)');
-        owned.forEach(sym => adminPrint(`  ${sym.padEnd(6)} × ${G.portfolio[sym]}  @ ${$$(STOCKS[sym].price)}`));
-        adminSep();
-        adminPrint('SKILLS', 'info');
-        Object.entries(SKILL_TREE).forEach(([id, s]) =>
-          adminPrint(`  ${s.icon} ${s.name.padEnd(20)} Lv${s.level}/${s.max}`));
-        adminSep();
-        break;
-      }
-
-      /* ── RESET ── */
-      case 'reset': {
-        adminPrint('⚠ Type  <b>reset confirm</b>  to actually reset the game.', 'warn');
-        break;
-      }
-      case 'reset confirm': // fallthrough won't work here, handle below
-        break;
-
-      /* ── SAVE ── */
-      case 'save': {
-        if (typeof saveGame === 'function') { saveGame(); adminPrint('✓ Game saved', 'ok'); }
-        else adminPrint('saveGame() not found', 'err');
-        break;
-      }
-
-      /* ── CLEAR ── */
-      case 'clear': {
-        const out = document.getElementById('admin-output');
-        out.innerHTML = '';
-        break;
-      }
-
-      /* ── EXIT ── */
-      case 'exit':
-      case 'close':
-      case 'quit':
-        closeAdminConsole();
-        break;
-
-      /* ── UNKNOWN ── */
-      default: {
-        // Handle "reset confirm" which includes a space
-        if (raw.trim().toLowerCase() === 'reset confirm') {
-          if (typeof resetGame === 'function') { resetGame(); adminPrint('✓ Game reset to $1,000', 'warn'); }
-          else adminPrint('resetGame() not found', 'err');
-        } else {
-          adminPrint(`Unknown command: <b>${escHtml(cmd)}</b> — type <b>help</b> for the list`, 'err');
-        }
-      }
-    }
-  }
-
-  /* ── Escape HTML helper ── */
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-})();
-</script>
-
 <body>
 
 <!-- ================================================
@@ -1994,15 +1527,62 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 
     <!-- RIGHT PANEL (column 3) -->
     <div id="right-panel">
-      <!-- Tabs -->
-      <div id="rp-tabs">
-        <button class="rp-tab active" data-tab="chart">⚡ Chart</button>
-        <button class="rp-tab" data-tab="portfolio">💼 Portfolio</button>
-        <button class="rp-tab" data-tab="history">📋 History</button>
-        <button class="rp-tab" data-tab="picks">🎯 Best Buys</button>
-        <button class="rp-tab" data-tab="intel">🧠 Intel</button>
-        <button class="rp-tab" data-tab="news">📰 News</button>
-        <button class="rp-tab" data-tab="ach">🏅 Badges</button>
+
+      <!-- Logo + Tabs header row -->
+      <div id="rp-header">
+        <div id="rp-logo">
+          <img src="logo.png" alt="" onerror="this.style.display='none';document.getElementById('rp-logo-text').style.display='block'">
+          <span id="rp-logo-text">📈 SB</span>
+        </div>
+        <div id="rp-tabs">
+          <button class="rp-tab active" data-tab="chart">
+            <span class="ti">⚡</span><span class="tl">Chart</span>
+          </button>
+          <button class="rp-tab" data-tab="portfolio">
+            <span class="ti">💼</span><span class="tl">Portfolio</span>
+          </button>
+          <button class="rp-tab" data-tab="orders">
+            <span class="ti">📋</span><span class="tl">Orders</span>
+          </button>
+          <button class="rp-tab" data-tab="history">
+            <span class="ti">🕐</span><span class="tl">History</span>
+          </button>
+          <button class="rp-tab" data-tab="picks">
+            <span class="ti">🎯</span><span class="tl">Picks</span>
+          </button>
+          <button class="rp-tab" data-tab="intel">
+            <span class="ti">🧠</span><span class="tl">Intel</span>
+          </button>
+          <button class="rp-tab" data-tab="news">
+            <span class="ti">📰</span><span class="tl">News</span>
+          </button>
+          <button class="rp-tab" data-tab="chat-room">
+            <span class="ti">💬</span><span class="tl">Chat</span>
+          </button>
+          <button class="rp-tab" data-tab="players">
+            <span class="ti">🔍</span><span class="tl">Players</span>
+          </button>
+          <button class="rp-tab" data-tab="ach">
+            <span class="ti">🏅</span><span class="tl">Badges</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin panel (only visible for avstr) -->
+      <div id="admin-panel">
+        <div class="admin-title">👑 Admin Controls — avstr</div>
+        <div class="admin-row">
+          <select id="admin-sym" class="admin-input" style="flex:1.2">
+            <option value="">Select stock…</option>
+          </select>
+          <input id="admin-price" class="admin-input" type="number" placeholder="New price" min="0.01" step="0.01">
+          <button class="admin-btn" onclick="adminSetPrice()">Set Price</button>
+        </div>
+        <div class="admin-row">
+          <button class="admin-btn" style="flex:1" onclick="adminPushNews()">📰 Trigger News</button>
+          <button class="admin-btn" style="flex:1" onclick="adminTriggerCrash()">📉 Market Crash</button>
+          <button class="admin-btn" style="flex:1" onclick="adminTriggerBoom()">📈 Market Boom</button>
+        </div>
       </div>
 
       <!-- CHART TAB -->
@@ -2141,7 +1721,56 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
         <div class="panel-title" style="padding:8px 12px 6px;flex-shrink:0">🏅 Achievements (<span id="ach-count">0</span>/<span id="ach-total">0</span>)</div>
         <div id="ach-grid" class="ach-grid" style="padding:0 12px 12px;overflow-y:auto;flex:1"></div>
       </div>
-    </div>
+
+      <!-- ORDERS TAB -->
+      <div class="tab-content" id="tab-orders">
+        <div id="orders-form">
+          <div class="order-label">Order Type</div>
+          <div class="orders-row">
+            <button class="order-type-btn active" data-otype="limitBuy">Limit Buy</button>
+            <button class="order-type-btn" data-otype="limitSell">Limit Sell</button>
+            <button class="order-type-btn" data-otype="stopLoss">Stop Loss</button>
+          </div>
+          <div class="orders-row">
+            <select id="order-sym" class="order-select" style="flex:1.5">
+              <option value="">Select stock…</option>
+            </select>
+            <input id="order-qty" class="order-input" type="number" placeholder="Qty" value="1" min="1" style="flex:0.7">
+          </div>
+          <div class="orders-row">
+            <div style="flex:1">
+              <div class="order-label">Trigger Price ($)</div>
+              <input id="order-price" class="order-input" type="number" placeholder="0.00" min="0.01" step="0.01" style="width:100%;box-sizing:border-box">
+            </div>
+          </div>
+          <button class="btn-place-order" onclick="placeOrder()">Place Order</button>
+        </div>
+        <div id="orders-list">
+          <div class="orders-empty">No pending orders.<br>Set a target price and StockBlitz will auto-execute.</div>
+        </div>
+      </div>
+
+      <!-- CHAT TAB -->
+      <div class="tab-content" id="tab-chat-room">
+        <div id="chat-messages"></div>
+        <div id="chat-input-row">
+          <textarea id="chat-input" placeholder="Say something…" maxlength="200" rows="1"></textarea>
+          <button id="chat-send">Send</button>
+        </div>
+      </div>
+
+      <!-- PLAYER SEARCH TAB -->
+      <div class="tab-content" id="tab-players">
+        <div id="player-search-bar">
+          <input id="player-search-input" type="text" placeholder="Search player name…" maxlength="20">
+          <button id="player-search-btn">🔍 Search</button>
+        </div>
+        <div id="player-results">
+          <div class="orders-empty" style="padding-top:30px">Search for a player to see their stats and portfolio.</div>
+        </div>
+      </div>
+
+    </div><!-- end right-panel -->
 
   </div><!-- /main -->
 
@@ -3427,7 +3056,7 @@ function addLimitedNewsItem(txt, sym, type, tag) {
   item.innerHTML = `<div class="news-time">${now}${symHtml}${tagHtml}</div><div class="news-text">${txt}</div>`;
   feed.insertBefore(item, feed.firstChild);
   // Keep only 3 items visible (auto-replace old ones)
-  while (feed.children.length > 3) feed.removeChild(feed.lastChild);
+  while (feed.children.length > 30) feed.removeChild(feed.lastChild);
 }
 
 /* ─── EMERGENCY MARKET DAY ───────────────────────────────── */
@@ -3438,7 +3067,7 @@ function triggerEmergencyDay() {
   G.emergencyTicksLeft = 20 + Math.floor(Math.random() * 25);
   G.lastEmergencyTick  = G.tickCount;
 
-  document.getElementById('emergency-banner').classList.add('on');
+  document.getElementById('emergency-banner').classList.add('on'); if(typeof fitMainPanel==='function') fitMainPanel();
   document.getElementById('mkt-dot').style.background = 'var(--red)';
   document.getElementById('mkt-status').textContent    = '🚨 EMERGENCY DAY';
   fireAlert('🚨 EMERGENCY MARKET CONDITIONS — extreme volatility across all assets!', null, 'volatility');
@@ -3450,7 +3079,7 @@ function triggerEmergencyDay() {
 function endEmergencyDay() {
   G.emergencyDay       = false;
   G.emergencyIntensity = 0;
-  document.getElementById('emergency-banner').classList.remove('on');
+  document.getElementById('emergency-banner').classList.remove('on'); if(typeof fitMainPanel==='function') fitMainPanel();
   document.getElementById('mkt-dot').style.background = 'var(--green)';
   document.getElementById('mkt-status').textContent    = 'Market: Normal';
   addLimitedNewsItem('✅ Emergency conditions lifted — markets stabilizing', null, 'positive', 'RESOLVED');
@@ -4014,10 +3643,13 @@ function selectSym(sym) {
 function switchTab(name) {
   document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+name));
-  if (name==='portfolio') refreshPortfolio();
-  if (name==='picks')     refreshPicks();
-  if (name==='intel')     refreshIntelTab();
-  if (name==='history')   refreshHistory();
+  if (name==='portfolio')  refreshPortfolio();
+  if (name==='picks')      refreshPicks();
+  if (name==='intel')      refreshIntelTab();
+  if (name==='history')    refreshHistory();
+  if (name==='orders')     renderOrders();
+  if (name==='chat-room')  chatPoll();
+  if (name==='players') {} // search triggered manually
 }
 
 /* ─── MASTER REFRESH ────────────────────────────── */
@@ -4341,17 +3973,20 @@ async function lbLoadAll() {
 // Write a single player's score entry using Firebase REST PATCH
 // PATCH only updates the specific player key without overwriting others
 async function pushLBScore() {
+  // Include portfolio snapshot so player search tab can show holdings
+  const portfolio = Object.fromEntries(
+    Object.entries(G.portfolio).filter(([,q]) => q > 0)
+  );
   const entry = {
-    name:   PLAYER_NAME,
-    score:  Math.round(totalVal() * 100) / 100,
-    trades: G.trades,
-    ach:    G.unlocked.size,
-    ts:     Date.now()
+    name:      PLAYER_NAME,
+    score:     Math.round(totalVal() * 100) / 100,
+    trades:    G.trades,
+    ach:       G.unlocked.size,
+    ts:        Date.now(),
+    portfolio,             // e.g. { TECH: 5, AAPL: 10 }
   };
-  // Always write to local storage as backup
   lbLocalSet(PLAYER_ID, entry);
-
-  if (!fbConfigured()) return; // skip remote if not set up
+  if (!fbConfigured()) return;
 
   try {
     // PATCH /stockblitz_lb/{PLAYER_ID}.json — only touches this player's key
@@ -5441,13 +5076,433 @@ function setNameStatus(msg, cls) {
   el.className   = cls; // 'ok', 'err', or 'check'
 }
 
+/* ══════════════════════════════════════════════════════════
+   💬 PUBLIC CHAT — Firebase Realtime Database
+   Path: /stockblitz_chat/{key} → {pid, name, text, ts}
+   Polls every 3 seconds. Messages expire after 24 hours.
+   Profanity filter applied before send.
+══════════════════════════════════════════════════════════ */
+const CHAT_PATH    = '/stockblitz_chat.json';
+const CHAT_SUBPATH = '/stockblitz_chat/';
+let   chatLastTs   = 0;
+let   chatPollTimer = null;
+
+async function chatSend() {
+  const inp  = document.getElementById('chat-input');
+  const text = (inp.value || '').trim().slice(0, 200);
+  if (!text) return;
+  if (containsProfanity(text)) {
+    flash('❌ Message contains disallowed content', '#ff1744'); return;
+  }
+  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
+  inp.value = '';
+  if (!fbConfigured()) {
+    chatAddLocal(PLAYER_NAME, text, Date.now());
+    return;
+  }
+  try {
+    const key = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    await fetch(`${FIREBASE_URL}${CHAT_SUBPATH}${key}.json`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ pid: PLAYER_ID, name: PLAYER_NAME, text, ts: Date.now() })
+    });
+    // Show immediately locally (don't wait for poll)
+    chatAddMsg({ name: PLAYER_NAME, text, ts: Date.now(), pid: PLAYER_ID });
+    chatLastTs = Date.now();
+  } catch(e) { flash('❌ Chat send failed', '#ff1744'); }
+}
+
+function chatAddLocal(name, text, ts) {
+  chatAddMsg({ name, text, ts, pid: PLAYER_ID });
+  chatLastTs = ts;
+}
+
+function chatAddMsg(msg) {
+  const feed = document.getElementById('chat-messages');
+  if (!feed) return;
+  const time = new Date(msg.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const isAdmin = msg.name === 'avstr';
+  const isMe    = msg.pid  === PLAYER_ID;
+  const div = document.createElement('div');
+  div.className = 'chat-msg';
+  div.innerHTML = `
+    <span class="chat-time">${time}</span>
+    <span class="chat-name${isAdmin?' admin':''}">${escHtml(msg.name)}${isMe?' (you)':''}</span>
+    <span class="chat-text">${escHtml(msg.text)}</span>`;
+  feed.appendChild(div);
+  // Auto-scroll to bottom
+  feed.scrollTop = feed.scrollHeight;
+  // Cap at 100 messages
+  while (feed.children.length > 100) feed.removeChild(feed.firstChild);
+}
+
+async function chatPoll() {
+  if (!fbConfigured()) return;
+  if (!document.getElementById('tab-chat-room').classList.contains('active')) return;
+  try {
+    const res = await fetch(FIREBASE_URL + CHAT_PATH, { cache: 'no-store' });
+    if (!res.ok) return;
+    const all = await res.json();
+    if (!all) return;
+    const cutoff = Date.now() - 24 * 3600 * 1000;
+    const newMsgs = Object.values(all)
+      .filter(m => m && m.ts > chatLastTs && m.ts > cutoff && m.pid !== PLAYER_ID)
+      .sort((a,b) => a.ts - b.ts);
+    for (const m of newMsgs) chatAddMsg(m);
+    if (newMsgs.length) chatLastTs = Math.max(...newMsgs.map(m => m.ts));
+  } catch(e) {}
+}
+
+function initChat() {
+  document.getElementById('chat-send').onclick = chatSend;
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatSend(); }
+  });
+  chatAddMsg({ name: '🤖 System', text: 'Welcome to StockBlitz chat! Be respectful.', ts: Date.now(), pid: '' });
+  chatLastTs = Date.now() - 3000; // pick up messages from last 3 seconds
+  // Poll every 3 seconds
+  chatPollTimer = setInterval(chatPoll, 3000);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════════════════════════
+   📋 ORDERS SYSTEM
+   Types: limitBuy (buy when price ≤ target)
+          limitSell (sell when price ≥ target)
+          stopLoss  (sell when price ≤ target)
+══════════════════════════════════════════════════════════ */
+let G_orders    = [];   // [{id, type, sym, qty, triggerPrice, status, ts}]
+let G_orderType = 'limitBuy';
+
+function placeOrder() {
+  const sym   = document.getElementById('order-sym').value;
+  const qty   = parseInt(document.getElementById('order-qty').value) || 1;
+  const price = parseFloat(document.getElementById('order-price').value);
+
+  if (!sym)        { flash('❌ Select a stock', '#ff1744'); return; }
+  if (qty < 1)     { flash('❌ Quantity must be ≥ 1', '#ff1744'); return; }
+  if (!price || price <= 0) { flash('❌ Enter a valid trigger price', '#ff1744'); return; }
+
+  const order = { id: Date.now().toString(36), type: G_orderType, sym, qty, triggerPrice: price, status: 'pending', ts: Date.now() };
+  G_orders.push(order);
+  renderOrders();
+  flash(`📋 Order placed: ${G_orderType} ${qty}× ${sym} @ ${$$(price)}`, 'var(--accent)');
+}
+
+function cancelOrder(id) {
+  const o = G_orders.find(x => x.id === id);
+  if (o) { o.status = 'cancelled'; renderOrders(); }
+}
+
+function checkOrders() {
+  let filled = false;
+  for (const o of G_orders) {
+    if (o.status !== 'pending') continue;
+    const s = STOCKS[o.sym];
+    if (!s) continue;
+    let triggered = false;
+    if (o.type === 'limitBuy'  && s.price <= o.triggerPrice) triggered = true;
+    if (o.type === 'limitSell' && s.price >= o.triggerPrice) triggered = true;
+    if (o.type === 'stopLoss'  && s.price <= o.triggerPrice) triggered = true;
+
+    if (!triggered) continue;
+    o.status = 'triggered';
+    filled = true;
+
+    if (o.type === 'limitBuy') {
+      const cost = s.price * o.qty;
+      if (cost <= G.cash) {
+        G.cash -= cost;
+        G.portfolio[o.sym] = (G.portfolio[o.sym] || 0) + o.qty;
+        G.costBasis[o.sym] = (G.costBasis[o.sym] || 0) + cost;
+        G.trades++;
+        recordTrade('buy', o.sym, o.qty, s.price, null);
+        flash(`✅ Order filled: Bought ${o.qty}× ${o.sym} @ ${$$(s.price)}`, 'var(--green)');
+        snd.buy();
+      } else {
+        o.status = 'cancelled';
+        flash(`❌ Order cancelled: insufficient funds for ${o.sym}`, '#ff1744');
+      }
+    } else {
+      const have = G.portfolio[o.sym] || 0;
+      const sellQty = Math.min(o.qty, have);
+      if (sellQty > 0) {
+        const proceeds = s.price * sellQty;
+        const cps = G.costBasis[o.sym] ? G.costBasis[o.sym] / have : 0;
+        const pnl = (s.price - cps) * sellQty;
+        G.cash += proceeds;
+        const ratio = (have - sellQty) / have;
+        G.portfolio[o.sym] = have - sellQty;
+        G.costBasis[o.sym] = (G.costBasis[o.sym] || 0) * ratio;
+        G.trades++;
+        recordTrade('sell', o.sym, sellQty, s.price, pnl);
+        flash(`✅ Order filled: Sold ${sellQty}× ${o.sym} @ ${$$(s.price)}`, 'var(--green)');
+        snd.sell();
+      }
+    }
+  }
+  // Clean up old cancelled/triggered orders older than 5 min
+  const cutoff = Date.now() - 5 * 60 * 1000;
+  G_orders = G_orders.filter(o => o.status === 'pending' || o.ts > cutoff);
+  if (filled) { refreshUI(); checkAchs(); saveGame(); pushLBScore(); renderOrders(); }
+}
+
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  if (!list) return;
+  const active  = G_orders.filter(o => o.status === 'pending');
+  const recent  = G_orders.filter(o => o.status !== 'pending').slice(-5).reverse();
+  const all     = [...active, ...recent];
+  if (!all.length) {
+    list.innerHTML = '<div class="orders-empty">No pending orders.<br>Set a target price and StockBlitz will auto-execute.</div>';
+    return;
+  }
+  list.innerHTML = all.map(o => {
+    const s     = STOCKS[o.sym];
+    const col   = s ? s.color : 'var(--text)';
+    const price = $$(o.triggerPrice);
+    const cur   = s ? $$(s.price) : '—';
+    const typeLabel = {limitBuy:'Limit Buy',limitSell:'Limit Sell',stopLoss:'Stop Loss'}[o.type] || o.type;
+    const statusText = o.status === 'pending' ? `current: ${cur}` : o.status.toUpperCase();
+    return `
+      <div class="order-card ${o.status}">
+        <span class="oc-type ${o.type}">${typeLabel}</span>
+        <span class="oc-sym" style="color:${col}">${o.sym}</span>
+        <span class="oc-info">${o.qty}× @ ${price}<br>${statusText}</span>
+        ${o.status === 'pending' ? `<button class="oc-cancel" onclick="cancelOrder('${o.id}')">✕</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function initOrders() {
+  // Populate stock selector
+  const sel = document.getElementById('order-sym');
+  SYM_LIST.forEach(sym => {
+    const opt = document.createElement('option');
+    opt.value = sym; opt.textContent = `${sym} — ${STOCKS[sym].name}`;
+    sel.appendChild(opt);
+  });
+  // Also populate admin sym selector
+  const asel = document.getElementById('admin-sym');
+  if (asel) {
+    SYM_LIST.forEach(sym => {
+      const opt = document.createElement('option');
+      opt.value = sym; opt.textContent = sym;
+      asel.appendChild(opt);
+    });
+  }
+  // Order type buttons
+  document.querySelectorAll('.order-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      G_orderType = btn.dataset.otype;
+      document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   🔍 PLAYER SEARCH
+══════════════════════════════════════════════════════════ */
+async function searchPlayers() {
+  const query   = (document.getElementById('player-search-input').value || '').trim().toLowerCase();
+  const results = document.getElementById('player-results');
+  if (!query) { results.innerHTML = '<div class="orders-empty">Enter a name to search.</div>'; return; }
+  results.innerHTML = '<div class="orders-empty">Searching…</div>';
+
+  let all = {};
+  if (fbConfigured()) {
+    try {
+      const res = await fetch(FIREBASE_URL + LB_FB_PATH, { cache: 'no-store' });
+      all = res.ok ? (await res.json() || {}) : {};
+    } catch(e) {}
+  }
+  all = { ...lbLocalLoad(), ...all };
+
+  const matches = Object.entries(all)
+    .filter(([id, e]) => e && e.name && e.name.toLowerCase().includes(query))
+    .sort((a,b) => (b[1].score||0) - (a[1].score||0))
+    .slice(0, 20);
+
+  if (!matches.length) {
+    results.innerHTML = `<div class="orders-empty">No players found matching "${escHtml(query)}".</div>`; return;
+  }
+
+  results.innerHTML = matches.map(([id, e]) => {
+    const isAdmin   = e.name === 'avstr';
+    const isMe      = id === PLAYER_ID;
+    const ago       = e.ts ? timeAgo(e.ts) : 'unknown';
+    const active    = e.ts && (Date.now() - e.ts) < 10 * 60 * 1000;
+    const dot       = active ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle"></span>' : '';
+    const portfolio = e.portfolio ? Object.entries(e.portfolio).filter(([,q]) => q > 0) : [];
+    const holdingsHtml = portfolio.length
+      ? portfolio.slice(0,12).map(([sym,qty]) => `<span class="player-holding-sym"><b>${escHtml(sym)}</b> ×${qty}</span>`).join('')
+      : '<span style="color:var(--text-dim)">No positions</span>';
+    return `
+      <div class="player-card" onclick="selectSym('${portfolio[0]?.[0]||'TECH'}')">
+        <div class="player-card-top">
+          <span class="player-card-name${isAdmin?' admin':''}">
+            ${dot}${escHtml(e.name)}${isMe?' (you)':''}
+          </span>
+          <span class="player-card-score">${$$(e.score||0)}</span>
+        </div>
+        <div class="player-card-stats">
+          <span>🔄 ${e.trades||0} trades</span>
+          <span>🏅 ${e.ach||0} badges</span>
+          <span>🕐 ${ago}</span>
+        </div>
+        ${portfolio.length ? `<div class="player-holdings">${holdingsHtml}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function initPlayerSearch() {
+  document.getElementById('player-search-btn').onclick = searchPlayers;
+  document.getElementById('player-search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchPlayers();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   👑 ADMIN — reserved username "avstr"
+   Only the account with localStorage pid matching avstr's
+   original device can claim it (first-claim, Firebase-locked).
+   Admin can set prices globally via Firebase override path.
+══════════════════════════════════════════════════════════ */
+const ADMIN_NAME     = 'avstr';
+const ADMIN_PID_PATH = '/stockblitz_admin/avstr_pid.json';
+const ADMIN_OVERRIDE = '/stockblitz_admin/price_override.json';
+let   isAdmin        = false;
+
+async function checkAdminStatus() {
+  if (PLAYER_NAME !== ADMIN_NAME) { isAdmin = false; updateAdminUI(); return; }
+  if (!fbConfigured()) { isAdmin = true; updateAdminUI(); return; }
+  try {
+    const res  = await fetch(FIREBASE_URL + ADMIN_PID_PATH, { cache: 'no-store' });
+    const pid  = res.ok ? await res.json() : null;
+    if (!pid) {
+      // First time avstr logs in — claim the name
+      await fetch(FIREBASE_URL + ADMIN_PID_PATH, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(PLAYER_ID)
+      });
+      isAdmin = true;
+    } else {
+      isAdmin = (pid === PLAYER_ID);
+    }
+  } catch(e) { isAdmin = false; }
+  updateAdminUI();
+}
+
+function updateAdminUI() {
+  const panel = document.getElementById('admin-panel');
+  if (panel) panel.classList.toggle('visible', isAdmin);
+}
+
+async function adminSetPrice() {
+  if (!isAdmin) return;
+  const sym   = document.getElementById('admin-sym').value;
+  const price = parseFloat(document.getElementById('admin-price').value);
+  if (!sym || !price || price <= 0) { flash('❌ Select stock and enter price', '#ff1744'); return; }
+
+  // Apply locally
+  const s = STOCKS[sym];
+  if (!s) return;
+  s.prev  = s.price;
+  s.price = price;
+  s.history.push(price);
+  if (s.history.length > 240) s.history.shift();
+
+  // Push to Firebase so all clients see the override
+  if (fbConfigured()) {
+    try {
+      await fetch(FIREBASE_URL + ADMIN_OVERRIDE + '.json', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sym, price, ts: Date.now(), by: PLAYER_NAME })
+      });
+    } catch(e) {}
+  }
+  flash(`👑 Price set: ${sym} → ${$$(price)}`, 'var(--gold)');
+  refreshUI();
+}
+
+async function pollAdminOverride() {
+  if (!fbConfigured() || isAdmin) return;
+  try {
+    const res = await fetch(FIREBASE_URL + ADMIN_OVERRIDE + '.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.sym || !data.ts) return;
+    if (Date.now() - data.ts > 10000) return; // only apply if fresh (<10s old)
+    const s = STOCKS[data.sym];
+    if (!s || Math.abs(s.price - data.price) < 0.001) return;
+    s.prev  = s.price;
+    s.price = Math.max(0.01, data.price);
+    s.history.push(s.price);
+    if (s.history.length > 240) s.history.shift();
+    refreshUI();
+  } catch(e) {}
+}
+
+function adminPushNews() {
+  if (!isAdmin) return;
+  const sym = document.getElementById('admin-sym').value || null;
+  const ev  = sym ? { sym, imp: 0.06, type: 'positive' } : { sym: null, imp: 0.03, type: 'positive' };
+  const txt = sym ? `👑 Admin bulletin: ${STOCKS[sym]?.name || sym} surges on breaking news!` : '👑 Admin: Broad market rally triggered!';
+  pushNewsEvent(ev, txt);
+  applyNewsEvent({ ...ev, txt, ts: Date.now() });
+}
+
+function adminTriggerCrash() {
+  if (!isAdmin) return;
+  const ev = { sym: null, imp: -0.05, type: 'negative' };
+  const txt = '🚨 ADMIN: Market-wide sell-off initiated!';
+  pushNewsEvent(ev, txt);
+  applyNewsEvent({ ...ev, txt, ts: Date.now() });
+}
+
+function adminTriggerBoom() {
+  if (!isAdmin) return;
+  const ev = { sym: null, imp: 0.04, type: 'positive' };
+  const txt = '🚀 ADMIN: Market-wide boom wave triggered!';
+  pushNewsEvent(ev, txt);
+  applyNewsEvent({ ...ev, txt, ts: Date.now() });
+}
+
+/* ─── RESERVED USERNAME CHECK ─────────────────────────────── */
+// Override isNameTaken to block "avstr" for anyone who isn't the real avstr
+const _origIsNameTaken = isNameTaken;
+async function isNameTaken(name, excludeId) {
+  if (name.toLowerCase() === ADMIN_NAME) {
+    // Only allow if this player already holds the avstr pid in Firebase
+    if (!fbConfigured()) return false; // local mode: allow (no way to check)
+    try {
+      const res = await fetch(FIREBASE_URL + ADMIN_PID_PATH, { cache: 'no-store' });
+      const pid = res.ok ? await res.json() : null;
+      if (!pid) return false; // not yet claimed, allow first setter
+      return pid !== excludeId; // taken if another player owns it
+    } catch(e) { return false; }
+  }
+  return _origIsNameTaken(name, excludeId);
+}
+
 /* ─── GAME LOOP ─────────────────────────────────── */
 function gameLoop() {
   // All clients run the same deterministic simulation — no host needed
   tickPrices();
 
-  // Poll Firebase for news events every 8 ticks
+  // Check pending orders every tick
+  checkOrders();
+
+  // Poll Firebase for news events every 8 ticks (~8s)
   if (G.tickCount % 8 === 0) pollNewsEvents();
+
+  // Poll admin price overrides every 5 ticks (~5s)
+  if (G.tickCount % 5 === 0) pollAdminOverride();
 
   refreshUI();
   checkAchs();
@@ -5519,12 +5574,23 @@ async function init() {
 
   // Size canvas
   const canvas = document.getElementById('chart');
-  const resizeCanvas = () => {
-    canvas.width = document.getElementById('tab-chart').clientWidth - 24;
-    drawChart();
-  };
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  function fitMainPanel() {
+    const header  = document.getElementById('header');
+    const ticker  = document.getElementById('ticker-bar');
+    const emer    = document.getElementById('emergency-banner');
+    const shorts  = document.getElementById('shortcuts');
+    const usedH   = (header?.offsetHeight||0) + (ticker?.offsetHeight||0) +
+                    (emer?.offsetHeight||0) + (shorts?.offsetHeight||0);
+    const main    = document.getElementById('main');
+    if (main) main.style.height = `calc(100vh - ${usedH}px)`;
+    if (canvas) {
+      canvas.width = document.getElementById('tab-chart').clientWidth - 24;
+      drawChart();
+    }
+  }
+  const resizeCanvas = fitMainPanel;
+  fitMainPanel();
+  window.addEventListener('resize', fitMainPanel);
 
   // Welcome news
   addLimitedNewsItem(
@@ -5574,17 +5640,28 @@ async function init() {
   // ── NEW: Zoom controls ──
   initZoomControls();
 
-  // ── NEW: Resizable panels ──
+  // ── Resizable panels ──
   initResizeHandle();
 
-  // ── NEW: History filter buttons ──
+  // ── History filter buttons ──
   initHistoryFilters();
 
+  // ── Orders system ──
+  initOrders();
+
+  // ── Chat ──
+  initChat();
+
+  // ── Player search ──
+  initPlayerSearch();
+
   // ── GLOBAL SYNC: Load shared market start time from Firebase ──
-  // This ensures all clients use the same tick counter → identical prices
   await loadOrCreateMarketStart();
-  // Poll for news events every 8 seconds (also done inside gameLoop)
   setInterval(pollNewsEvents, 8000);
+  setInterval(pollAdminOverride, 5000);
+
+  // ── Check admin status after player name is known ──
+  await checkAdminStatus();
 
   // Initial UI render
   refreshUI();
@@ -5597,7 +5674,7 @@ async function init() {
   // Schedule first news event (8–15s after load)
   setTimeout(() => { fireNews(); scheduleNews(); }, 8000 + Math.random() * 7000);
 
-  // Push initial score to leaderboard
+  // Push initial score to leaderboard (includes portfolio for player search)
   pushLBScore();
 
   // Show tutorial on very first visit
