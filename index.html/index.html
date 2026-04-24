@@ -533,28 +533,27 @@ td {
 .flash-g { animation: flash-g 0.55s ease-out; }
 .flash-r { animation: flash-r 0.55s ease-out; }
 
+/* Cornered stock rows pulse gold to draw attention */
+@keyframes cornered-pulse {
+  0%,100% { background:rgba(255,214,0,0.03); }
+  50%     { background:rgba(255,214,0,0.10); }
+}
+.stock-row.cornered { border-left:2px solid var(--gold) !important; }
+.stock-row.cornered td { animation:cornered-pulse 2.2s ease-in-out infinite; }
+.stock-row.majority { border-left:2px solid var(--orange) !important; }
+.stock-row.whale { border-left:2px solid var(--blue) !important; }
+
+/* Float bar in table */
+.float-bar-wrap { display:inline-block; width:68px; vertical-align:middle; }
+.float-bar-track { height:4px; background:var(--bg4); border-radius:2px; overflow:hidden; margin-bottom:2px; }
+.float-bar-fill  { height:4px; border-radius:2px; transition:width 0.4s; }
+.float-bar-mine  { position:absolute; right:0; top:0; height:4px; background:var(--gold); border-radius:2px; }
+.float-label     { font-size:0.55em; line-height:1; }
+
 /* ─── RIGHT PANEL ───────────────────────────────────────── */
 /* Tab system */
 #rp-tabs-placeholder { display: none; } /* old rule replaced by #rp-header layout */
-.rp-tab {
-  flex-shrink: 0;
-  flex-grow: 0;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.58em;
-  padding: 7px 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.15s;
-  text-align: center;
-  white-space: nowrap;
-}
-.rp-tab:hover { color: var(--text); }
-.rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* rp-tab rules moved to #rp-header section */
 
 .tab-content {
   display: none;
@@ -951,8 +950,13 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
   scrollbar-width: none;
   padding: 0 2px;
   gap: 1px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  user-select: none;
 }
 #rp-tabs::-webkit-scrollbar { display: none; }
+#rp-tabs.is-dragging { cursor: grabbing; scroll-behavior: auto; }
 .rp-tab {
   flex-shrink: 0;
   background: transparent;
@@ -968,15 +972,37 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 7px 9px 5px;
+  gap: 3px;
+  padding: 9px 12px 7px;
   line-height: 1;
-  min-width: 40px;
+  min-width: 50px;
 }
-.rp-tab .ti { font-size: 1.1em; display: block; }
-.rp-tab .tl { font-size: 0.52em; text-transform: uppercase; letter-spacing: 0.8px; display: block; color: inherit; }
-.rp-tab:hover { color: var(--text-hi); background: rgba(255,255,255,0.03); }
-.rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(var(--accent-rgb),0.05); }
+.rp-tab .ti { font-size: 1.4em; display: block; }
+.rp-tab .tl { font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.8px; display: block; color: inherit; font-weight: 600; }
+.rp-tab:hover { color: var(--text-hi); background: rgba(255,255,255,0.04); }
+.rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(var(--accent-rgb),0.06); }
+.rp-tab.active .ti { filter: drop-shadow(0 0 5px rgba(var(--accent-rgb),0.8)); }
+
+/* ── Scroll dragger bar beneath tab row ── */
+#tabs-dragger-wrap {
+  height: 5px;
+  background: var(--bg3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+#tabs-dragger-thumb {
+  position: absolute;
+  top: 0;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(var(--accent-rgb), 0.40);
+  cursor: grab;
+  transition: background 0.15s;
+  min-width: 28px;
+}
+#tabs-dragger-thumb:hover { background: rgba(var(--accent-rgb), 0.70); }
+#tabs-dragger-thumb.is-dragging { background: var(--accent); cursor: grabbing; }
 
 /* ─── ORDERS TAB ─────────────────────────────────────────── */
 #tab-orders { flex-direction: column; overflow: hidden; min-height: 0; }
@@ -1111,6 +1137,145 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
   border-radius: 3px; font-weight: bold; transition: all 0.15s;
 }
 .admin-btn:hover { background: rgba(255,214,0,0.25); }
+
+/* ─── MATCHES TAB ────────────────────────────────────────── */
+.match-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+.match-card.live { border-color: rgba(255,23,68,0.4); background: rgba(255,23,68,0.03); }
+.match-card.ended { opacity: 0.5; }
+.match-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+.match-name { font-weight:bold; font-size:0.82em; color:var(--text-hi); }
+.match-status {
+  font-size:0.55em; padding:2px 7px; border-radius:10px; font-weight:bold;
+  text-transform:uppercase; letter-spacing:1px;
+}
+.match-status.waiting { background:rgba(41,182,246,0.15); color:var(--blue); border:1px solid rgba(41,182,246,0.3); }
+.match-status.live    { background:rgba(255,23,68,0.15);  color:var(--red);  border:1px solid rgba(255,23,68,0.3); animation:pulse-live 1s infinite; }
+.match-status.ended   { background:rgba(100,100,100,0.15); color:var(--text-dim); border:1px solid var(--border); }
+.match-meta { font-size:0.62em; color:var(--text-dim); display:flex; gap:10px; margin-bottom:6px; }
+.match-players { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:6px; }
+.match-player-chip {
+  font-size:0.58em; padding:2px 6px; border-radius:10px;
+  background:var(--bg4); border:1px solid var(--border); color:var(--text-dim);
+}
+.match-player-chip.you { color:var(--accent); border-color:rgba(var(--accent-rgb),0.3); }
+.match-player-chip.winner { color:var(--gold); border-color:rgba(255,214,0,0.4); background:rgba(255,214,0,0.06); }
+.match-join-btn {
+  width:100%; padding:5px; background:rgba(var(--accent-rgb),0.1);
+  border:1px solid rgba(var(--accent-rgb),0.3); color:var(--accent);
+  font-family:var(--mono); font-size:0.65em; cursor:pointer; border-radius:4px;
+  font-weight:bold; transition:all 0.15s; text-transform:uppercase;
+}
+.match-join-btn:hover { background:rgba(var(--accent-rgb),0.2); }
+.match-join-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+/* Match leaderboard inside HUD */
+.match-lb-row {
+  display:flex; align-items:center; gap:6px; padding:4px 0;
+  border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.68em;
+}
+.match-lb-rank { width:20px; color:var(--text-dim); flex-shrink:0; }
+.match-lb-name { flex:1; color:var(--text-hi); }
+.match-lb-val  { font-weight:bold; color:var(--gold); }
+
+/* Sudden event flash */
+.match-event-flash {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(255,23,68,0.95); color:#fff; padding:14px 28px;
+  border-radius:10px; font-size:0.95em; font-weight:bold; text-align:center;
+  z-index:2000; pointer-events:none; letter-spacing:1px;
+  animation:match-event-appear 3s forwards;
+  box-shadow:0 0 40px rgba(255,23,68,0.6);
+}
+@keyframes match-event-appear {
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)}
+  12%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}
+  22%{transform:translate(-50%,-50%) scale(1)}
+  75%{opacity:1} 100%{opacity:0}
+}
+
+/* Final scoreboard */
+.match-winner-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:3000;
+  display:flex; align-items:center; justify-content:center;
+  animation:fadein 0.4s;
+}
+.match-winner-box {
+  background:var(--bg2); border:2px solid var(--gold); border-radius:12px;
+  padding:28px 32px; width:400px; max-width:92vw;
+  box-shadow:0 0 60px rgba(255,214,0,0.3); text-align:center;
+}
+
+/* ─── TEAMS TAB ──────────────────────────────────────────── */
+.team-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+.team-card:hover { border-color: rgba(var(--accent-rgb),0.3); }
+.team-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+.team-card-name { font-weight:bold; font-size:0.82em; color:var(--text-hi); }
+.team-card-val  { font-size:0.78em; color:var(--gold); font-weight:bold; }
+.team-members-row { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:6px; }
+.team-member-chip {
+  font-size:0.58em; padding:2px 7px; border-radius:10px;
+  background:var(--bg4); border:1px solid var(--border); color:var(--text-dim);
+  display:flex; align-items:center; gap:3px;
+}
+.role-dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
+.role-dot.analyst { background: var(--blue); }
+.role-dot.trader  { background: var(--green); }
+.role-dot.risk    { background: var(--orange); }
+.team-join-btn {
+  width:100%; padding:5px; background:rgba(var(--accent-rgb),0.08);
+  border:1px solid rgba(var(--accent-rgb),0.25); color:var(--accent);
+  font-family:var(--mono); font-size:0.63em; cursor:pointer; border-radius:4px;
+  font-weight:bold; transition:all 0.15s; text-transform:uppercase;
+}
+.team-join-btn:hover { background:rgba(var(--accent-rgb),0.18); }
+.team-join-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.team-role-btn {
+  flex:1; padding:6px 4px; font-family:var(--mono); font-size:0.62em;
+  border:1px solid var(--border); background:var(--bg3); color:var(--text-dim);
+  cursor:pointer; border-radius:5px; transition:all 0.15s; text-align:center;
+}
+.team-role-btn:hover { border-color:var(--accent); color:var(--accent); }
+.team-role-btn.selected { border-color:var(--accent); color:var(--accent); background:rgba(var(--accent-rgb),0.1); }
+
+/* Role info boxes */
+.role-info {
+  padding:8px 10px; border-radius:5px; font-size:0.67em; margin-top:6px;
+  border:1px solid; line-height:1.5;
+}
+.role-info.analyst  { border-color:rgba(41,182,246,0.3);  background:rgba(41,182,246,0.06);  color:var(--blue); }
+.role-info.trader   { border-color:rgba(0,230,118,0.3);   background:rgba(0,230,118,0.06);   color:var(--green); }
+.role-info.risk     { border-color:rgba(255,152,0,0.3);   background:rgba(255,152,0,0.06);   color:var(--orange); }
+.role-locked-msg { text-align:center; padding:20px 12px; color:var(--text-dim); font-size:0.72em; }
+
+/* ─── TRADE FEED TAB ─────────────────────────────────────── */
+.feed-item {
+  display:flex; align-items:center; gap:6px; padding:5px 4px;
+  border-bottom:1px solid rgba(255,255,255,0.025);
+  font-size:0.67em; animation:feed-slide-in 0.25s ease;
+}
+@keyframes feed-slide-in { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:none} }
+.feed-action { width:32px; font-weight:bold; flex-shrink:0; }
+.feed-action.buy  { color:var(--green); }
+.feed-action.sell { color:var(--red); }
+.feed-player { flex:1; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.feed-player strong { color:var(--text-hi); }
+.feed-sym { font-weight:bold; flex-shrink:0; }
+.feed-qty { color:var(--text-dim); flex-shrink:0; }
+.feed-price { color:var(--text-dim); flex-shrink:0; font-size:0.88em; }
+.feed-ago  { color:var(--text-dim); font-size:0.82em; flex-shrink:0; }
+.feed-hype { background:rgba(255,152,0,0.08); }
+.feed-empty { text-align:center; color:var(--text-dim); font-size:0.72em; padding:30px 0; }
 
 /* ─── SAVE INDICATOR ─────────────────────────────────────── */
 #save-indicator {
@@ -1511,6 +1676,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
             <th data-col="sector">Sector</th>
             <th class="r" data-col="price">Price</th>
             <th class="r" data-col="chg">Sess %</th>
+            <th class="r" data-col="float">Float</th>
             <th class="r" data-col="signal">Signal</th>
             <th class="r" data-col="owned">Owned</th>
             <th class="r" data-col="value">Pos $</th>
@@ -1562,10 +1728,24 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
           <button class="rp-tab" data-tab="players">
             <span class="ti">🔍</span><span class="tl">Players</span>
           </button>
+          <button class="rp-tab" data-tab="matches">
+            <span class="ti">🏁</span><span class="tl">Matches</span>
+          </button>
+          <button class="rp-tab" data-tab="teams">
+            <span class="ti">👥</span><span class="tl">Teams</span>
+          </button>
+          <button class="rp-tab" data-tab="feed">
+            <span class="ti">📣</span><span class="tl">Feed</span>
+          </button>
           <button class="rp-tab" data-tab="ach">
             <span class="ti">🏅</span><span class="tl">Badges</span>
           </button>
         </div>
+      </div>
+
+      <!-- Tab scroll dragger — drag this bar to scroll the tab row -->
+      <div id="tabs-dragger-wrap">
+        <div id="tabs-dragger-thumb"></div>
       </div>
 
       <!-- Admin panel (only visible for avstr) -->
@@ -1634,6 +1814,12 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
           </div>
         </div>
         <div id="port-list"><div class="port-empty">No positions yet.<br>Buy some stocks to get started! 📈</div></div>
+
+        <!-- Ownership Benefits Panel (shown when you have 10%+ of any float) -->
+        <div style="padding:6px 12px 2px;font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);flex-shrink:0;border-top:1px solid var(--border)">👑 Ownership Benefits</div>
+        <div id="ownership-panel" style="padding:0 12px 8px;overflow-y:auto;flex-shrink:0;max-height:240px">
+          <div style="font-size:0.62em;color:var(--text-dim);padding:4px 0">Own 10%+ of a float to unlock benefits.</div>
+        </div>
       </div>
 
       <!-- TRADE HISTORY TAB -->
@@ -1770,6 +1956,123 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
         </div>
       </div>
 
+      <!-- ═══ MATCHES TAB ══════════════════════════════════ -->
+      <div class="tab-content" id="tab-matches">
+        <!-- Header / lobby selector -->
+        <div id="match-header" style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="panel-title">🏁 Timed Matches</div>
+            <div id="match-live-badge" style="display:none;font-size:0.55em;background:rgba(255,23,68,0.15);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:2px 8px;animation:pulse-live 1.2s ease-in-out infinite">● LIVE</div>
+          </div>
+          <!-- Duration picker (only shown in lobby) -->
+          <div id="match-create-row" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+            <select id="match-duration" class="order-select" style="flex:1">
+              <option value="5">5 min · Blitz</option>
+              <option value="10" selected>10 min · Standard</option>
+              <option value="15">15 min · Extended</option>
+            </select>
+            <input id="match-start-cash" class="order-input" type="number" value="1000" min="500" step="500" placeholder="Start $" style="width:90px;flex:none">
+            <button class="btn-place-order" style="flex:none;padding:5px 12px;white-space:nowrap" onclick="createMatch()">➕ New Match</button>
+          </div>
+        </div>
+
+        <!-- Active match HUD (hidden when not in match) -->
+        <div id="match-hud" style="display:none;padding:6px 12px;border-bottom:1px solid var(--border);background:rgba(255,23,68,0.04);flex-shrink:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+            <div>
+              <div style="font-size:0.58em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Match in progress</div>
+              <div id="match-hud-name" style="font-size:0.8em;font-weight:bold;color:var(--text-hi)">—</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:0.55em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Time Left</div>
+              <div id="match-countdown" style="font-size:1.4em;font-weight:bold;color:var(--red);font-variant-numeric:tabular-nums">00:00</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:0.55em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Your Value</div>
+              <div id="match-hud-val" style="font-size:0.88em;font-weight:bold;color:var(--green)">$1,000</div>
+            </div>
+          </div>
+          <!-- Pressure bar -->
+          <div style="margin-top:5px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden">
+            <div id="match-pressure-bar" style="height:3px;background:linear-gradient(90deg,var(--green),var(--red));border-radius:2px;transition:width 1s linear;width:100%"></div>
+          </div>
+          <button onclick="leaveMatch()" style="margin-top:5px;width:100%;background:transparent;border:1px solid rgba(255,23,68,0.3);color:var(--red);font-family:var(--mono);font-size:0.6em;padding:3px;cursor:pointer;border-radius:3px">Leave Match</button>
+        </div>
+
+        <!-- Lobby list + leaderboard -->
+        <div id="match-content" style="overflow-y:auto;flex:1;min-height:0;padding:6px 10px"></div>
+      </div>
+
+      <!-- ═══ TEAMS TAB ════════════════════════════════════ -->
+      <div class="tab-content" id="tab-teams">
+        <div id="teams-header" style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="panel-title">👥 Team Trading</div>
+            <div id="team-role-badge" style="display:none;font-size:0.58em;padding:2px 8px;border-radius:10px;font-weight:bold"></div>
+          </div>
+          <div id="team-create-row" style="display:flex;gap:5px">
+            <input id="team-name-input" class="order-input" placeholder="Team name…" maxlength="20" style="flex:1">
+            <button class="btn-place-order" style="padding:5px 10px;white-space:nowrap;flex:none" onclick="createTeam()">➕ Create</button>
+          </div>
+        </div>
+
+        <!-- Team HUD when in a team -->
+        <div id="team-hud" style="display:none;flex-shrink:0;border-bottom:1px solid var(--border);padding:8px 12px;background:rgba(var(--accent-rgb),0.03)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <div id="team-hud-name" style="font-weight:bold;font-size:0.85em;color:var(--text-hi)">Team Alpha</div>
+              <div id="team-hud-role" style="font-size:0.6em;color:var(--text-dim);margin-top:1px">Role: Trader</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:0.55em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Shared Value</div>
+              <div id="team-hud-val" style="font-size:0.9em;font-weight:bold;color:var(--green)">$1,000</div>
+            </div>
+          </div>
+          <!-- Team members -->
+          <div id="team-members-list" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px"></div>
+          <button onclick="leaveTeam()" style="width:100%;background:transparent;border:1px solid rgba(255,23,68,0.2);color:var(--red);font-family:var(--mono);font-size:0.58em;padding:3px;cursor:pointer;border-radius:3px">Leave Team</button>
+        </div>
+
+        <!-- Role selector (shown before joining) -->
+        <div id="team-role-picker" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="font-size:0.6em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Choose your role</div>
+          <div style="display:flex;gap:4px">
+            <button class="team-role-btn" data-role="analyst" onclick="pickRole('analyst')">📡 Analyst</button>
+            <button class="team-role-btn" data-role="trader" onclick="pickRole('trader')">⚡ Trader</button>
+            <button class="team-role-btn" data-role="risk" onclick="pickRole('risk')">🛡 Risk Mgr</button>
+          </div>
+        </div>
+
+        <div id="teams-content" style="overflow-y:auto;flex:1;min-height:0;padding:6px 10px"></div>
+      </div>
+
+      <!-- ═══ TRADE FEED TAB ═══════════════════════════════ -->
+      <div class="tab-content" id="tab-feed">
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+          <div class="panel-title">📣 Live Trade Feed</div>
+          <div style="font-size:0.55em;color:var(--green);display:flex;align-items:center;gap:4px">
+            <span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse-live 1.4s ease-in-out infinite"></span>
+            LIVE
+          </div>
+        </div>
+        <div id="feed-list" style="overflow-y:auto;flex:1;min-height:0;padding:4px 8px"></div>
+        <!-- Feed stats -->
+        <div id="feed-stats" style="padding:5px 12px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;flex-shrink:0;background:var(--bg2)">
+          <div style="text-align:center">
+            <div style="font-size:0.5em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Most Bought</div>
+            <div id="feed-top-buy" style="font-size:0.75em;font-weight:bold;color:var(--green);margin-top:1px">—</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:0.5em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Most Sold</div>
+            <div id="feed-top-sell" style="font-size:0.75em;font-weight:bold;color:var(--red);margin-top:1px">—</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:0.5em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Trades Today</div>
+            <div id="feed-trade-count" style="font-size:0.75em;font-weight:bold;color:var(--text-hi);margin-top:1px">0</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- end right-panel -->
 
   </div><!-- /main -->
@@ -1791,6 +2094,8 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 
 <!-- Flash message -->
 <div id="flash"></div>
+<!-- Dividend / corner tax income indicator -->
+<div id="dividend-indicator" style="position:fixed;bottom:52px;left:12px;font-size:0.65em;color:var(--gold);background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.25);border-radius:4px;padding:3px 10px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:100"></div>
 <!-- Achievement toast -->
 <div id="toast">
   <div id="toast-label">🏅 Achievement Unlocked!</div>
@@ -2073,81 +2378,142 @@ const ACCENT_MAP = {
           runaway prices. News events create the upside excitement.
    ──────────────────────────────────────────────────────────── */
 const STOCKS = {
-  /* ── TECH (10) ── */
-  TECH:  { name:'TechNova Corp',       price:142.50, vol:0.012, drift:0, color:'#29b6f6', sector:'Tech' },
-  SEMI:  { name:'Silicon Chip Co',     price: 98.40, vol:0.014, drift:0, color:'#4fc3f7', sector:'Tech' },
-  APPL:  { name:'AppleSeed Devices',   price:187.20, vol:0.009, drift:0, color:'#81d4fa', sector:'Tech' },
-  GOOG:  { name:'Googleplex AI',       price:175.80, vol:0.010, drift:0, color:'#4dd0e1', sector:'Tech' },
-  META:  { name:'Metaverse Corp',      price: 52.60, vol:0.015, drift:0, color:'#26c6da', sector:'Tech' },
-  MSFT:  { name:'MicroSoft Systems',   price:415.30, vol:0.008, drift:0, color:'#00bcd4', sector:'Tech' },
-  NFLX:  { name:'NetFlix Media',       price:632.40, vol:0.011, drift:0, color:'#f44336', sector:'Tech' },
-  SPOT:  { name:'Spotwave Music',      price: 78.90, vol:0.012, drift:0, color:'#1db954', sector:'Tech' },
-  UBER:  { name:'UberDrive Mobility',  price: 43.20, vol:0.013, drift:0, color:'#607d8b', sector:'Tech' },
-  AIRB:  { name:'AirBase Rentals',     price:128.60, vol:0.011, drift:0, color:'#ff5a5f', sector:'Tech' },
+  /* ── TECH (10) ── large-cap: 200k–500k shares, hard to corner ── */
+  TECH:  { name:'TechNova Corp',       price:142.50, vol:0.012, drift:0, color:'#29b6f6', sector:'Tech',          shares:500000 },
+  SEMI:  { name:'Silicon Chip Co',     price: 98.40, vol:0.014, drift:0, color:'#4fc3f7', sector:'Tech',          shares:350000 },
+  APPL:  { name:'AppleSeed Devices',   price:187.20, vol:0.009, drift:0, color:'#81d4fa', sector:'Tech',          shares:400000 },
+  GOOG:  { name:'Googleplex AI',       price:175.80, vol:0.010, drift:0, color:'#4dd0e1', sector:'Tech',          shares:400000 },
+  META:  { name:'Metaverse Corp',      price: 52.60, vol:0.015, drift:0, color:'#26c6da', sector:'Tech',          shares:250000 },
+  MSFT:  { name:'MicroSoft Systems',   price:415.30, vol:0.008, drift:0, color:'#00bcd4', sector:'Tech',          shares:500000 },
+  NFLX:  { name:'NetFlix Media',       price:632.40, vol:0.011, drift:0, color:'#f44336', sector:'Tech',          shares:200000 },
+  SPOT:  { name:'Spotwave Music',      price: 78.90, vol:0.012, drift:0, color:'#1db954', sector:'Tech',          shares:150000 },
+  UBER:  { name:'UberDrive Mobility',  price: 43.20, vol:0.013, drift:0, color:'#607d8b', sector:'Tech',          shares:200000 },
+  AIRB:  { name:'AirBase Rentals',     price:128.60, vol:0.011, drift:0, color:'#ff5a5f', sector:'Tech',          shares:175000 },
 
-  /* ── FINANCE (6) ── */
-  BANK:  { name:'FirstNation Bank',    price: 88.40, vol:0.007, drift:0, color:'#66bb6a', sector:'Finance' },
-  GOLD:  { name:'GoldStar Finance',    price:210.70, vol:0.008, drift:0, color:'#ffd600', sector:'Finance' },
-  INSUR: { name:'SafeNet Insurance',   price: 66.30, vol:0.006, drift:0, color:'#81c784', sector:'Finance' },
-  COIN:  { name:'CryptoCoin Exchange', price: 24.80, vol:0.035, drift:0, color:'#f7931a', sector:'Finance' },
-  PAYM:  { name:'PayMax Payments',     price:154.20, vol:0.009, drift:0, color:'#42a5f5', sector:'Finance' },
-  HEDG:  { name:'HedgeFund Alpha',     price:312.50, vol:0.010, drift:0, color:'#7e57c2', sector:'Finance' },
+  /* ── FINANCE (6) ── 75k–300k shares ── */
+  BANK:  { name:'FirstNation Bank',    price: 88.40, vol:0.007, drift:0, color:'#66bb6a', sector:'Finance',       shares:300000 },
+  GOLD:  { name:'GoldStar Finance',    price:210.70, vol:0.008, drift:0, color:'#ffd600', sector:'Finance',       shares:200000 },
+  INSUR: { name:'SafeNet Insurance',   price: 66.30, vol:0.006, drift:0, color:'#81c784', sector:'Finance',       shares:250000 },
+  COIN:  { name:'CryptoCoin Exchange', price: 24.80, vol:0.035, drift:0, color:'#f7931a', sector:'Finance',       shares: 75000 },
+  PAYM:  { name:'PayMax Payments',     price:154.20, vol:0.009, drift:0, color:'#42a5f5', sector:'Finance',       shares:175000 },
+  HEDG:  { name:'HedgeFund Alpha',     price:312.50, vol:0.010, drift:0, color:'#7e57c2', sector:'Finance',       shares:100000 },
 
-  /* ── ENERGY (5) ── */
-  ENERGY:{ name:'SolarBlast Energy',   price: 62.30, vol:0.008, drift:0, color:'#80cbc4', sector:'Energy' },
-  OIL:   { name:'PetroMax Oil',        price: 94.60, vol:0.010, drift:0, color:'#8d6e63', sector:'Energy' },
-  NUKE:  { name:'NuclearPower Inc',    price: 48.20, vol:0.007, drift:0, color:'#26a69a', sector:'Energy' },
-  WIND:  { name:'WindFarm Global',     price: 38.70, vol:0.008, drift:0, color:'#80deea', sector:'Energy' },
-  GAS:   { name:'GasLine Corp',        price: 57.40, vol:0.008, drift:0, color:'#a5d6a7', sector:'Energy' },
+  /* ── ENERGY (5) ── 100k–250k shares ── */
+  ENERGY:{ name:'SolarBlast Energy',   price: 62.30, vol:0.008, drift:0, color:'#80cbc4', sector:'Energy',        shares:200000 },
+  OIL:   { name:'PetroMax Oil',        price: 94.60, vol:0.010, drift:0, color:'#8d6e63', sector:'Energy',        shares:250000 },
+  NUKE:  { name:'NuclearPower Inc',    price: 48.20, vol:0.007, drift:0, color:'#26a69a', sector:'Energy',        shares:150000 },
+  WIND:  { name:'WindFarm Global',     price: 38.70, vol:0.008, drift:0, color:'#80deea', sector:'Energy',        shares:120000 },
+  GAS:   { name:'GasLine Corp',        price: 57.40, vol:0.008, drift:0, color:'#a5d6a7', sector:'Energy',        shares:175000 },
 
-  /* ── HEALTH (5) ── */
-  PHARMA:{ name:'MediCure Labs',       price:108.75, vol:0.013, drift:0, color:'#ef9a9a', sector:'Health' },
-  GENE:  { name:'GenomeX Bio',         price: 34.60, vol:0.020, drift:0, color:'#f48fb1', sector:'Health' },
-  HOSP:  { name:'HealthPlus Hospitals',price: 72.80, vol:0.007, drift:0, color:'#f8bbd0', sector:'Health' },
-  VACC:  { name:'VaccTech Sciences',   price: 58.40, vol:0.016, drift:0, color:'#ec407a', sector:'Health' },
-  FIT:   { name:'FitLife Wellness',    price: 28.90, vol:0.011, drift:0, color:'#ff80ab', sector:'Health' },
+  /* ── HEALTH (5) ── 50k–200k shares ── */
+  PHARMA:{ name:'MediCure Labs',       price:108.75, vol:0.013, drift:0, color:'#ef9a9a', sector:'Health',        shares:150000 },
+  GENE:  { name:'GenomeX Bio',         price: 34.60, vol:0.020, drift:0, color:'#f48fb1', sector:'Health',        shares: 50000 },
+  HOSP:  { name:'HealthPlus Hospitals',price: 72.80, vol:0.007, drift:0, color:'#f8bbd0', sector:'Health',        shares:200000 },
+  VACC:  { name:'VaccTech Sciences',   price: 58.40, vol:0.016, drift:0, color:'#ec407a', sector:'Health',        shares: 75000 },
+  FIT:   { name:'FitLife Wellness',    price: 28.90, vol:0.011, drift:0, color:'#ff80ab', sector:'Health',        shares:100000 },
 
-  /* ── FOOD (5) ── */
-  FOOD:  { name:'NomNom Foods',        price: 48.20, vol:0.007, drift:0, color:'#ffb74d', sector:'Food' },
-  CAFE:  { name:'BeanBrew Cafes',      price: 92.40, vol:0.008, drift:0, color:'#ff8f00', sector:'Food' },
-  BEER:  { name:'BrewCraft Beverages', price: 56.70, vol:0.007, drift:0, color:'#ffa726', sector:'Food' },
-  FARM:  { name:'AgriGrow Farms',      price: 31.50, vol:0.006, drift:0, color:'#8bc34a', sector:'Food' },
-  SODA:  { name:'FizzPop Beverages',   price: 44.80, vol:0.006, drift:0, color:'#ffcc02', sector:'Food' },
+  /* ── FOOD (5) ── 100k–250k shares ── */
+  FOOD:  { name:'NomNom Foods',        price: 48.20, vol:0.007, drift:0, color:'#ffb74d', sector:'Food',          shares:200000 },
+  CAFE:  { name:'BeanBrew Cafes',      price: 92.40, vol:0.008, drift:0, color:'#ff8f00', sector:'Food',          shares:150000 },
+  BEER:  { name:'BrewCraft Beverages', price: 56.70, vol:0.007, drift:0, color:'#ffa726', sector:'Food',          shares:175000 },
+  FARM:  { name:'AgriGrow Farms',      price: 31.50, vol:0.006, drift:0, color:'#8bc34a', sector:'Food',          shares:250000 },
+  SODA:  { name:'FizzPop Beverages',   price: 44.80, vol:0.006, drift:0, color:'#ffcc02', sector:'Food',          shares:200000 },
 
-  /* ── AUTO (5) ── */
-  AUTO:  { name:'VeloRide Motors',     price: 78.90, vol:0.009, drift:0, color:'#ce93d8', sector:'Auto' },
-  EV:    { name:'ElectroRide EV',      price: 22.40, vol:0.025, drift:0, color:'#b39ddb', sector:'Auto' },
-  SHIP:  { name:'OceanFreight Lines',  price: 44.60, vol:0.007, drift:0, color:'#80cbc4', sector:'Auto' },
-  SAIR:  { name:'Schultz Airlines',    price: 18.30, vol:0.014, drift:0, color:'#90caf9', sector:'Auto' },
-  TRUK:  { name:'HeavyLoad Trucks',    price: 67.80, vol:0.008, drift:0, color:'#bcaaa4', sector:'Auto' },
+  /* ── AUTO (5) ── 75k–300k shares ── */
+  AUTO:  { name:'VeloRide Motors',     price: 78.90, vol:0.009, drift:0, color:'#ce93d8', sector:'Auto',          shares:200000 },
+  EV:    { name:'ElectroRide EV',      price: 22.40, vol:0.025, drift:0, color:'#b39ddb', sector:'Auto',          shares: 75000 },
+  SHIP:  { name:'OceanFreight Lines',  price: 44.60, vol:0.007, drift:0, color:'#80cbc4', sector:'Auto',          shares:300000 },
+  SAIR:  { name:'Schultz Airlines',    price: 18.30, vol:0.014, drift:0, color:'#90caf9', sector:'Auto',          shares:150000 },
+  TRUK:  { name:'HeavyLoad Trucks',    price: 67.80, vol:0.008, drift:0, color:'#bcaaa4', sector:'Auto',          shares:200000 },
 
-  /* ── ENTERTAINMENT (5) ── */
-  GAME:  { name:'GameStrike Studios',  price: 82.40, vol:0.015, drift:0, color:'#ff7043', sector:'Entertainment' },
-  STRM:  { name:'StreamVault Media',   price: 48.60, vol:0.012, drift:0, color:'#7c4dff', sector:'Entertainment' },
-  FILM:  { name:'HollywoodPix',        price: 36.90, vol:0.010, drift:0, color:'#f06292', sector:'Entertainment' },
-  SPORT: { name:'SportMax League',     price:124.50, vol:0.009, drift:0, color:'#42a5f5', sector:'Entertainment' },
-  CASIN: { name:'LuckyDraw Casinos',   price: 68.20, vol:0.016, drift:0, color:'#ffb300', sector:'Entertainment' },
+  /* ── ENTERTAINMENT (5) ── 50k–200k shares ── */
+  GAME:  { name:'GameStrike Studios',  price: 82.40, vol:0.015, drift:0, color:'#ff7043', sector:'Entertainment', shares:100000 },
+  STRM:  { name:'StreamVault Media',   price: 48.60, vol:0.012, drift:0, color:'#7c4dff', sector:'Entertainment', shares:150000 },
+  FILM:  { name:'HollywoodPix',        price: 36.90, vol:0.010, drift:0, color:'#f06292', sector:'Entertainment', shares:200000 },
+  SPORT: { name:'SportMax League',     price:124.50, vol:0.009, drift:0, color:'#42a5f5', sector:'Entertainment', shares:100000 },
+  CASIN: { name:'LuckyDraw Casinos',   price: 68.20, vol:0.016, drift:0, color:'#ffb300', sector:'Entertainment', shares: 75000 },
 
-  /* ── MEME / VOLATILE (4) ── note: still wild, just not insane ── */
-  MEME:  { name:'MoonShot Inc',        price: 11.50, vol:0.030, drift:0, color:'#f48fb1', sector:'Meme' },
-  GILD:  { name:'Gilad Inc',           price:  4.20, vol:0.040, drift:0, color:'#ff6f00', sector:'Meme' },
-  DOGE:  { name:'DogeRocket Ltd',      price:  0.85, vol:0.045, drift:0, color:'#c6a740', sector:'Meme' },
-  PUMP:  { name:'PumpMax Token',       price:  2.10, vol:0.050, drift:0, color:'#ff4081', sector:'Meme' },
+  /* ── MEME (4) ── tiny float so they're actually cornerable 🚀 ── */
+  MEME:  { name:'MoonShot Inc',        price: 11.50, vol:0.030, drift:0, color:'#f48fb1', sector:'Meme',          shares: 25000 },
+  GILD:  { name:'Gilad Inc',           price:  4.20, vol:0.040, drift:0, color:'#ff6f00', sector:'Meme',          shares: 10000 },
+  DOGE:  { name:'DogeRocket Ltd',      price:  0.85, vol:0.045, drift:0, color:'#c6a740', sector:'Meme',          shares: 50000 },
+  PUMP:  { name:'PumpMax Token',       price:  2.10, vol:0.050, drift:0, color:'#ff4081', sector:'Meme',          shares: 15000 },
 
-  /* ── RETAIL (4) ── */
-  SHOP:  { name:'ShopMart Global',     price:186.40, vol:0.008, drift:0, color:'#ff6f00', sector:'Retail' },
-  LUXE:  { name:'LuxeGoods Fashion',   price:342.80, vol:0.009, drift:0, color:'#e91e63', sector:'Retail' },
-  LAPW:  { name:'Lappen Co',           price: 72.30, vol:0.008, drift:0, color:'#ff5722', sector:'Retail' },
-  MART:  { name:'DiscountMart Corp',   price: 58.60, vol:0.007, drift:0, color:'#ffb74d', sector:'Retail' },
+  /* ── RETAIL (4) ── 100k–250k shares ── */
+  SHOP:  { name:'ShopMart Global',     price:186.40, vol:0.008, drift:0, color:'#ff6f00', sector:'Retail',        shares:150000 },
+  LUXE:  { name:'LuxeGoods Fashion',   price:342.80, vol:0.009, drift:0, color:'#e91e63', sector:'Retail',        shares:100000 },
+  LAPW:  { name:'Lappen Co',           price: 72.30, vol:0.008, drift:0, color:'#ff5722', sector:'Retail',        shares:125000 },
+  MART:  { name:'DiscountMart Corp',   price: 58.60, vol:0.007, drift:0, color:'#ffb74d', sector:'Retail',        shares:200000 },
 
-  /* ── FUTURE / SPACE (4) ── */
-  SPACE: { name:'OrbitX Space',        price: 28.60, vol:0.022, drift:0, color:'#9c27b0', sector:'Future' },
-  ROBO:  { name:'RoboTech AI',         price: 54.30, vol:0.018, drift:0, color:'#673ab7', sector:'Future' },
-  QUAN:  { name:'QuantumCore Systems', price:112.40, vol:0.019, drift:0, color:'#ab47bc', sector:'Future' },
-  PRNT:  { name:'3D PrintPro Corp',    price: 19.80, vol:0.016, drift:0, color:'#7b1fa2', sector:'Future' },
+  /* ── FUTURE / SPACE (4) ── 25k–100k shares, high-risk small-cap ── */
+  SPACE: { name:'OrbitX Space',        price: 28.60, vol:0.022, drift:0, color:'#9c27b0', sector:'Future',        shares: 50000 },
+  ROBO:  { name:'RoboTech AI',         price: 54.30, vol:0.018, drift:0, color:'#673ab7', sector:'Future',        shares: 75000 },
+  QUAN:  { name:'QuantumCore Systems', price:112.40, vol:0.019, drift:0, color:'#ab47bc', sector:'Future',        shares: 40000 },
+  PRNT:  { name:'3D PrintPro Corp',    price: 19.80, vol:0.016, drift:0, color:'#7b1fa2', sector:'Future',        shares: 25000 },
 };
 
 const SYM_LIST = Object.keys(STOCKS);
+
+/* ─── SHARE OWNERSHIP TRACKING ──────────────────────────────
+   sharesOwned[sym] = total shares held by ALL players globally.
+   Updated from Firebase LB every 30s + immediately on buy/sell.
+   ─────────────────────────────────────────────────────────── */
+const sharesOwned = {};  // { sym: totalQtyAcrossAllPlayers }
+SYM_LIST.forEach(sym => { sharesOwned[sym] = 0; });
+
+/** Recompute global sharesOwned from leaderboard portfolio data */
+function recomputeSharesOwned(allPlayers) {
+  SYM_LIST.forEach(sym => { sharesOwned[sym] = 0; });
+  for (const p of Object.values(allPlayers)) {
+    if (!p?.portfolio) continue;
+    for (const [sym, qty] of Object.entries(p.portfolio)) {
+      if (STOCKS[sym] && qty > 0) sharesOwned[sym] = (sharesOwned[sym]||0) + qty;
+    }
+  }
+}
+
+/** Shares available to buy for a given stock */
+function availableShares(sym) {
+  const s = STOCKS[sym];
+  if (!s) return 0;
+  return Math.max(0, s.shares - (sharesOwned[sym]||0));
+}
+
+/** Ownership % of a player's holding in a stock (0–100) */
+function ownershipPct(sym, qty) {
+  return STOCKS[sym] ? (qty / STOCKS[sym].shares) * 100 : 0;
+}
+
+/** Global ownership % (all players combined) */
+function globalOwnershipPct(sym) {
+  return STOCKS[sym] ? ((sharesOwned[sym]||0) / STOCKS[sym].shares) * 100 : 0;
+}
+
+/**
+ * Scarcity price multiplier: when the float is mostly taken,
+ * prices get pushed up naturally. Kicks in above 50% owned.
+ *   50% owned → 0% bonus
+ *   75% owned → +15% bonus
+ *   90% owned → +40% bonus
+ *   100% owned → +80% bonus
+ */
+function scarcityMultiplier(sym) {
+  const pct = globalOwnershipPct(sym) / 100;
+  if (pct < 0.5) return 1;
+  return 1 + Math.pow((pct - 0.5) * 2, 2) * 0.8;
+}
+
+/** Corner status label for a single player's holding */
+function cornerStatus(sym, qty) {
+  const pct = ownershipPct(sym, qty);
+  if (pct >= 75) return { label:'👑 CORNERED',  color:'#ffd600', glow: true  };
+  if (pct >= 50) return { label:'🐋 MAJORITY',  color:'#ff9800', glow: false };
+  if (pct >= 25) return { label:'💎 WHALE',      color:'#29b6f6', glow: false };
+  if (pct >= 10) return { label:'📈 MAJOR',      color:'#00e676', glow: false };
+  return null;
+}
+
+
 
 /* Init stock history, prev, and NEW fundamentals */
 for (const s of Object.values(STOCKS)) {
@@ -2389,6 +2755,10 @@ const ACHIEVES = [
   { id:'hodl',      icon:'🙌', name:'HODL',                desc:'Go 2 minutes without selling',       chk:()=> holdTimer() >= 120 },
   { id:'speedrun',  icon:'⏱', name:'Speed Trader',        desc:'Make 5 trades in 30 seconds',        chk:checkSpeedRun },
   { id:'whale',     icon:'🐋', name:'Whale',               desc:'Spend $50,000 in a single trade',    chk:()=> G.biggestTrade >= 50000 },
+  { id:'major',     icon:'📈', name:'Major Holder',         desc:'Own 10%+ of any stock\'s float',      chk:()=> SYM_LIST.some(s=>(G.portfolio[s]||0)>0 && ownershipPct(s,G.portfolio[s]||0)>=10) },
+  { id:'majority',  icon:'💰', name:'Majority Owner',       desc:'Own 50%+ of any stock\'s float',      chk:()=> SYM_LIST.some(s=>(G.portfolio[s]||0)>0 && ownershipPct(s,G.portfolio[s]||0)>=50) },
+  { id:'cornered',  icon:'👑', name:'Market Corner',        desc:'Own 75%+ of any stock\'s entire float', chk:()=> SYM_LIST.some(s=>(G.portfolio[s]||0)>0 && ownershipPct(s,G.portfolio[s]||0)>=75) },
+  { id:'monopoly',  icon:'🏰', name:'Monopoly',             desc:'Corner a stock with 100% of the float', chk:()=> SYM_LIST.some(s=>availableShares(s)===0 && (G.portfolio[s]||0)>0) },
 ];
 
 /* Speed run tracking */
@@ -2755,11 +3125,20 @@ function tickPrices() {
     // Clamp any single-tick move to ±8% max (was ±14%)
     finalChg = Math.max(-0.08, Math.min(0.08, finalChg));
 
-    // Commit
-    s.price = Math.max(0.01, s.price * (1 + finalChg));
+    // ── Scarcity premium: heavily owned stocks trade higher ──
+    // The base price gets nudged upward proportional to how much
+    // of the float is owned. This is applied as a gentle persistent
+    // pressure rather than a one-time jump.
+    const scarMult = scarcityMultiplier(sym);
+    const targetP  = s.startP * Math.max(1, scarMult);
+    const scarBias = (targetP - s.price) * 0.002; // gentle nudge toward scarcity price
 
-    // Apply hard bounds
-    s.price = Math.max(s.startP * 0.20, Math.min(s.startP * 2.0, s.price));
+    // Commit
+    s.price = Math.max(0.01, s.price * (1 + finalChg) + scarBias);
+
+    // Apply hard bounds (relaxed ceiling slightly for cornered stocks)
+    const maxMult = scarMult > 1.5 ? 4.0 : 2.0;
+    s.price = Math.max(s.startP * 0.20, Math.min(s.startP * maxMult, s.price));
 
     s.history.push(s.price);
     if (s.history.length > 240) s.history.shift();
@@ -3253,10 +3632,34 @@ function buy(sym) {
   const feesLvl = SKILL_TREE.fees ? (SKILL_TREE.fees.level || 0) : 0;
   if (feesLvl > 0) cost = cost * (1 - feesLvl * 0.003);
 
+  // ── Lockout check — cornered owner may have locked this stock ──
+  if (isLocked(sym)) {
+    const rem = Math.ceil((LOCKOUT_ACTIVE[sym] - Date.now()) / 1000);
+    flash(`🔒 ${sym} is locked out — ${rem}s remaining (market cornered)`, '#ff1744');
+    return;
+  }
+
+  // ── Share supply check ──────────────────────────────────
+  const avail = availableShares(sym);
+  if (qty > avail) {
+    if (avail <= 0) { flash(`❌ No shares available — ${sym} float is fully owned!`, '#ff1744'); return; }
+    flash(`⚠️ Only ${avail.toLocaleString()} shares available — adjusting qty`, '#ff9800');
+    // Clamp to available
+    const clampedQty = avail;
+    const inp = document.getElementById('qty-' + sym);
+    if (inp) inp.value = clampedQty;
+    cost = s.price * clampedQty * (feesLvl > 0 ? (1 - feesLvl * 0.003) : 1);
+    // Recurse with clamped qty is complex, so just deny and let user retry
+    flash(`❌ Max buyable: ${avail.toLocaleString()} shares (float limit)`, '#ff1744');
+    return;
+  }
+
   if (cost > G.cash) { flash('❌ Not enough cash!', '#ff1744'); return; }
   G.cash -= cost;
   G.portfolio[sym] = (G.portfolio[sym] || 0) + qty;
   G.costBasis[sym] = (G.costBasis[sym] || 0) + cost;
+  // Track global ownership immediately (before Firebase sync)
+  sharesOwned[sym] = (sharesOwned[sym] || 0) + qty;
   G.trades++;
   G.tradeTimes.push(Date.now());
   if (cost > G.biggestTrade) G.biggestTrade = cost;
@@ -3279,12 +3682,21 @@ function buy(sym) {
   snd.buy();
   // Record in trade history
   recordTrade('buy', sym, qty, s.price, null);
+  // Push to public trade feed
+  pushTradeFeed('buy', sym, qty, s.price);
   refreshUI();
   checkAchs();
   saveGame();
   pushLBScore();
   const rebateNote = feesLvl > 0 ? ` (${(feesLvl*0.3).toFixed(1)}% fee rebate)` : '';
-  flash(`✅ Bought ${qty}× ${sym} @ ${$$(s.price)}${rebateNote}`, '#00e676');
+  const myNewQty   = G.portfolio[sym] || 0;
+  const status     = cornerStatus(sym, myNewQty);
+  if (status) {
+    flash(`${status.label} — You now own ${ownershipPct(sym, myNewQty).toFixed(1)}% of ${sym}!`, status.color);
+    snd.ach();
+  } else {
+    flash(`✅ Bought ${qty}× ${sym} @ ${$$(s.price)}${rebateNote}`, '#00e676');
+  }
 }
 
 function sell(sym) {
@@ -3318,6 +3730,8 @@ function sell(sym) {
   G.portfolio[sym]  = have - qty;
   G.costBasis[sym]  = (G.costBasis[sym] || 0) * ratio;
   if (G.portfolio[sym] === 0 && G.holdTimers) delete G.holdTimers[sym];
+  // Release shares back to the float immediately
+  sharesOwned[sym] = Math.max(0, (sharesOwned[sym]||0) - qty);
 
   G.trades++;
   G.tradeTimes.push(Date.now());
@@ -3338,6 +3752,10 @@ function sell(sym) {
   // Record in trade history with realized P&L
   const realizedPnl = gainPerShare * qty + (bonus > 0 ? gainPerShare * qty * bonus : 0);
   recordTrade('sell', sym, qty, s.price, realizedPnl);
+  // Push to public trade feed
+  pushTradeFeed('sell', sym, qty, s.price);
+  // Push corner tax event so the corner owner receives their 2% cut
+  pushCornerTaxEvent(sym, proceeds);
   refreshUI();
   checkAchs();
   saveGame();
@@ -3372,10 +3790,11 @@ function buildTable() {
       <td><span class="sect" id="sect-${sym}">${s.sector}</span></td>
       <td class="prc" id="prc-${sym}">${$$(s.price)}</td>
       <td class="chg" id="chg-${sym}">+0.00%</td>
+      <td class="r"   id="flt-${sym}" style="min-width:70px"></td>
       <td class="r"   id="sig-${sym}"><span class="trend-lbl trend-neutral">—</span></td>
       <td class="own" id="own-${sym}">0</td>
       <td class="val" id="val-${sym}">—</td>
-      <td><input type="number" class="qty" id="qty-${sym}" value="${CFG.defQty}" min="1" max="9999999"></td>
+      <td><input type="number" class="qty" id="qty-${sym}" value="${CFG.defQty}" min="1" max="${s.shares}"></td>
       <td>
         <button class="b-buy"  onclick="event.stopPropagation();buy('${sym}')">BUY</button>
         <button class="b-sell" onclick="event.stopPropagation();sell('${sym}')">SELL</button>
@@ -3416,6 +3835,31 @@ function refreshTable() {
 
     vEl.textContent = owned > 0 ? $$(owned*s.price) : '—';
 
+    // ── Float / ownership bar ──
+    const fltEl = document.getElementById('flt-'+sym);
+    if (fltEl) {
+      const globalPct  = globalOwnershipPct(sym);
+      const myPct      = ownershipPct(sym, owned);
+      const avail      = availableShares(sym);
+      const status     = owned > 0 ? cornerStatus(sym, owned) : null;
+      // Color: green = free float, gold = your slice, red = others
+      const barW       = Math.min(100, globalPct).toFixed(1);
+      const myBarW     = Math.min(100, myPct).toFixed(1);
+      const barColor   = globalPct >= 90 ? '#ff1744' : globalPct >= 50 ? '#ff9800' : 'rgba(var(--accent-rgb),0.5)';
+      fltEl.innerHTML  = `
+        <div title="${avail.toLocaleString()} shares free · ${globalPct.toFixed(1)}% owned globally"
+             style="width:68px;display:inline-block">
+          <div style="height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:2px">
+            <div style="height:4px;width:${barW}%;background:${barColor};border-radius:2px;position:relative">
+              ${myPct > 0 ? `<div style="position:absolute;right:0;top:0;height:4px;width:${Math.min(100,(myPct/Math.max(globalPct,0.01))*100).toFixed(1)}%;background:var(--gold);border-radius:2px"></div>` : ''}
+            </div>
+          </div>
+          <div style="font-size:0.55em;color:${barColor};line-height:1">
+            ${status ? `<span style="color:${status.color};font-weight:bold">${status.label}</span>` : `${avail.toLocaleString()} left`}
+          </div>
+        </div>`;
+    }
+
     // ── Trend / Signal label ──
     const sigEl = document.getElementById('sig-'+sym);
     if (sigEl) {
@@ -3427,11 +3871,22 @@ function refreshTable() {
         neutral:   { cls:'trend-neutral',   txt:'·' },
       };
       const tm = TREND_MAP[s.trend] || TREND_MAP.neutral;
-      sigEl.innerHTML = `<span class="trend-lbl ${tm.cls}">${tm.txt}</span>`;
+      const insider = getInsiderSignal(sym);
+      const insiderHtml = insider
+        ? `<span style="color:${insider.color};font-size:0.9em;margin-left:3px" title="${insider.tip}">${insider.dir}</span>`
+        : '';
+      sigEl.innerHTML = `<span class="trend-lbl ${tm.cls}">${tm.txt}</span>${insiderHtml}`;
     }
 
     // ── Unusual volume alert row indicator ──
     row.classList.toggle('alert-row', !!s.unusualVol);
+
+    // ── Corner status row highlight ──
+    const myOwned   = G.portfolio[sym] || 0;
+    const myPctRaw  = ownershipPct(sym, myOwned);
+    row.classList.toggle('cornered', myPctRaw >= 75);
+    row.classList.toggle('majority', myPctRaw >= 50 && myPctRaw < 75);
+    row.classList.toggle('whale',    myPctRaw >= 25 && myPctRaw < 50);
 
     // Show/hide sector column
     if (sEl) sEl.parentElement.style.display = CFG.showSector ? '' : 'none';
@@ -3643,13 +4098,19 @@ function selectSym(sym) {
 function switchTab(name) {
   document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+name));
-  if (name==='portfolio')  refreshPortfolio();
+  if (name==='portfolio')  { refreshPortfolio(); updateOwnershipPanel(); }
   if (name==='picks')      refreshPicks();
   if (name==='intel')      refreshIntelTab();
   if (name==='history')    refreshHistory();
   if (name==='orders')     renderOrders();
   if (name==='chat-room')  chatPoll();
-  if (name==='players') {} // search triggered manually
+  if (name==='matches')    renderMatches();
+  if (name==='teams')      renderTeams();
+  if (name==='feed')       { pollTradeFeed(); if (!feedCache.length) { const fl=document.getElementById('feed-list'); if(fl)fl.innerHTML='<div class="feed-empty">No trades yet — be the first!</div>'; } }
+  if (name==='players') {}
+  // Scroll the active tab into view
+  const activeBtn = document.querySelector(`.rp-tab[data-tab="${name}"]`);
+  if (activeBtn) activeBtn.scrollIntoView({ behavior:'smooth', inline:'nearest', block:'nearest' });
 }
 
 /* ─── MASTER REFRESH ────────────────────────────── */
@@ -3958,15 +4419,23 @@ function initPlayerBox() {
 
 // Load all scores from Firebase (or local fallback if not configured)
 async function lbLoadAll() {
-  if (!fbConfigured()) return lbLocalLoad();
+  if (!fbConfigured()) {
+    const local = lbLocalLoad();
+    recomputeSharesOwned(local);
+    return local;
+  }
   try {
     const res = await fetch(FIREBASE_URL + LB_FB_PATH, { cache: 'no-store' });
     if (!res.ok) throw new Error('Firebase fetch failed: ' + res.status);
-    const data = await res.json();
-    return data || {};
+    const data = await res.json() || {};
+    // Sync global ownership from all player portfolios
+    recomputeSharesOwned(data);
+    return data;
   } catch(e) {
     console.warn('Leaderboard fetch failed, using local fallback:', e.message);
-    return lbLocalLoad();
+    const local = lbLocalLoad();
+    recomputeSharesOwned(local);
+    return local;
   }
 }
 
@@ -4407,6 +4876,8 @@ function showSaveIndicator() {
 
 // Auto-save every 30 seconds + push live LB score
 setInterval(() => { saveGame(); pushLBScore(); }, 30000);
+// Sync global share ownership every 60s by pulling fresh LB data
+setInterval(() => lbLoadAll(), 60000);
 
 /* ─── PICKS ENGINE ───────────────────────────────── */
 /* Scores each stock on 5 signals and returns top 5  */
@@ -4889,6 +5360,108 @@ function initZoomControls() {
 }
 
 /* ─── RESIZABLE PANELS ───────────────────────────────────── */
+/* ─── TAB BAR DRAG-TO-SCROLL ─────────────────────────────── */
+function initTabDragger() {
+  const tabs  = document.getElementById('rp-tabs');
+  const thumb = document.getElementById('tabs-dragger-thumb');
+  const wrap  = document.getElementById('tabs-dragger-wrap');
+  if (!tabs || !thumb || !wrap) return;
+
+  /* ── Update thumb position/size based on tabs scroll state ── */
+  function syncThumb() {
+    const scrollW  = tabs.scrollWidth;
+    const clientW  = tabs.clientWidth;
+    if (scrollW <= clientW) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    const ratio     = clientW / scrollW;
+    const thumbW    = Math.max(28, Math.floor(clientW * ratio));
+    const maxLeft   = clientW - thumbW;
+    const thumbLeft = Math.floor((tabs.scrollLeft / (scrollW - clientW)) * maxLeft);
+    thumb.style.width = thumbW + 'px';
+    thumb.style.left  = thumbLeft + 'px';
+  }
+  tabs.addEventListener('scroll', syncThumb);
+  window.addEventListener('resize', syncThumb);
+  syncThumb();
+
+  /* ── Drag the thumb to scroll tabs ── */
+  let thumbDragging = false, thumbStartX = 0, thumbStartScroll = 0;
+
+  thumb.addEventListener('mousedown', e => {
+    thumbDragging   = true;
+    thumbStartX     = e.clientX;
+    thumbStartScroll = tabs.scrollLeft;
+    thumb.classList.add('is-dragging');
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!thumbDragging) return;
+    const scrollW = tabs.scrollWidth;
+    const clientW = tabs.clientWidth;
+    const ratio   = (scrollW - clientW) / (clientW - thumb.offsetWidth);
+    tabs.scrollLeft = thumbStartScroll + (e.clientX - thumbStartX) * ratio;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!thumbDragging) return;
+    thumbDragging = false;
+    thumb.classList.remove('is-dragging');
+    document.body.style.userSelect = '';
+  });
+
+  /* ── Click on the track to jump scroll there ── */
+  wrap.addEventListener('click', e => {
+    if (e.target === thumb) return;
+    const rect    = wrap.getBoundingClientRect();
+    const clickX  = e.clientX - rect.left;
+    const ratio   = clickX / wrap.clientWidth;
+    tabs.scrollLeft = ratio * (tabs.scrollWidth - tabs.clientWidth);
+  });
+
+  /* ── Drag the tabs row itself (mouse/touch) ── */
+  let tabsDragging = false, tabsStartX = 0, tabsScrollStart = 0, didDrag = false;
+
+  tabs.addEventListener('mousedown', e => {
+    // Don't hijack actual button clicks
+    if (e.target.closest('.rp-tab')) return;
+    tabsDragging    = true;
+    tabsStartX      = e.clientX;
+    tabsScrollStart = tabs.scrollLeft;
+    didDrag         = false;
+    tabs.classList.add('is-dragging');
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!tabsDragging) return;
+    const dx = e.clientX - tabsStartX;
+    if (Math.abs(dx) > 3) didDrag = true;
+    tabs.scrollLeft = tabsScrollStart - dx;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!tabsDragging) return;
+    tabsDragging = false;
+    tabs.classList.remove('is-dragging');
+    document.body.style.userSelect = '';
+  });
+
+  /* ── Touch support ── */
+  let touchStartX = 0, touchScrollStart = 0;
+  tabs.addEventListener('touchstart', e => {
+    touchStartX     = e.touches[0].clientX;
+    touchScrollStart = tabs.scrollLeft;
+  }, { passive: true });
+  tabs.addEventListener('touchmove', e => {
+    const dx = touchStartX - e.touches[0].clientX;
+    tabs.scrollLeft = touchScrollStart + dx;
+  }, { passive: true });
+  tabs.addEventListener('touchend', syncThumb);
+}
+
 function initResizeHandle() {
   const handle = document.getElementById('resize-handle');
   const main   = document.getElementById('main');
@@ -5490,10 +6063,1070 @@ async function isNameTaken(name, excludeId) {
   return _origIsNameTaken(name, excludeId);
 }
 
+/* ══════════════════════════════════════════════════════════
+   🏁  TIMED MATCH SYSTEM
+   Firebase paths:
+     /stockblitz_matches/{matchId}   — match document
+     /stockblitz_matches/{matchId}/players/{pid} — per-player state
+══════════════════════════════════════════════════════════ */
+const MATCHES_PATH = '/stockblitz_matches.json';
+
+let G_match = null;       // current match object (null = not in a match)
+let G_matchId = null;
+let G_matchTimer = null;  // setInterval for countdown
+let G_matchPortfolio = {};
+let G_matchCostBasis = {};
+let G_matchCash = 0;
+
+const MATCH_SUDDEN_EVENTS = [
+  { txt:'🚨 FLASH CRASH — All stocks drop sharply!',            imp:-0.08, sym:null },
+  { txt:'🚀 BULL WAVE — Broad market surge!',                    imp: 0.07, sym:null },
+  { txt:'⚡ SECTOR FREEZE — Tech halted for 30 seconds!',        imp:-0.06, sym:'TECH' },
+  { txt:'🔥 MEME EXPLOSION — Meme stocks 🚀 to the moon!',      imp: 0.10, sym:'MEME' },
+  { txt:'💀 LIQUIDITY CRISIS — Finance sector in freefall!',     imp:-0.09, sym:'BANK' },
+  { txt:'☀️  ENERGY SHOCK — Oil & solar spike hard!',           imp: 0.09, sym:'OIL'  },
+  { txt:'🤖 AI BOOM — Tech & robotics surge!',                   imp: 0.08, sym:'ROBO' },
+  { txt:'📉 MARGIN CALLS — Leveraged positions collapsing!',     imp:-0.07, sym:null },
+  { txt:'💊 BIOTECH RALLY — Health sector surges on FDA news!',  imp: 0.09, sym:'PHARMA' },
+  { txt:'🌊 BLACK SWAN — Unexpected global event hits all sectors!', imp:-0.10, sym:null },
+];
+
+async function createMatch() {
+  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
+  const dur    = parseInt(document.getElementById('match-duration').value) || 10;
+  const cash   = parseFloat(document.getElementById('match-start-cash').value) || 1000;
+  const matchId = 'M' + Date.now().toString(36).toUpperCase();
+  const match   = {
+    id:        matchId,
+    name:      `${PLAYER_NAME}'s ${dur}m Match`,
+    host:      PLAYER_ID,
+    hostName:  PLAYER_NAME,
+    duration:  dur * 60,      // seconds
+    startCash: cash,
+    status:    'waiting',     // waiting | live | ended
+    startAt:   null,
+    endAt:     null,
+    players:   { [PLAYER_ID]: { name: PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() } },
+    events:    [],
+    createdAt: Date.now(),
+  };
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(match)
+      });
+    } catch(e) {}
+  }
+  joinMatchLocally(matchId, match);
+  renderMatches();
+  flash(`🏁 Match created — waiting for players!`, 'var(--accent)');
+}
+
+async function joinMatch(matchId) {
+  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
+  if (G_matchId) { flash('❌ Leave your current match first', '#ff1744'); return; }
+
+  let match = null;
+  if (fbConfigured()) {
+    try {
+      const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {cache:'no-store'});
+      match = res.ok ? await res.json() : null;
+    } catch(e) {}
+  }
+  if (!match) { flash('❌ Match not found', '#ff1744'); return; }
+  if (match.status === 'ended') { flash('❌ Match has already ended', '#ff1744'); return; }
+
+  const cash = match.startCash;
+  match.players[PLAYER_ID] = { name:PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() };
+
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}/players/${PLAYER_ID}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ name:PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() })
+      });
+    } catch(e) {}
+  }
+
+  joinMatchLocally(matchId, match);
+  // If host, start the match
+  if (match.host === PLAYER_ID && match.status === 'waiting') startMatch(matchId, match);
+  flash(`🏁 Joined match!`, 'var(--accent)');
+}
+
+function joinMatchLocally(matchId, match) {
+  G_matchId = matchId;
+  G_match   = match;
+  G_matchCash = match.startCash;
+  G_matchPortfolio = {};
+  G_matchCostBasis = {};
+  updateMatchHUD();
+  startMatchCountdown(match);
+  document.getElementById('match-hud').style.display = 'block';
+  document.getElementById('match-live-badge').style.display = 'inline';
+}
+
+async function startMatch(matchId, match) {
+  if (match.host !== PLAYER_ID) return;
+  const now = Date.now();
+  const endAt = now + match.duration * 1000;
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ status:'live', startAt:now, endAt })
+      });
+    } catch(e) {}
+  }
+  match.status = 'live'; match.startAt = now; match.endAt = endAt;
+  G_match = match;
+  startMatchCountdown(match);
+  flash('🏁 Match started — GO!', '#ff1744');
+
+  // Schedule 2-3 sudden events at random intervals
+  const numEvents = 2 + Math.floor(Math.random() * 2);
+  for (let i = 0; i < numEvents; i++) {
+    const delay = (match.duration * 1000 * (i + 1)) / (numEvents + 1);
+    setTimeout(() => fireSuddenEvent(matchId), delay);
+  }
+}
+
+function startMatchCountdown(match) {
+  clearInterval(G_matchTimer);
+  G_matchTimer = setInterval(() => {
+    if (!G_match) { clearInterval(G_matchTimer); return; }
+    const now = Date.now();
+    const endAt = G_match.endAt || (G_match.startAt + G_match.duration * 1000);
+    const left = Math.max(0, Math.floor((endAt - now) / 1000));
+    const total = G_match.duration;
+    const mins = String(Math.floor(left / 60)).padStart(2,'0');
+    const secs = String(left % 60).padStart(2,'0');
+    const cd = document.getElementById('match-countdown');
+    if (cd) {
+      cd.textContent = `${mins}:${secs}`;
+      cd.style.color = left < 30 ? 'var(--red)' : left < 60 ? 'var(--orange)' : 'var(--text-hi)';
+    }
+    const bar = document.getElementById('match-pressure-bar');
+    if (bar) bar.style.width = `${(left / total) * 100}%`;
+    // Urgent pulse when <30s
+    if (left < 30 && left % 2 === 0 && cd) cd.style.textShadow = '0 0 10px rgba(255,23,68,0.8)';
+
+    if (left <= 0) {
+      clearInterval(G_matchTimer);
+      endMatch();
+    } else {
+      updateMatchHUD();
+      // Poll Firebase for match updates every 5s
+      if (left % 5 === 0) pollMatchState();
+    }
+  }, 1000);
+}
+
+async function fireSuddenEvent(matchId) {
+  if (!G_match || G_match.status !== 'live') return;
+  const ev = MATCH_SUDDEN_EVENTS[Math.floor(Math.random() * MATCH_SUDDEN_EVENTS.length)];
+
+  // Show overlay flash
+  const div = document.createElement('div');
+  div.className = 'match-event-flash';
+  div.innerHTML = `⚡ SUDDEN EVENT<br><span style="font-size:0.75em;font-weight:normal">${ev.txt}</span>`;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3200);
+
+  // Apply price effect
+  const fakeEv = { sym: ev.sym, imp: ev.imp, type: ev.imp > 0 ? 'positive' : 'negative', txt: ev.txt, ts: Date.now() };
+  applyNewsEvent(fakeEv);
+
+  // Push to Firebase so all match participants see it
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}/events/${Date.now()}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(fakeEv)
+      });
+    } catch(e) {}
+  }
+}
+
+function endMatch() {
+  if (!G_match) return;
+  G_match.status = 'ended';
+  if (fbConfigured() && G_matchId) {
+    // Push final score
+    const val = matchPortVal() + G_matchCash;
+    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players/${PLAYER_ID}.json`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ cash:G_matchCash, pnl:val - G_match.startCash, finalVal:val, ts:Date.now() })
+    }).catch(()=>{});
+    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ status:'ended', endAt:Date.now() })
+    }).catch(()=>{});
+  }
+  setTimeout(showMatchResults, 500);
+}
+
+async function showMatchResults() {
+  let players = G_match?.players ? Object.values(G_match.players) : [];
+  // Fetch fresh from Firebase
+  if (fbConfigured() && G_matchId) {
+    try {
+      const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players.json`,{cache:'no-store'});
+      if (res.ok) { const d = await res.json(); if (d) players = Object.values(d); }
+    } catch(e) {}
+  }
+  // Add my own final value
+  const myFinal = matchPortVal() + G_matchCash;
+  players = players.map(p => p.name === PLAYER_NAME ? {...p, finalVal:myFinal} : p);
+  players.sort((a,b) => (b.finalVal||b.cash||0) - (a.finalVal||a.cash||0));
+
+  const winner = players[0];
+  const medals = ['🥇','🥈','🥉'];
+  const rows = players.map((p,i) =>
+    `<div class="match-lb-row">
+      <span class="match-lb-rank">${medals[i]||'#'+(i+1)}</span>
+      <span class="match-lb-name">${escHtml(p.name||'?')}${p.name===PLAYER_NAME?' <span style="color:var(--accent)">(you)</span>':''}</span>
+      <span class="match-lb-val">${$$((p.finalVal||p.cash||0))}</span>
+    </div>`
+  ).join('');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'match-winner-overlay';
+  overlay.innerHTML = `
+    <div class="match-winner-box">
+      <div style="font-size:2.4em;margin-bottom:8px">🏆</div>
+      <div style="font-size:0.65em;text-transform:uppercase;letter-spacing:3px;color:var(--gold);margin-bottom:4px">Match Over</div>
+      <div style="font-size:1.1em;font-weight:bold;color:var(--text-hi);margin-bottom:2px">${escHtml(winner?.name||'?')} wins!</div>
+      <div style="font-size:0.72em;color:var(--gold);margin-bottom:16px">${$$(winner?.finalVal||0)}</div>
+      <div style="text-align:left;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;padding:6px 10px">${rows}</div>
+      <button onclick="this.closest('.match-winner-overlay').remove();leaveMatch()"
+        style="width:100%;background:rgba(var(--accent-rgb),0.12);border:1px solid var(--accent);color:var(--accent);
+        padding:8px;font-family:var(--mono);font-size:0.72em;font-weight:bold;cursor:pointer;border-radius:5px">
+        ✕ Close
+      </button>
+    </div>`;
+  document.body.appendChild(overlay);
+  snd.ach();
+}
+
+function matchPortVal() {
+  let v = 0;
+  for (const [sym, qty] of Object.entries(G_matchPortfolio)) {
+    if (qty > 0 && STOCKS[sym]) v += qty * STOCKS[sym].price;
+  }
+  return v;
+}
+
+function updateMatchHUD() {
+  const val = matchPortVal() + G_matchCash;
+  const el  = document.getElementById('match-hud-val');
+  if (el) { el.textContent = $$(val); el.style.color = val >= (G_match?.startCash||1000) ? 'var(--green)' : 'var(--red)'; }
+  const nm = document.getElementById('match-hud-name');
+  if (nm && G_match) nm.textContent = G_match.name;
+}
+
+async function pollMatchState() {
+  if (!G_matchId || !fbConfigured()) return;
+  try {
+    const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`,{cache:'no-store'});
+    if (!res.ok) return;
+    const m = await res.json();
+    if (!m) return;
+    G_match = m;
+    if (m.status === 'live' && !G_matchTimer) startMatchCountdown(m);
+    if (m.status === 'ended' && G_matchTimer) { clearInterval(G_matchTimer); showMatchResults(); }
+  } catch(e) {}
+}
+
+function leaveMatch() {
+  clearInterval(G_matchTimer);
+  G_match = null; G_matchId = null; G_matchTimer = null;
+  G_matchPortfolio = {}; G_matchCostBasis = {}; G_matchCash = 0;
+  document.getElementById('match-hud').style.display = 'none';
+  document.getElementById('match-live-badge').style.display = 'none';
+  renderMatches();
+}
+
+/* Match buy/sell — uses isolated match portfolio */
+function matchBuy(sym) {
+  if (!G_match || G_match.status !== 'live') { flash('❌ No active match', '#ff1744'); return; }
+  const s = STOCKS[sym];
+  const qty = getQty(sym);
+  const cost = s.price * qty;
+  if (cost > G_matchCash) { flash('❌ Insufficient match funds', '#ff1744'); return; }
+  G_matchCash -= cost;
+  G_matchPortfolio[sym] = (G_matchPortfolio[sym]||0) + qty;
+  G_matchCostBasis[sym]  = (G_matchCostBasis[sym]||0) + cost;
+  snd.buy();
+  updateMatchHUD();
+  flash(`🏁 [MATCH] Bought ${qty}× ${sym} @ ${$$(s.price)}`, 'var(--green)');
+  // Push to Firebase
+  if (fbConfigured() && G_matchId) {
+    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players/${PLAYER_ID}.json`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ cash:G_matchCash, portfolio:G_matchPortfolio, ts:Date.now() })
+    }).catch(()=>{});
+  }
+}
+
+async function renderMatches() {
+  const el = document.getElementById('match-content');
+  if (!el) return;
+  el.innerHTML = '<div class="orders-empty">Loading matches…</div>';
+
+  let matches = {};
+  if (fbConfigured()) {
+    try {
+      const res = await fetch(FIREBASE_URL + MATCHES_PATH, {cache:'no-store'});
+      if (res.ok) matches = (await res.json()) || {};
+    } catch(e) {}
+  }
+
+  const list = Object.values(matches)
+    .filter(m => m && Date.now() - m.createdAt < 30*60*1000) // last 30 min
+    .sort((a,b) => b.createdAt - a.createdAt)
+    .slice(0, 20);
+
+  if (!list.length) {
+    el.innerHTML = `
+      <div class="orders-empty" style="padding:30px 12px">
+        No matches yet.<br><span style="font-size:0.85em">Create one above to get started!</span>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(m => {
+    const inMatch   = G_matchId === m.id;
+    const players   = Object.values(m.players||{});
+    const playerChips = players.map(p =>
+      `<span class="match-player-chip${p.name===PLAYER_NAME?' you':''}">${escHtml(p.name||'?')}</span>`
+    ).join('');
+    const timeLeft  = m.endAt ? Math.max(0,Math.floor((m.endAt-Date.now())/1000)) : m.duration;
+    const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
+    const dur   = m.duration/60;
+    const canJoin = m.status !== 'ended' && !G_matchId && !inMatch;
+    const statusCls = m.status === 'live' ? 'live' : m.status === 'ended' ? 'ended' : 'waiting';
+
+    // Live scoreboard
+    let scoreHtml = '';
+    if (m.status !== 'waiting') {
+      const sorted = players.sort((a,b)=>(b.finalVal||b.cash||0)-(a.finalVal||a.cash||0));
+      scoreHtml = sorted.slice(0,5).map((p,i)=>
+        `<div class="match-lb-row"><span class="match-lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</span>
+        <span class="match-lb-name">${escHtml(p.name||'?')}</span>
+        <span class="match-lb-val">${$$(p.finalVal||p.cash||m.startCash)}</span></div>`
+      ).join('');
+    }
+
+    return `
+      <div class="match-card ${statusCls}">
+        <div class="match-card-top">
+          <span class="match-name">${escHtml(m.name)}</span>
+          <span class="match-status ${statusCls}">${m.status}</span>
+        </div>
+        <div class="match-meta">
+          <span>⏱ ${dur}min · $${(m.startCash/1000).toFixed(0)}k start</span>
+          <span>👥 ${players.length} players</span>
+          ${m.status==='live' ? `<span style="color:var(--red)">⏳ ${mins}m ${secs}s left</span>` : ''}
+        </div>
+        <div class="match-players">${playerChips}</div>
+        ${scoreHtml ? `<div style="border:1px solid var(--border);border-radius:4px;padding:4px 8px;margin-bottom:6px">${scoreHtml}</div>` : ''}
+        ${canJoin ? `<button class="match-join-btn" onclick="joinMatch('${m.id}')">Join Match</button>` : ''}
+        ${inMatch ? `<div style="text-align:center;font-size:0.62em;color:var(--accent)">✓ You are in this match</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════
+   👥  TEAM TRADING
+   Firebase: /stockblitz_teams/{teamId}
+   Members share one portfolio and one cash balance.
+══════════════════════════════════════════════════════════ */
+const TEAMS_PATH = '/stockblitz_teams.json';
+
+let G_teamId   = null;
+let G_team     = null;
+let G_teamRole = null;  // 'analyst' | 'trader' | 'risk'
+
+const ROLE_INFO = {
+  analyst: { color:'var(--blue)',   label:'📡 Analyst',  desc:'You read market signals, trends, and fundamentals. You cannot execute trades directly — advise your Trader.' },
+  trader:  { color:'var(--green)',  label:'⚡ Trader',   desc:'You execute all buy/sell orders for the team. Listen to your Analyst and watch the Risk Manager\'s limits.' },
+  risk:    { color:'var(--orange)', label:'🛡 Risk Mgr', desc:'You can set position limits and stop-loss levels for the team. Protect the portfolio from large drawdowns.' },
+};
+
+async function createTeam() {
+  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
+  if (G_teamId)     { flash('❌ Leave your current team first', '#ff1744'); return; }
+  const name = (document.getElementById('team-name-input').value||'').trim() || `${PLAYER_NAME}'s Team`;
+  const teamId = 'T' + Date.now().toString(36).toUpperCase();
+  const team = {
+    id: teamId, name, cash:1000, portfolio:{}, costBasis:{},
+    members:{ [PLAYER_ID]:{ name:PLAYER_NAME, role:null, pid:PLAYER_ID, ts:Date.now() } },
+    createdAt:Date.now(), trades:0, totalVal:1000,
+  };
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_teams/${teamId}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(team)
+      });
+    } catch(e) {}
+  }
+  G_teamId = teamId; G_team = team; G_teamRole = null;
+  showRolePicker();
+  renderTeams();
+  flash(`👥 Team "${name}" created!`, 'var(--accent)');
+}
+
+async function joinTeam(teamId) {
+  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
+  if (G_teamId)     { flash('❌ Leave your current team first', '#ff1744'); return; }
+  let team = null;
+  if (fbConfigured()) {
+    try {
+      const res = await fetch(`${FIREBASE_URL}/stockblitz_teams/${teamId}.json`,{cache:'no-store'});
+      team = res.ok ? await res.json() : null;
+    } catch(e) {}
+  }
+  if (!team) { flash('❌ Team not found', '#ff1744'); return; }
+  if (Object.keys(team.members||{}).length >= 3) { flash('❌ Team is full (max 3)', '#ff1744'); return; }
+
+  team.members[PLAYER_ID] = { name:PLAYER_NAME, role:null, pid:PLAYER_ID, ts:Date.now() };
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_teams/${teamId}/members/${PLAYER_ID}.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ name:PLAYER_NAME, role:null, pid:PLAYER_ID, ts:Date.now() })
+      });
+    } catch(e) {}
+  }
+  G_teamId = teamId; G_team = team; G_teamRole = null;
+  showRolePicker();
+  renderTeams();
+  flash(`👥 Joined "${team.name}"!`, 'var(--accent)');
+}
+
+function showRolePicker() {
+  document.getElementById('team-role-picker').style.display = 'block';
+  document.getElementById('team-hud').style.display = 'none';
+}
+
+async function pickRole(role) {
+  G_teamRole = role;
+  document.querySelectorAll('.team-role-btn').forEach(b => b.classList.toggle('selected', b.dataset.role===role));
+  if (fbConfigured() && G_teamId) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_teams/${G_teamId}/members/${PLAYER_ID}/role.json`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(role)
+      });
+    } catch(e) {}
+  }
+  G_team.members[PLAYER_ID].role = role;
+  document.getElementById('team-role-picker').style.display = 'none';
+  document.getElementById('team-hud').style.display = 'block';
+  document.getElementById('team-role-badge').style.display = 'inline';
+  const badge = document.getElementById('team-role-badge');
+  badge.textContent = ROLE_INFO[role].label;
+  badge.style.color = ROLE_INFO[role].color;
+  badge.style.border = `1px solid ${ROLE_INFO[role].color}`;
+  badge.style.background = 'transparent';
+  document.getElementById('team-hud-name').textContent = G_team.name;
+  document.getElementById('team-hud-role').textContent = `Role: ${ROLE_INFO[role].label}`;
+  updateTeamHUD();
+  renderTeams();
+  flash(`✅ Role set: ${ROLE_INFO[role].label}`, ROLE_INFO[role].color);
+}
+
+async function leaveTeam() {
+  if (!G_teamId) return;
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_teams/${G_teamId}/members/${PLAYER_ID}.json`, {
+        method:'DELETE'
+      });
+    } catch(e) {}
+  }
+  G_teamId = null; G_team = null; G_teamRole = null;
+  document.getElementById('team-hud').style.display = 'none';
+  document.getElementById('team-role-picker').style.display = 'none';
+  document.getElementById('team-role-badge').style.display = 'none';
+  renderTeams();
+}
+
+function updateTeamHUD() {
+  if (!G_team) return;
+  const portV = Object.entries(G_team.portfolio||{}).reduce((a,[sym,qty])=>a+(STOCKS[sym]?.price||0)*qty,0);
+  const total = (G_team.cash||0) + portV;
+  const el = document.getElementById('team-hud-val');
+  if (el) { el.textContent=$$(total); el.style.color=total>=1000?'var(--green)':'var(--red)'; }
+  const ml = document.getElementById('team-members-list');
+  if (ml && G_team.members) {
+    ml.innerHTML = Object.values(G_team.members).map(m => {
+      const r = m.role;
+      const dot = r ? `<span class="role-dot ${r}"></span>` : '';
+      return `<span class="team-member-chip">${dot}${escHtml(m.name||'?')}${m.name===PLAYER_NAME?' (you)':''}</span>`;
+    }).join('');
+  }
+}
+
+/* Team buy/sell — only Traders can execute */
+async function teamBuy(sym) {
+  if (!G_team) return;
+  if (G_teamRole !== 'trader') { flash('🛡 Only Traders can execute orders', 'var(--orange)'); return; }
+  const s = STOCKS[sym];
+  const qty = getQty(sym);
+  const cost = s.price * qty;
+  if (cost > (G_team.cash||0)) { flash('❌ Insufficient team funds', '#ff1744'); return; }
+  G_team.cash -= cost;
+  G_team.portfolio[sym] = (G_team.portfolio[sym]||0) + qty;
+  G_team.costBasis = G_team.costBasis || {};
+  G_team.costBasis[sym] = (G_team.costBasis[sym]||0) + cost;
+  G_team.trades = (G_team.trades||0)+1;
+  if (fbConfigured() && G_teamId) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_teams/${G_teamId}.json`, {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ cash:G_team.cash, portfolio:G_team.portfolio, costBasis:G_team.costBasis, trades:G_team.trades })
+      });
+    } catch(e) {}
+  }
+  snd.buy();
+  updateTeamHUD();
+  flash(`👥 [TEAM] Bought ${qty}× ${sym} @ ${$$(s.price)}`, 'var(--green)');
+}
+
+async function pollTeamState() {
+  if (!G_teamId || !fbConfigured()) return;
+  try {
+    const res = await fetch(`${FIREBASE_URL}/stockblitz_teams/${G_teamId}.json`,{cache:'no-store'});
+    if (!res.ok) return;
+    const t = await res.json();
+    if (!t) return;
+    G_team = t;
+    updateTeamHUD();
+  } catch(e) {}
+}
+
+async function renderTeams() {
+  const el = document.getElementById('teams-content');
+  if (!el) return;
+
+  // Show role info box if in a team
+  if (G_teamId && G_teamRole) {
+    const info = ROLE_INFO[G_teamRole];
+    const portV = Object.entries(G_team?.portfolio||{}).reduce((a,[sym,qty])=>a+(STOCKS[sym]?.price||0)*qty,0);
+    const total = (G_team?.cash||0) + portV;
+    el.innerHTML = `
+      <div class="role-info ${G_teamRole}">${info.desc}</div>
+      ${G_teamRole === 'analyst' ? buildAnalystView() : ''}
+      ${G_teamRole === 'risk'    ? buildRiskView()    : ''}
+      ${G_teamRole === 'trader'  ? `<div style="font-size:0.67em;color:var(--text-dim);padding:8px 0">Use the main stock table to buy/sell for the team. Team cash: <strong style="color:var(--green)">${$$(G_team?.cash||0)}</strong></div>` : ''}
+    `;
+    return;
+  }
+
+  el.innerHTML = '<div class="orders-empty" style="padding:10px 0">Loading teams…</div>';
+  let teams = {};
+  if (fbConfigured()) {
+    try {
+      const res = await fetch(FIREBASE_URL + TEAMS_PATH, {cache:'no-store'});
+      if (res.ok) teams = (await res.json()) || {};
+    } catch(e) {}
+  }
+  const list = Object.values(teams)
+    .filter(t => t && Date.now() - t.createdAt < 60*60*1000)
+    .sort((a,b) => b.createdAt - a.createdAt)
+    .slice(0,20);
+
+  if (!list.length) {
+    el.innerHTML = '<div class="orders-empty" style="padding:30px 12px">No teams yet.<br><span style="font-size:0.85em">Create one above!</span></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(t => {
+    const members   = Object.values(t.members||{});
+    const full      = members.length >= 3;
+    const inTeam    = G_teamId === t.id;
+    const portV     = Object.entries(t.portfolio||{}).reduce((a,[sym,qty])=>a+(STOCKS[sym]?.price||0)*qty,0);
+    const total     = (t.cash||0) + portV;
+    const chips     = members.map(m => {
+      const r = m.role;
+      const dot = r ? `<span class="role-dot ${r}" style="margin-right:2px"></span>` : '';
+      return `<span class="team-member-chip">${dot}${escHtml(m.name||'?')}</span>`;
+    }).join('');
+    return `
+      <div class="team-card">
+        <div class="team-card-top">
+          <span class="team-card-name">${escHtml(t.name||'Team')}</span>
+          <span class="team-card-val">${$$(total)}</span>
+        </div>
+        <div class="team-members-row">${chips}</div>
+        <div style="font-size:0.6em;color:var(--text-dim);margin-bottom:5px">${members.length}/3 members · ${t.trades||0} trades</div>
+        ${!inTeam && !G_teamId
+          ? `<button class="team-join-btn" ${full?'disabled':''} onclick="joinTeam('${t.id}')">${full?'Team Full':'Join Team'}</button>`
+          : inTeam ? `<div style="text-align:center;font-size:0.6em;color:var(--accent)">✓ Your team</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function buildAnalystView() {
+  // Show top 5 signals for the analyst role
+  const signals = SYM_LIST.map(sym => {
+    const s = STOCKS[sym];
+    const pct = ((s.price-s.startP)/s.startP*100);
+    return { sym, pct, trend:s.trend, sent:s.sentiment||0, vol:s.vol };
+  }).sort((a,b)=>b.sent-a.sent).slice(0,8);
+
+  return `<div style="margin-top:6px">
+    <div style="font-size:0.6em;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px">📡 Analyst Dashboard</div>
+    ${signals.map(s=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.67em">
+        <span style="font-weight:bold;color:${STOCKS[s.sym].color}">${s.sym}</span>
+        <span style="color:${s.pct>=0?'var(--green)':'var(--red)'}">${s.pct>=0?'+':''}${s.pct.toFixed(1)}%</span>
+        <span class="trend-badge trend-${s.trend}">${s.trend}</span>
+        <span style="color:${s.sent>0?'var(--green)':'var(--red)'}">😀 ${(s.sent*100).toFixed(0)}%</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+function buildRiskView() {
+  if (!G_team?.portfolio) return '<div class="role-info risk" style="margin-top:6px">No team positions yet.</div>';
+  const positions = Object.entries(G_team.portfolio).filter(([,q])=>q>0);
+  return `<div style="margin-top:6px">
+    <div style="font-size:0.6em;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px">🛡 Risk Dashboard</div>
+    ${positions.length===0?'<div style="font-size:0.67em;color:var(--text-dim)">No open positions.</div>':positions.map(([sym,qty])=>{
+      const s = STOCKS[sym];
+      const cv = qty*s.price;
+      const cb = G_team.costBasis?.[sym]||0;
+      const pnl= cv-cb;
+      return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.67em">
+        <span style="font-weight:bold;color:${s.color}">${sym}</span>
+        <span>${qty}×</span>
+        <span style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':''}${$$(pnl)}</span>
+      </div>`;
+    }).join('')}
+    <div style="font-size:0.6em;color:var(--orange);padding-top:5px">Team Cash: ${$$(G_team.cash||0)}</div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   📣  PUBLIC TRADE FEED
+   Firebase: /stockblitz_trade_feed/{key}
+   Every buy/sell pushes a record. All clients poll.
+══════════════════════════════════════════════════════════ */
+const TRADE_FEED_PATH = '/stockblitz_trade_feed.json';
+let   feedLastTs      = 0;
+let   feedCache       = [];  // local ring buffer for stats
+const FEED_MAX        = 100;
+
+async function pushTradeFeed(action, sym, qty, price) {
+  const myQty  = G.portfolio[sym] || 0;
+  const status = action === 'buy' ? cornerStatus(sym, myQty) : null;
+  const entry  = {
+    pid:    PLAYER_ID,
+    name:   PLAYER_NAME,
+    action, sym, qty, price,
+    ts:     Date.now(),
+    corner: status?.label || null,
+  };
+  feedAddItem(entry);
+  feedCache.unshift(entry);
+  if (feedCache.length > FEED_MAX) feedCache.length = FEED_MAX;
+  updateFeedStats();
+
+  // If player just cornered the stock, fire a global news event
+  if (status && action === 'buy') {
+    const pct  = ownershipPct(sym, myQty).toFixed(1);
+    const txt  = `${status.label} ${PLAYER_NAME} now controls ${pct}% of ${STOCKS[sym].name} (${sym}) float!`;
+    const ev   = { sym, imp: 0.04, type:'positive' };
+    pushNewsEvent(ev, txt);
+    addLimitedNewsItem(txt, sym, 'positive', 'CORNER');
+    const ti = document.createElement('span');
+    ti.className = 'ti ti-up';
+    ti.textContent = `👑 ${txt}`;
+    document.getElementById('ticker-inner').prepend(ti);
+  }
+
+  if (!fbConfigured()) return;
+  try {
+    const key = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    await fetch(`${FIREBASE_URL}/stockblitz_trade_feed/${key}.json`, {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry)
+    });
+  } catch(e) {}
+}
+
+async function pollTradeFeed() {
+  if (!fbConfigured()) return;
+  if (!document.getElementById('tab-feed')?.classList.contains('active')) return;
+  try {
+    const res = await fetch(FIREBASE_URL + TRADE_FEED_PATH, {cache:'no-store'});
+    if (!res.ok) return;
+    const all = await res.json();
+    if (!all) return;
+    const cutoff = Date.now() - 60*60*1000; // last hour
+    const items  = Object.values(all)
+      .filter(e => e && e.ts > feedLastTs && e.ts > cutoff && e.pid !== PLAYER_ID)
+      .sort((a,b) => a.ts-b.ts);
+    for (const item of items) {
+      feedAddItem(item);
+      feedCache.unshift(item);
+    }
+    if (feedCache.length > FEED_MAX) feedCache.length = FEED_MAX;
+    if (items.length) { feedLastTs = Math.max(...items.map(e=>e.ts)); updateFeedStats(); }
+  } catch(e) {}
+}
+
+function feedAddItem(entry) {
+  const list = document.getElementById('feed-list');
+  if (!list) return;
+  const ago  = entry.ts ? timeAgo(entry.ts) : '';
+  const s    = STOCKS[entry.sym];
+  const col  = s ? s.color : 'var(--text)';
+  const isMe = entry.pid === PLAYER_ID;
+  const big  = entry.qty * entry.price > 5000;
+
+  const div = document.createElement('div');
+  div.className = `feed-item${big?' feed-hype':''}`;
+  const cornerBadge = entry.corner
+    ? `<span style="font-size:0.8em;margin-left:2px">${entry.corner}</span>`
+    : '';
+  div.innerHTML = `
+    <span class="feed-action ${entry.action}">${entry.action.toUpperCase()}</span>
+    <span class="feed-player">${isMe?'<strong style="color:var(--accent)">You</strong>':`<strong>${escHtml(entry.name||'?')}</strong>`}</span>
+    <span class="feed-sym" style="color:${col}">${entry.sym}</span>
+    <span class="feed-qty">${entry.qty}×</span>
+    <span class="feed-price">@ ${$$(entry.price)}</span>
+    ${cornerBadge}
+    <span class="feed-ago">${ago}</span>`;
+
+  list.insertBefore(div, list.firstChild);
+  while (list.children.length > FEED_MAX) list.removeChild(list.lastChild);
+}
+
+function updateFeedStats() {
+  const hour = Date.now() - 3600*1000;
+  const recent = feedCache.filter(e => e.ts > hour);
+  const buyMap = {}, sellMap = {};
+  let count = recent.length;
+  for (const e of recent) {
+    if (e.action==='buy')  buyMap[e.sym]  = (buyMap[e.sym]||0) + e.qty;
+    if (e.action==='sell') sellMap[e.sym] = (sellMap[e.sym]||0) + e.qty;
+  }
+  const topBuy  = Object.entries(buyMap).sort((a,b)=>b[1]-a[1])[0];
+  const topSell = Object.entries(sellMap).sort((a,b)=>b[1]-a[1])[0];
+  const tbEl = document.getElementById('feed-top-buy');
+  const tsEl = document.getElementById('feed-top-sell');
+  const tcEl = document.getElementById('feed-trade-count');
+  if (tbEl) tbEl.textContent = topBuy  ? topBuy[0]  : '—';
+  if (tsEl) tsEl.textContent = topSell ? topSell[0] : '—';
+  if (tcEl) tcEl.textContent = count;
+}
+
+function initTradeFeed() {
+  feedLastTs = Date.now() - 5*60*1000; // pick up last 5 min on load
+  setInterval(pollTradeFeed, 4000);
+}
+
+/* ══════════════════════════════════════════════════════════
+   👑 OWNERSHIP BENEFITS SYSTEM
+   ──────────────────────────────────────────────────────────
+   Owning a significant share of a stock's float gives you
+   real mechanical advantages that scale with your stake:
+
+   10%+ MAJOR   → Dividends: passive income every tick
+   25%+ WHALE   → Insider Edge: early trend signals (±dir visible)
+   50%+ MAJORITY→ Market Squeeze: force a price bump (2min cooldown)
+   75%+ CORNERED→ Corner Tax: collect a cut when others sell your stock
+   100% MONOPOLY→ Full Lockout: block all buys for 60s (once per game)
+══════════════════════════════════════════════════════════ */
+
+/* ─── DIVIDEND SYSTEM (10%+ → passive income per tick) ─────
+   Rate: 0.0002% of position value per tick per 1% of float owned.
+   Example: own 20% of MEME (11,500 price × 5000 shares = $57,500 pos)
+   → ~$57,500 × 0.20 × 0.000002 × 60 ticks ≈ $1.38/min passively.
+   Big stake in an expensive stock = meaningful passive income.       */
+let G_totalDividends = 0;  // lifetime dividend earnings
+
+function tickDividends() {
+  let earned = 0;
+  for (const [sym, qty] of Object.entries(G.portfolio)) {
+    if (!qty || qty <= 0) continue;
+    const s   = STOCKS[sym];
+    if (!s) continue;
+    const pct = ownershipPct(sym, qty) / 100;   // 0..1
+    if (pct < 0.10) continue;                   // need 10%+ to earn
+
+    // Dividend rate scales with ownership %
+    // 10% = 0.002%/tick, 50% = 0.006%/tick, 100% = 0.010%/tick
+    const rate = 0.00002 + pct * 0.00008;
+    const positionValue = qty * s.price;
+    earned += positionValue * rate;
+  }
+  if (earned <= 0) return;
+  G.cash += earned;
+  G_totalDividends += earned;
+
+  // Show a small dividend indicator every 10 ticks to avoid spam
+  if (G.tickCount % 10 === 0 && earned > 0.01) {
+    const indicator = document.getElementById('dividend-indicator');
+    if (indicator) {
+      indicator.textContent = `💰 +${$$(earned)}/tick dividends`;
+      indicator.style.opacity = '1';
+      clearTimeout(indicator._t);
+      indicator._t = setTimeout(() => { indicator.style.opacity = '0'; }, 3000);
+    }
+  }
+}
+
+/* ─── INSIDER EDGE (25%+ → see next direction) ─────────────
+   When you own 25%+ of a stock, you see a subtle directional
+   arrow in the signal column showing where the price is heading
+   in the next few ticks, based on fundamentals + sentiment.        */
+function getInsiderSignal(sym) {
+  const s   = STOCKS[sym];
+  const qty = G.portfolio[sym] || 0;
+  if (ownershipPct(sym, qty) < 25) return null;
+
+  // Predict based on: sentiment, demand vs supply, crash memory
+  const demandBias = (s.demand - s.supply) * 0.15;
+  const sentBias   = (s.sentiment || 0) * 0.006;
+  const scarBias   = scarcityMultiplier(sym) > 1.05 ? 0.003 : 0;
+  const total      = demandBias + sentBias + scarBias;
+
+  if      (total >  0.003) return { dir:'▲', color:'var(--green)', tip:'Insider: bullish pressure detected' };
+  else if (total < -0.003) return { dir:'▼', color:'var(--red)',   tip:'Insider: bearish pressure detected' };
+  else                     return { dir:'→', color:'var(--text-dim)', tip:'Insider: neutral' };
+}
+
+/* ─── MARKET SQUEEZE (50%+ → force a price push) ───────────
+   Once you own majority, you can execute a Market Squeeze:
+   a coordinated buy pressure wave that temporarily pumps the
+   price 3-8%. 2 minute cooldown. Burns no cash — it's your
+   market maker power. Can only be used on stocks you own 50%+. */
+const SQUEEZE_COOLDOWNS = {};  // { sym: lastUsedTs }
+
+function canSqueeze(sym) {
+  const qty      = G.portfolio[sym] || 0;
+  const pct      = ownershipPct(sym, qty);
+  const lastUsed = SQUEEZE_COOLDOWNS[sym] || 0;
+  const cooldown = 120000; // 2 minutes
+  return pct >= 50 && (Date.now() - lastUsed) > cooldown;
+}
+
+function executeSqueeze(sym) {
+  if (!canSqueeze(sym)) {
+    const last = SQUEEZE_COOLDOWNS[sym] || 0;
+    const rem  = Math.ceil((120000 - (Date.now() - last)) / 1000);
+    flash(`⏳ Squeeze on cooldown — ${rem}s remaining`, 'var(--orange)');
+    return;
+  }
+  const s     = STOCKS[sym];
+  const boost = 0.03 + Math.random() * 0.05;  // 3-8%
+  SQUEEZE_COOLDOWNS[sym] = Date.now();
+
+  // Apply the squeeze
+  s.prev  = s.price;
+  s.sentiment = Math.min(1, (s.sentiment||0) + 0.5);
+  applyPrice(s, s.price * (1 + boost));
+  s.history.push(s.price);
+  if (s.history.length > 240) s.history.shift();
+
+  // Push as a news event so all players see it
+  const ev  = { sym, imp: boost, type:'positive' };
+  const txt = `🔥 SQUEEZE: ${PLAYER_NAME} executes market squeeze on ${s.name} — price surges ${(boost*100).toFixed(1)}%!`;
+  pushNewsEvent(ev, txt);
+  addLimitedNewsItem(txt, sym, 'positive', 'SQUEEZE');
+
+  const ti = document.createElement('span');
+  ti.className = 'ti ti-up';
+  ti.textContent = `🔥 ${txt}`;
+  document.getElementById('ticker-inner').prepend(ti);
+
+  snd.good();
+  flash(`🔥 Market Squeeze executed on ${sym} — +${(boost*100).toFixed(1)}%!`, 'var(--gold)');
+  refreshUI();
+  updateOwnershipPanel();
+}
+
+/* ─── CORNER TAX (75%+ → collect fee from other sellers) ───
+   When someone sells a stock you've cornered, you collect a
+   tiny "illiquidity premium" — 2% of their sale goes to you.
+   This is checked inside the sell() function.                      */
+function collectCornerTax(sym, saleProceeds, sellerPid) {
+  if (sellerPid === PLAYER_ID) return;  // don't tax yourself
+  const myQty = G.portfolio[sym] || 0;
+  if (ownershipPct(sym, myQty) < 75) return;
+
+  const tax = saleProceeds * 0.02;
+  G.cash += tax;
+  G_totalDividends += tax;  // count in same bucket as dividends
+  if (tax > 0.01) {
+    const indicator = document.getElementById('dividend-indicator');
+    if (indicator) {
+      indicator.textContent = `👑 +${$$(tax)} corner tax collected`;
+      indicator.style.opacity = '1';
+      clearTimeout(indicator._t);
+      indicator._t = setTimeout(() => { indicator.style.opacity = '0'; }, 3000);
+    }
+  }
+}
+
+/* Push corner tax to Firebase when someone sells so the corner owner receives it */
+async function pushCornerTaxEvent(sym, saleProceeds) {
+  if (!fbConfigured()) return;
+  try {
+    const key = `ct_${Date.now().toString(36)}`;
+    await fetch(`${FIREBASE_URL}/stockblitz_corner_tax/${key}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sym, proceeds: saleProceeds, ts: Date.now(), seller: PLAYER_ID })
+    });
+  } catch(e) {}
+}
+
+async function pollCornerTax() {
+  if (!fbConfigured()) return;
+  try {
+    const res = await fetch(`${FIREBASE_URL}/stockblitz_corner_tax.json`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const all = await res.json();
+    if (!all) return;
+    const cutoff = Date.now() - 10000;  // last 10s
+    for (const entry of Object.values(all)) {
+      if (!entry || entry.ts < cutoff || entry.seller === PLAYER_ID) continue;
+      collectCornerTax(entry.sym, entry.proceeds, entry.seller);
+    }
+  } catch(e) {}
+}
+
+/* ─── MONOPOLY LOCKOUT (100% → block all buys for 60s) ─────
+   If you own 100% of a stock's float, you can trigger a
+   Temporary Lockout once per game — nobody can buy for 60s
+   (they get an error saying the market is locked). Price surges
+   from the artificial scarcity during the window.                  */
+const LOCKOUT_ACTIVE = {};  // { sym: endTs }
+let G_lockoutUsed = false;
+
+function executeLockout(sym) {
+  const qty    = G.portfolio[sym] || 0;
+  const avail  = availableShares(sym);
+  if (avail > 0 || qty === 0) { flash('❌ You must own 100% of the float to lock out the market', '#ff1744'); return; }
+  if (G_lockoutUsed)          { flash('❌ Lockout already used this session', '#ff1744'); return; }
+
+  LOCKOUT_ACTIVE[sym] = Date.now() + 60000;
+  G_lockoutUsed = true;
+
+  const txt = `🔒 LOCKOUT: ${PLAYER_NAME} locks ${sym} — no new buyers for 60 seconds!`;
+  const ev  = { sym, imp: 0.06, type:'positive' };
+  pushNewsEvent(ev, txt);
+  addLimitedNewsItem(txt, sym, 'positive', 'LOCKOUT');
+  snd.ach();
+  flash(`🔒 ${sym} locked out for 60 seconds — nobody can buy!`, 'var(--gold)');
+
+  // Auto-release after 60s
+  setTimeout(() => {
+    delete LOCKOUT_ACTIVE[sym];
+    addLimitedNewsItem(`✅ ${sym} lockout lifted — trading resumes`, sym, 'neutral', 'LOCKOUT');
+    updateOwnershipPanel();
+  }, 60000);
+
+  updateOwnershipPanel();
+}
+
+function isLocked(sym) {
+  return LOCKOUT_ACTIVE[sym] && LOCKOUT_ACTIVE[sym] > Date.now();
+}
+
+/* ─── OWNERSHIP PANEL (shown in portfolio tab) ──────────────
+   Renders a card for each stock you own with the active benefits
+   and action buttons available at your ownership tier.            */
+function buildOwnershipPanel() {
+  const positions = SYM_LIST.filter(sym => (G.portfolio[sym]||0) > 0);
+  const hasBenefits = positions.some(sym => ownershipPct(sym, G.portfolio[sym]) >= 10);
+
+  const container = document.getElementById('ownership-panel');
+  if (!container) return;
+
+  if (!hasBenefits) {
+    container.innerHTML = `
+      <div style="font-size:0.62em;color:var(--text-dim);padding:6px 0;line-height:1.6">
+        💡 Own <strong>10%+</strong> of a stock's float to unlock benefits.<br>
+        Meme stocks (GILD: 10k shares, PUMP: 15k) are easiest to corner.
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = positions
+    .filter(sym => ownershipPct(sym, G.portfolio[sym]) >= 10)
+    .sort((a,b) => ownershipPct(b, G.portfolio[b]) - ownershipPct(a, G.portfolio[a]))
+    .map(sym => {
+      const s    = STOCKS[sym];
+      const qty  = G.portfolio[sym];
+      const pct  = ownershipPct(sym, qty);
+      const st   = cornerStatus(sym, qty);
+      const avail = availableShares(sym);
+
+      // Dividend rate for display
+      const rate     = 0.00002 + (pct/100) * 0.00008;
+      const posVal   = qty * s.price;
+      const perMin   = posVal * rate * 60;
+
+      // Insider signal
+      const insider  = getInsiderSignal(sym);
+
+      // Squeeze button
+      const sqCD     = SQUEEZE_COOLDOWNS[sym] || 0;
+      const sqReady  = canSqueeze(sym);
+      const sqRem    = sqCD ? Math.max(0, Math.ceil((120000-(Date.now()-sqCD))/1000)) : 0;
+
+      const tiers = [
+        { pct:10,  label:'💰 Dividends',       detail:`+${$$(perMin)}/min passive income`, unlocked: pct>=10 },
+        { pct:25,  label:'🔍 Insider Edge',     detail: insider ? `Next direction: <span style="color:${insider.color};font-weight:bold">${insider.dir}</span>` : 'Need 25%', unlocked: pct>=25 },
+        { pct:50,  label:'🔥 Market Squeeze',   detail: pct>=50 ? (sqReady ? 'Ready' : `Cooldown: ${sqRem}s`) : 'Need 50%', unlocked: pct>=50 },
+        { pct:75,  label:'👑 Corner Tax',        detail: pct>=75 ? '2% of all sells in your stock' : 'Need 75%', unlocked: pct>=75 },
+        { pct:100, label:'🔒 Market Lockout',    detail: avail===0 ? (G_lockoutUsed ? 'Used this session' : 'Available') : 'Need 100%', unlocked: avail===0 },
+      ];
+
+      return `
+        <div style="background:var(--bg3);border:1px solid ${st?st.color:'var(--border)'};border-radius:6px;padding:10px 12px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-weight:bold;font-size:0.85em;color:${s.color}">${sym}</span>
+            ${st ? `<span style="font-size:0.68em;font-weight:bold;color:${st.color}">${st.label}</span>` : ''}
+            <span style="font-size:0.72em;color:var(--gold)">${pct.toFixed(1)}% of float</span>
+          </div>
+          <!-- Tier progress bar -->
+          <div style="display:flex;gap:2px;margin-bottom:7px">
+            ${[10,25,50,75,100].map(t=>`<div style="flex:1;height:3px;border-radius:2px;background:${pct>=t?'var(--accent)':'var(--bg4)'}"></div>`).join('')}
+          </div>
+          <!-- Benefits list -->
+          <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:7px">
+            ${tiers.map(t=>`
+              <div style="display:flex;justify-content:space-between;font-size:0.63em;opacity:${t.unlocked?1:0.35}">
+                <span>${t.label}</span>
+                <span style="color:${t.unlocked?'var(--text-hi)':'var(--text-dim)'}">${t.detail}</span>
+              </div>`).join('')}
+          </div>
+          <!-- Action buttons -->
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            ${pct>=50 ? `<button onclick="executeSqueeze('${sym}')" style="flex:1;padding:4px 6px;font-family:var(--mono);font-size:0.6em;font-weight:bold;cursor:pointer;border-radius:4px;border:1px solid ${sqReady?'rgba(255,152,0,0.5)':'var(--border)'};background:${sqReady?'rgba(255,152,0,0.1)':'var(--bg4)'};color:${sqReady?'var(--orange)':'var(--text-dim)'}">🔥 Squeeze${sqReady?'':' ('+sqRem+'s)'}</button>` : ''}
+            ${avail===0 && !G_lockoutUsed ? `<button onclick="executeLockout('${sym}')" style="flex:1;padding:4px 6px;font-family:var(--mono);font-size:0.6em;font-weight:bold;cursor:pointer;border-radius:4px;border:1px solid rgba(255,214,0,0.5);background:rgba(255,214,0,0.08);color:var(--gold)">🔒 Lockout</button>` : ''}
+          </div>
+        </div>`;
+    }).join('') || `<div style="font-size:0.62em;color:var(--text-dim);padding:6px 0">Own 10%+ of a float to see ownership benefits here.</div>`;
+}
+
+function updateOwnershipPanel() {
+  buildOwnershipPanel();
+}
+
 /* ─── GAME LOOP ─────────────────────────────────── */
 function gameLoop() {
   // All clients run the same deterministic simulation — no host needed
   tickPrices();
+
+  // ── Ownership benefits ──
+  tickDividends();                                     // passive dividend income every tick
+  if (G.tickCount % 10 === 0) pollCornerTax();         // check if corner tax is owed
+  if (G.tickCount % 15 === 0) updateOwnershipPanel();  // refresh benefit panel
 
   // Check pending orders every tick
   checkOrders();
@@ -5554,6 +7187,14 @@ async function init() {
 
   // Ensure tradeHistory exists (old saves won't have it)
   if (!G.tradeHistory) G.tradeHistory = [];
+
+  // Seed local sharesOwned from own portfolio immediately (before Firebase sync)
+  SYM_LIST.forEach(sym => {
+    const qty = G.portfolio[sym] || 0;
+    if (qty > 0) sharesOwned[sym] = (sharesOwned[sym]||0) + qty;
+  });
+  // Pull global ownership from Firebase/local LB
+  lbLoadAll().then(() => refreshTable());
 
   buildTable();
   buildAchs();
@@ -5640,6 +7281,9 @@ async function init() {
   // ── NEW: Zoom controls ──
   initZoomControls();
 
+  // ── Tab bar drag-to-scroll ──
+  initTabDragger();
+
   // ── Resizable panels ──
   initResizeHandle();
 
@@ -5654,6 +7298,12 @@ async function init() {
 
   // ── Player search ──
   initPlayerSearch();
+
+  // ── Trade feed ──
+  initTradeFeed();
+
+  // ── Team state polling every 8s ──
+  setInterval(pollTeamState, 8000);
 
   // ── GLOBAL SYNC: Load shared market start time from Firebase ──
   await loadOrCreateMarketStart();
