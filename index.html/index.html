@@ -1959,24 +1959,69 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
       <!-- ═══ MATCHES TAB ══════════════════════════════════ -->
       <div class="tab-content" id="tab-matches">
         <!-- Header / lobby selector -->
-        <div id="match-header" style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+             <div id="match-header" style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div class="panel-title">🏁 Timed Matches</div>
             <div id="match-live-badge" style="display:none;font-size:0.55em;background:rgba(255,23,68,0.15);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:2px 8px;animation:pulse-live 1.2s ease-in-out infinite">● LIVE</div>
           </div>
-          <!-- Duration picker (only shown in lobby) -->
-          <div id="match-create-row" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
-            <select id="match-duration" class="order-select" style="flex:1">
-              <option value="5">5 min · Blitz</option>
-              <option value="10" selected>10 min · Standard</option>
-              <option value="15">15 min · Extended</option>
-            </select>
-            <input id="match-start-cash" class="order-input" type="number" value="1000" min="500" step="500" placeholder="Start $" style="width:90px;flex:none">
-            <button class="btn-place-order" style="flex:none;padding:5px 12px;white-space:nowrap" onclick="createMatch()">➕ New Match</button>
+
+          <!-- CREATE + JOIN section (shown when not in a match) -->
+          <div id="match-create-row">
+            <div style="display:flex;gap:4px;margin-bottom:5px;flex-wrap:wrap">
+              <select id="match-duration" class="order-select" style="flex:1">
+                <option value="5">5 min · Blitz</option>
+                <option value="10" selected>10 min · Standard</option>
+                <option value="15">15 min · Extended</option>
+              </select>
+              <input id="match-start-cash" class="order-input" type="number" value="1000" min="500" step="500" placeholder="Start $" style="width:80px;flex:none">
+            </div>
+            <button class="btn-place-order" onclick="createMatch()" style="margin-bottom:6px">➕ Create Match</button>
+            <div style="display:flex;align-items:center;gap:6px;margin:4px 0">
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+              <span style="font-size:0.58em;color:var(--text-dim)">or join with code</span>
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+            </div>
+            <div style="display:flex;gap:4px;margin-top:5px">
+              <input id="match-join-code" class="order-input" placeholder="Enter 6-letter code…" maxlength="6"
+                style="flex:1;text-transform:uppercase;font-size:0.9em;letter-spacing:4px;font-weight:bold;text-align:center"
+                oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+              <button class="btn-place-order" onclick="joinByCode()" style="flex:none;padding:5px 14px">Join</button>
+            </div>
+          </div>
+
+          <!-- HOST LOBBY (shown after creating, before starting) -->
+          <div id="match-lobby" style="display:none">
+            <div style="background:var(--bg3);border:2px solid rgba(var(--accent-rgb),0.4);border-radius:8px;padding:10px 14px;margin-bottom:8px;text-align:center">
+              <div style="font-size:0.55em;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Share this code</div>
+              <div id="match-lobby-code" style="font-size:2.2em;font-weight:900;color:var(--accent);letter-spacing:10px;font-family:'Courier New',monospace;text-shadow:0 0 20px rgba(var(--accent-rgb),0.5)">——</div>
+              <div style="font-size:0.58em;color:var(--text-dim);margin-top:4px">Opponent enters this to join your match</div>
+            </div>
+            <div style="font-size:0.62em;color:var(--text-dim);margin-bottom:4px">⚙️ <span id="lobby-settings-summary"></span></div>
+            <div style="font-size:0.62em;color:var(--text-dim);margin-bottom:5px">Players in lobby:</div>
+            <div id="lobby-players-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+            <button id="match-start-btn" onclick="hostStartMatch()"
+              style="width:100%;padding:8px;background:rgba(0,230,118,0.12);border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-size:0.72em;font-weight:bold;cursor:pointer;border-radius:5px;letter-spacing:1px;transition:all 0.15s;margin-bottom:4px">
+              ▶ Start Match
+            </button>
+            <button onclick="cancelMatch()"
+              style="width:100%;background:transparent;border:1px solid rgba(255,23,68,0.3);color:var(--red);font-family:var(--mono);font-size:0.6em;padding:4px;cursor:pointer;border-radius:3px">
+              ✕ Cancel & Delete Match
+            </button>
+          </div>
+
+          <!-- WAITING view (non-host who has joined) -->
+          <div id="match-waiting" style="display:none;text-align:center;padding:6px 0">
+            <div style="font-size:0.65em;color:var(--text-dim);margin-bottom:6px">You're in the lobby — waiting for host to start</div>
+            <div id="match-waiting-code" style="font-size:1.6em;font-weight:900;color:var(--blue);letter-spacing:8px;font-family:'Courier New',monospace;margin-bottom:6px">——</div>
+            <div id="match-waiting-players" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:8px"></div>
+            <button onclick="leaveMatch()"
+              style="width:100%;background:transparent;border:1px solid rgba(255,23,68,0.3);color:var(--red);font-family:var(--mono);font-size:0.6em;padding:4px;cursor:pointer;border-radius:3px">
+              Leave Lobby
+            </button>
           </div>
         </div>
 
-        <!-- Active match HUD (hidden when not in match) -->
+        <!-- Active match HUD -->
         <div id="match-hud" style="display:none;padding:6px 12px;border-bottom:1px solid var(--border);background:rgba(255,23,68,0.04);flex-shrink:0">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
             <div>
@@ -1992,14 +2037,12 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
               <div id="match-hud-val" style="font-size:0.88em;font-weight:bold;color:var(--green)">$1,000</div>
             </div>
           </div>
-          <!-- Pressure bar -->
           <div style="margin-top:5px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden">
             <div id="match-pressure-bar" style="height:3px;background:linear-gradient(90deg,var(--green),var(--red));border-radius:2px;transition:width 1s linear;width:100%"></div>
           </div>
           <button onclick="leaveMatch()" style="margin-top:5px;width:100%;background:transparent;border:1px solid rgba(255,23,68,0.3);color:var(--red);font-family:var(--mono);font-size:0.6em;padding:3px;cursor:pointer;border-radius:3px">Leave Match</button>
         </div>
 
-        <!-- Lobby list + leaderboard -->
         <div id="match-content" style="overflow-y:auto;flex:1;min-height:0;padding:6px 10px"></div>
       </div>
 
@@ -2092,6 +2135,13 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 <!-- Save indicator -->
 <div id="save-indicator">💾 Saved</div>
 
+<!-- Player Profile Modal -->
+<div id="profile-modal-bg" class="modal-bg">
+  <div class="modal-box" style="width:480px;max-height:88vh;overflow-y:auto;padding:0">
+    <div id="profile-modal-inner" style="padding:0"></div>
+  </div>
+</div>
+
 <!-- Flash message -->
 <div id="flash"></div>
 <!-- Dividend / corner tax income indicator -->
@@ -2138,76 +2188,126 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
      SETTINGS MODAL
 ================================================ -->
 <div class="modal-bg" id="settings-modal-bg">
-  <div class="modal-box" style="width:500px">
+  <div class="modal-box" style="width:540px">
     <div class="modal-title">⚙️ SETTINGS</div>
 
-    <!-- Audio -->
+    <!-- ── AUDIO ───────────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-section-title">🔊 Audio</div>
       <div class="setting-row">
         <span class="setting-label">Sound Effects</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="set-sound" checked>
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="toggle-wrap"><input type="checkbox" id="set-sound" checked><span class="toggle-slider"></span></label>
       </div>
       <div class="setting-row">
-        <span class="setting-label">Volume <span class="setting-sub">How loud? 0–100</span></span>
+        <span class="setting-label">Volume<span class="setting-sub">0 – 100</span></span>
         <input type="range" class="setting-slider" id="set-volume" min="0" max="100" value="60">
         <span class="setting-val" id="set-volume-val">60</span>
       </div>
     </div>
 
-    <!-- Market -->
+    <!-- ── MARKET ──────────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-section-title">📈 Market</div>
       <div class="setting-row">
-        <span class="setting-label">Tick Speed <span class="setting-sub">How often prices update</span></span>
+        <span class="setting-label">Tick Speed<span class="setting-sub">How often prices update</span></span>
         <select class="setting-select" id="set-tickspeed">
-          <option value="500">0.5 seconds</option>
-          <option value="1000" selected>1 second</option>
-          <option value="2000">2 seconds</option>
-          <option value="5000">5 seconds</option>
+          <option value="250">Turbo (0.25s)</option>
+          <option value="500">Fast (0.5s)</option>
+          <option value="1000" selected>Normal (1s)</option>
+          <option value="2000">Slow (2s)</option>
+          <option value="5000">Very Slow (5s)</option>
         </select>
       </div>
       <div class="setting-row">
-        <span class="setting-label">News Frequency <span class="setting-sub">How often news fires</span></span>
+        <span class="setting-label">News Frequency<span class="setting-sub">How often events fire</span></span>
         <select class="setting-select" id="set-newsfreq">
           <option value="fast">Fast (5–10s)</option>
           <option value="normal" selected>Normal (10–20s)</option>
           <option value="slow">Slow (20–40s)</option>
+          <option value="off">Off</option>
         </select>
       </div>
       <div class="setting-row">
-        <span class="setting-label">Default Quantity <span class="setting-sub">Pre-fill qty boxes</span></span>
+        <span class="setting-label">Market Volatility<span class="setting-sub">Scales all stock vol values</span></span>
+        <select class="setting-select" id="set-volatility">
+          <option value="0.5">Calm (50%)</option>
+          <option value="1.0" selected>Normal (100%)</option>
+          <option value="1.5">Spicy (150%)</option>
+          <option value="2.0">Chaos (200%)</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Starting Cash<span class="setting-sub">New game only</span></span>
+        <select class="setting-select" id="set-startcash">
+          <option value="500">$500</option>
+          <option value="1000" selected>$1,000</option>
+          <option value="5000">$5,000</option>
+          <option value="10000">$10,000</option>
+          <option value="100000">$100,000</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Default Quantity<span class="setting-sub">Pre-fill qty boxes</span></span>
         <input type="number" class="setting-num" id="set-defqty" value="1" min="1" max="9999">
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Random Events<span class="setting-sub">Scandals, hype waves, emergency days</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-events" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Dividends<span class="setting-sub">Passive income from float ownership</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-dividends" checked><span class="toggle-slider"></span></label>
       </div>
     </div>
 
-    <!-- Display -->
+    <!-- ── DISPLAY ─────────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-section-title">🎨 Display</div>
       <div class="setting-row">
         <span class="setting-label">Accent Color</span>
         <div class="color-opts" id="color-opts">
-          <div class="color-btn active" data-color="green"   style="background:#00e676" title="Green"></div>
-          <div class="color-btn"        data-color="blue"    style="background:#29b6f6" title="Blue"></div>
-          <div class="color-btn"        data-color="purple"  style="background:#ce93d8" title="Purple"></div>
-          <div class="color-btn"        data-color="gold"    style="background:#ffd600" title="Gold"></div>
-          <div class="color-btn"        data-color="orange"  style="background:#ff9800" title="Orange"></div>
-          <div class="color-btn"        data-color="red"     style="background:#ff5252" title="Red"></div>
+          <div class="color-btn active" data-color="green"  style="background:#00e676" title="Green"></div>
+          <div class="color-btn"        data-color="blue"   style="background:#29b6f6" title="Blue"></div>
+          <div class="color-btn"        data-color="purple" style="background:#ce93d8" title="Purple"></div>
+          <div class="color-btn"        data-color="gold"   style="background:#ffd600" title="Gold"></div>
+          <div class="color-btn"        data-color="orange" style="background:#ff9800" title="Orange"></div>
+          <div class="color-btn"        data-color="red"    style="background:#ff5252" title="Red"></div>
         </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Theme<span class="setting-sub">Background darkness</span></span>
+        <select class="setting-select" id="set-theme">
+          <option value="dark" selected>Dark (Default)</option>
+          <option value="darker">Ultra Dark</option>
+          <option value="midnight">Midnight Blue</option>
+        </select>
       </div>
       <div class="setting-row">
         <span class="setting-label">Chart Style</span>
         <select class="setting-select" id="set-chartstyle">
           <option value="area" selected>Area (Gradient)</option>
           <option value="line">Line Only</option>
+          <option value="candle">Candlestick</option>
         </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Table Font Size<span class="setting-sub">Scale the stock table text</span></span>
+        <select class="setting-select" id="set-tablefont">
+          <option value="11px">Small (11px)</option>
+          <option value="13px" selected>Normal (13px)</option>
+          <option value="15px">Large (15px)</option>
+          <option value="17px">XL (17px)</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Right Panel Width<span class="setting-sub">Pixels</span></span>
+        <input type="range" class="setting-slider" id="set-panelwidth" min="220" max="600" value="320" step="10">
+        <span class="setting-val" id="set-panelwidth-val">320</span>
       </div>
       <div class="setting-row">
         <span class="setting-label">Ticker Speed</span>
         <select class="setting-select" id="set-tickerspeed">
+          <option value="25s">Very Fast</option>
           <option value="40s">Fast</option>
           <option value="60s" selected>Normal</option>
           <option value="90s">Slow</option>
@@ -2215,7 +2315,7 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
         </select>
       </div>
       <div class="setting-row">
-        <span class="setting-label">Max News Items <span class="setting-sub">Items in the news feed</span></span>
+        <span class="setting-label">Max News Items<span class="setting-sub">Items shown in feed</span></span>
         <select class="setting-select" id="set-maxnews">
           <option value="10">10</option>
           <option value="25" selected>25</option>
@@ -2225,21 +2325,50 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
       </div>
       <div class="setting-row">
         <span class="setting-label">Show Sector Column</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="set-showsector" checked>
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="toggle-wrap"><input type="checkbox" id="set-showsector" checked><span class="toggle-slider"></span></label>
       </div>
       <div class="setting-row">
-        <span class="setting-label">Flash Row on Price Change</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="set-flashrows" checked>
-          <span class="toggle-slider"></span>
-        </label>
+        <span class="setting-label">Show Float Column<span class="setting-sub">Ownership bar in table</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-showfloat" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Flash Row on Change</span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-flashrows" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Compact Table Mode<span class="setting-sub">Tighter row spacing</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-compact"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Animate Chart Line<span class="setting-sub">Smooth point movement</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-animchart" checked><span class="toggle-slider"></span></label>
       </div>
     </div>
 
-    <!-- Skill Tree -->
+    <!-- ── TRADING ─────────────────────────────────── -->
+    <div class="settings-section">
+      <div class="settings-section-title">💼 Trading</div>
+      <div class="setting-row">
+        <span class="setting-label">Confirm Before Sell<span class="setting-sub">Prompt on every sell</span></span>
+        <label class="toggle-wrap"><input type="checkbox" id="set-confirmsell"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Max Buy Amount<span class="setting-sub">Limit per trade ($0 = unlimited)</span></span>
+        <input type="number" class="setting-num" id="set-maxbuy" value="0" min="0" step="100" style="width:80px">
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Auto-Sell on Profit %<span class="setting-sub">0 = off</span></span>
+        <input type="number" class="setting-num" id="set-autosell" value="0" min="0" max="999" style="width:60px">
+        <span style="font-size:0.75em;color:var(--text-dim);margin-left:3px">%</span>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Auto-Sell on Loss %<span class="setting-sub">Stop loss (0 = off)</span></span>
+        <input type="number" class="setting-num" id="set-stoploss" value="0" min="0" max="100" style="width:60px">
+        <span style="font-size:0.75em;color:var(--text-dim);margin-left:3px">%</span>
+      </div>
+    </div>
+
+    <!-- ── SKILL TREE ───────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-section-title">🌲 Skill Tree — <span id="skill-pts-display" style="color:var(--gold)">0</span> pts available</div>
       <div id="xp-display">
@@ -2247,20 +2376,40 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
         <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
         <span id="xp-level-label" style="color:var(--accent)">Lv.1</span>
       </div>
-      <div class="skill-grid" id="skill-grid"><!-- built by JS --></div>
+      <div class="skill-grid" id="skill-grid"></div>
     </div>
 
-    <!-- Danger Zone -->
+    <!-- ── FIREBASE ─────────────────────────────────── -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔥 Firebase</div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:5px">
+        <span class="setting-label">Database URL<span class="setting-sub">Paste your Firebase Realtime DB URL here</span></span>
+        <input type="text" id="set-firebase-url" class="setting-select" style="width:100%;font-size:0.7em;padding:5px 8px"
+          placeholder="https://your-project-default-rtdb.firebaseio.com">
+        <button onclick="applyFirebaseUrl()" style="background:rgba(var(--accent-rgb),0.12);border:1px solid rgba(var(--accent-rgb),0.3);color:var(--accent);padding:4px 12px;font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:3px">Apply & Reconnect</button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Sync Status</span>
+        <span id="settings-sync-status" style="font-size:0.72em;color:var(--text-dim)">—</span>
+      </div>
+    </div>
+
+    <!-- ── DANGER ZONE ──────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-section-title" style="color:#ff5252;border-bottom-color:rgba(255,82,82,0.3)">⚠️ Danger Zone</div>
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <button class="btn-danger" id="btn-reset" style="flex:1">🔄 Reset Game</button>
+        <button class="btn-danger" onclick="clearAllOrders()" style="flex:1">📋 Clear All Orders</button>
+      </div>
       <div style="margin-top:6px">
-        <button class="btn-danger" id="btn-reset">🔄 Reset Game — Start from $1,000</button>
+        <button class="btn-danger" onclick="exportSave()" style="width:100%;background:rgba(41,182,246,0.08);border-color:rgba(41,182,246,0.3);color:var(--blue)">💾 Export Save Data</button>
       </div>
     </div>
 
     <button class="modal-close" id="btn-settings-close">✕ Close Settings</button>
   </div>
 </div>
+
 
 <!-- ================================================
      PANIC MODE — Fake Google Docs
@@ -2324,17 +2473,31 @@ canvas#chart { display: block; width: 100%; border-radius: 3px; flex-shrink: 0; 
 
 /* ─── SETTINGS STATE ────────────────────────────── */
 const CFG = {
-  soundOn:     true,
-  volume:      0.60,
-  tickSpeed:   1000,
-  newsFreq:    'normal',
-  defQty:      1,
-  chartStyle:  'area',
-  accentColor: 'green',
-  tickerSpeed: '60s',
-  maxNews:     25,
-  showSector:  true,
-  flashRows:   true,
+  soundOn:        true,
+  volume:         0.60,
+  tickSpeed:      1000,
+  newsFreq:       'normal',
+  defQty:         1,
+  chartStyle:     'area',
+  accentColor:    'green',
+  tickerSpeed:    '60s',
+  maxNews:        25,
+  showSector:     true,
+  showFloat:      true,
+  flashRows:      true,
+  volatilityMult: 1.0,
+  startCash:      1000,
+  eventsOn:       true,
+  dividendsOn:    true,
+  theme:          'dark',
+  tableFont:      '13px',
+  panelWidth:     320,
+  compactTable:   false,
+  animChart:      true,
+  confirmSell:    false,
+  maxBuyAmt:      0,
+  autoSellProfit: 0,
+  stopLoss:       0,
 };
 
 /* ─── GAME STATE ────────────────────────────────── */
@@ -3044,7 +3207,8 @@ function tickPrices() {
     const si = symIdx++;   // deterministic sym index for seeding
 
     // Base random: seeded Box-Muller — identical across all clients at this tick
-    let chg = seededNormal(G.tickCount, si, 0) * s.vol + s.drift;
+    // Volatility multiplied by user's setting (default 1.0)
+    let chg = seededNormal(G.tickCount, si, 0) * s.vol * (CFG.volatilityMult||1) + s.drift;
 
     // Emergency day: amplify volatility (also seeded)
     if (G.emergencyDay) {
@@ -3655,6 +3819,11 @@ function buy(sym) {
   }
 
   if (cost > G.cash) { flash('❌ Not enough cash!', '#ff1744'); return; }
+
+  // Max buy amount per trade
+  if (CFG.maxBuyAmt > 0 && cost > CFG.maxBuyAmt) {
+    flash(`❌ Trade exceeds max buy limit ($${CFG.maxBuyAmt.toLocaleString()})`, '#ff1744'); return;
+  }
   G.cash -= cost;
   G.portfolio[sym] = (G.portfolio[sym] || 0) + qty;
   G.costBasis[sym] = (G.costBasis[sym] || 0) + cost;
@@ -3705,8 +3874,12 @@ function sell(sym) {
   const have = G.portfolio[sym] || 0;
   if (have < qty) { flash(`❌ Only own ${have} share${have!==1?'s':''} of ${sym}`, '#ff1744'); return; }
 
-  let proceeds = s.price * qty;
+  // Confirm sell if setting is on
+  if (CFG.confirmSell) {
+    if (!confirm(`Sell ${qty}× ${sym} @ ${$$(s.price)}?\nTotal: ${$$(s.price * qty)}`)) return;
+  }
 
+  let proceeds = s.price * qty;
   // Synergy multiplier applied to gains only
   const { bonus } = calcSynergyBonus();
   const costPerShare = G.costBasis[sym] ? G.costBasis[sym] / have : 0;
@@ -3838,6 +4011,8 @@ function refreshTable() {
     // ── Float / ownership bar ──
     const fltEl = document.getElementById('flt-'+sym);
     if (fltEl) {
+      // Hide entire column if showFloat is off
+      if (!CFG.showFloat) { fltEl.style.display = 'none'; fltEl.parentElement?.querySelectorAll?.('td[id^="flt-"]'); }
       const globalPct  = globalOwnershipPct(sym);
       const myPct      = ownershipPct(sym, owned);
       const avail      = availableShares(sym);
@@ -4552,8 +4727,103 @@ function timeAgo(ts) {
 }
 
 /* ─── SETTINGS ──────────────────────────────────── */
-function showSettings() { document.getElementById('settings-modal-bg').classList.add('open'); }
+function showSettings() {
+  document.getElementById('settings-modal-bg').classList.add('open');
+  // Populate Firebase URL field with current value
+  const fu = document.getElementById('set-firebase-url');
+  if (fu) fu.value = typeof FIREBASE_URL !== 'undefined' ? FIREBASE_URL : '';
+  // Sync status
+  const ss = document.getElementById('settings-sync-status');
+  if (ss) {
+    const sl = document.getElementById('sync-label');
+    ss.textContent = sl ? sl.textContent : '—';
+    ss.style.color = fbConfigured() ? 'var(--green)' : 'var(--red)';
+  }
+}
 function hideSettings() { document.getElementById('settings-modal-bg').classList.remove('open'); }
+
+/* Apply new theme setting */
+const THEMES = {
+  dark:     { bg:'#07090d', bg2:'#0c1018', bg3:'#111820', bg4:'#161f2a' },
+  darker:   { bg:'#030406', bg2:'#060a0f', bg3:'#0a1016', bg4:'#10181f' },
+  midnight: { bg:'#040812', bg2:'#081020', bg3:'#0e1a2e', bg4:'#14223c' },
+};
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.dark;
+  document.documentElement.style.setProperty('--bg',  t.bg);
+  document.documentElement.style.setProperty('--bg2', t.bg2);
+  document.documentElement.style.setProperty('--bg3', t.bg3);
+  document.documentElement.style.setProperty('--bg4', t.bg4);
+  CFG.theme = name;
+}
+
+/* Apply table font size */
+function applyTableFont(size) {
+  document.body.style.fontSize = size;
+  CFG.tableFont = size;
+}
+
+/* Apply right panel width */
+function applyPanelWidth(px) {
+  const main = document.getElementById('main');
+  if (main) {
+    const cols = getComputedStyle(main).gridTemplateColumns.split(' ');
+    if (cols.length === 3) main.style.gridTemplateColumns = `${cols[0]} 6px ${px}px`;
+  }
+  CFG.panelWidth = px;
+}
+
+/* Firebase URL hot-swap */
+function applyFirebaseUrl() {
+  const inp = document.getElementById('set-firebase-url');
+  if (!inp) return;
+  const url = inp.value.trim();
+  // We can't actually reassign const, but we CAN reload with it saved to localStorage
+  try { localStorage.setItem('stockblitz_firebase_url', url); } catch(e) {}
+  flash('🔥 Firebase URL saved — reload the page to reconnect', 'var(--orange)');
+}
+
+/* Auto-sell / stop-loss logic (checked every tick) */
+function checkAutoSell() {
+  const autoProfit = parseFloat(CFG.autoSellProfit) || 0;
+  const stopLoss   = parseFloat(CFG.stopLoss) || 0;
+  if (!autoProfit && !stopLoss) return;
+  for (const sym of SYM_LIST) {
+    const qty  = G.portfolio[sym] || 0;
+    if (!qty) continue;
+    const s    = STOCKS[sym];
+    const cb   = G.costBasis[sym] || 0;
+    const cps  = cb / qty;
+    const pct  = cps > 0 ? ((s.price - cps) / cps) * 100 : 0;
+    if (autoProfit > 0 && pct >= autoProfit) {
+      flash(`🤖 Auto-sell: ${sym} hit +${autoProfit}% profit target!`, 'var(--green)');
+      sell(sym);
+    } else if (stopLoss > 0 && pct <= -stopLoss) {
+      flash(`🛑 Stop-loss: ${sym} hit -${stopLoss}% — auto-selling!`, 'var(--red)');
+      sell(sym);
+    }
+  }
+}
+
+/* Clear all pending orders */
+function clearAllOrders() {
+  G_orders = [];
+  renderOrders();
+  flash('📋 All orders cleared', 'var(--text-dim)');
+}
+
+/* Export save data as downloadable JSON */
+function exportSave() {
+  const data = localStorage.getItem('stockblitz_save_v1') || '{}';
+  const blob = new Blob([data], { type:'application/json' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `stockblitz_save_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  flash('💾 Save data exported!', 'var(--blue)');
+}
+
+
 
 function applyAccent(color) {
   const m = ACCENT_MAP[color];
@@ -4565,72 +4835,74 @@ function applyAccent(color) {
 }
 
 function initSettings() {
-  // Sound toggle
-  document.getElementById('set-sound').addEventListener('change', e => {
-    CFG.soundOn = e.target.checked;
-  });
+  const wire = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('change', fn); };
+  const wireInput = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('input', fn); };
 
-  // Volume
-  const volSlider = document.getElementById('set-volume');
-  const volVal    = document.getElementById('set-volume-val');
-  volSlider.addEventListener('input', e => {
+  wire('set-sound', e => { CFG.soundOn = e.target.checked; });
+
+  wireInput('set-volume', e => {
     CFG.volume = e.target.value / 100;
-    volVal.textContent = e.target.value;
+    document.getElementById('set-volume-val').textContent = e.target.value;
   });
 
-  // Tick speed
-  document.getElementById('set-tickspeed').addEventListener('change', e => {
+  wire('set-tickspeed', e => {
     CFG.tickSpeed = parseInt(e.target.value);
     clearInterval(G.loopTimer);
     G.loopTimer = setInterval(gameLoop, CFG.tickSpeed);
   });
 
-  // News frequency
-  document.getElementById('set-newsfreq').addEventListener('change', e => {
-    CFG.newsFreq = e.target.value;
-    scheduleNews();
-  });
+  wire('set-newsfreq', e => { CFG.newsFreq = e.target.value; if (e.target.value !== 'off') scheduleNews(); else clearTimeout(G.newsTimer); });
 
-  // Default qty
-  document.getElementById('set-defqty').addEventListener('change', e => {
+  wire('set-volatility', e => { CFG.volatilityMult = parseFloat(e.target.value); });
+
+  wire('set-startcash', e => { CFG.startCash = parseFloat(e.target.value); });
+
+  wire('set-defqty', e => {
     CFG.defQty = Math.max(1, parseInt(e.target.value)||1);
     document.querySelectorAll('.qty').forEach(q => q.value = CFG.defQty);
   });
 
-  // Chart style
-  document.getElementById('set-chartstyle').addEventListener('change', e => {
-    CFG.chartStyle = e.target.value; drawChart();
+  wire('set-events', e => { CFG.eventsOn = e.target.checked; });
+  wire('set-dividends', e => { CFG.dividendsOn = e.target.checked; });
+
+  wire('set-theme', e => { applyTheme(e.target.value); });
+
+  wire('set-chartstyle', e => { CFG.chartStyle = e.target.value; drawChart(); });
+
+  wire('set-tablefont', e => { applyTableFont(e.target.value); });
+
+  wireInput('set-panelwidth', e => {
+    applyPanelWidth(parseInt(e.target.value));
+    document.getElementById('set-panelwidth-val').textContent = e.target.value;
   });
 
-  // Ticker speed
-  document.getElementById('set-tickerspeed').addEventListener('change', e => {
+  wire('set-tickerspeed', e => {
     const spd = e.target.value;
-    document.getElementById('ticker-inner').style.animationDuration = spd === '0s' ? '0s' : spd;
-    document.getElementById('ticker-inner').style.animationPlayState = spd === '0s' ? 'paused' : 'running';
+    const ti  = document.getElementById('ticker-inner');
+    ti.style.animationDuration   = spd === '0s' ? '0s' : spd;
+    ti.style.animationPlayState  = spd === '0s' ? 'paused' : 'running';
   });
 
-  // Max news
-  document.getElementById('set-maxnews').addEventListener('change', e => {
-    CFG.maxNews = parseInt(e.target.value);
+  wire('set-maxnews', e => { CFG.maxNews = parseInt(e.target.value); });
+  wire('set-showsector', e => { CFG.showSector = e.target.checked; refreshTable(); });
+  wire('set-showfloat', e => { CFG.showFloat = e.target.checked; refreshTable(); });
+  wire('set-flashrows', e => { CFG.flashRows = e.target.checked; });
+
+  wire('set-compact', e => {
+    CFG.compactTable = e.target.checked;
+    document.querySelectorAll('#tbody td').forEach(td => { td.style.padding = e.target.checked ? '3px 6px' : '6px 6px'; });
   });
 
-  // Show sector
-  document.getElementById('set-showsector').addEventListener('change', e => {
-    CFG.showSector = e.target.checked;
-    refreshTable();
-  });
+  wire('set-animchart', e => { CFG.animChart = e.target.checked; });
+  wire('set-confirmsell', e => { CFG.confirmSell = e.target.checked; });
+  wire('set-maxbuy', e => { CFG.maxBuyAmt = parseFloat(e.target.value)||0; });
+  wire('set-autosell', e => { CFG.autoSellProfit = parseFloat(e.target.value)||0; });
+  wire('set-stoploss', e => { CFG.stopLoss = parseFloat(e.target.value)||0; });
 
-  // Flash rows
-  document.getElementById('set-flashrows').addEventListener('change', e => {
-    CFG.flashRows = e.target.checked;
-  });
-
-  // Accent colors
   document.querySelectorAll('.color-btn').forEach(btn => {
     btn.addEventListener('click', () => applyAccent(btn.dataset.color));
   });
 
-  // Reset button
   document.getElementById('btn-reset').onclick = () => {
     if (!confirm('Reset the game? All progress will be lost!')) return;
     hideSettings();
@@ -4780,16 +5052,31 @@ function saveGame() {
       stockPrices:  Object.fromEntries(SYM_LIST.map(s=>[s, STOCKS[s].price])),
       tradeHistory: G.tradeHistory.slice(0, 500),
       cfg: {
-        soundOn:    CFG.soundOn,
-        volume:     CFG.volume,
-        accentColor:CFG.accentColor,
-        chartStyle: CFG.chartStyle,
-        defQty:     CFG.defQty,
-        tickSpeed:  CFG.tickSpeed,
-        newsFreq:   CFG.newsFreq,
-        maxNews:    CFG.maxNews,
-        showSector: CFG.showSector,
-        flashRows:  CFG.flashRows,
+        soundOn:        CFG.soundOn,
+        volume:         CFG.volume,
+        accentColor:    CFG.accentColor,
+        chartStyle:     CFG.chartStyle,
+        defQty:         CFG.defQty,
+        tickSpeed:      CFG.tickSpeed,
+        newsFreq:       CFG.newsFreq,
+        maxNews:        CFG.maxNews,
+        showSector:     CFG.showSector,
+        showFloat:      CFG.showFloat,
+        flashRows:      CFG.flashRows,
+        volatilityMult: CFG.volatilityMult,
+        startCash:      CFG.startCash,
+        eventsOn:       CFG.eventsOn,
+        dividendsOn:    CFG.dividendsOn,
+        theme:          CFG.theme,
+        tableFont:      CFG.tableFont,
+        panelWidth:     CFG.panelWidth,
+        compactTable:   CFG.compactTable,
+        animChart:      CFG.animChart,
+        confirmSell:    CFG.confirmSell,
+        maxBuyAmt:      CFG.maxBuyAmt,
+        autoSellProfit: CFG.autoSellProfit,
+        stopLoss:       CFG.stopLoss,
+        tickerSpeed:    CFG.tickerSpeed,
       }
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -4837,26 +5124,52 @@ function loadGame() {
 }
 
 function applySavedSettings() {
-  // Sync all settings UI to match loaded CFG
-  const s = document.getElementById('set-sound');
-  if (s) s.checked = CFG.soundOn;
-  const v = document.getElementById('set-volume');
-  if (v) { v.value = Math.round(CFG.volume * 100); document.getElementById('set-volume-val').textContent = v.value; }
-  const ts = document.getElementById('set-tickspeed');
-  if (ts) ts.value = String(CFG.tickSpeed);
-  const nf = document.getElementById('set-newsfreq');
-  if (nf) nf.value = CFG.newsFreq;
-  const dq = document.getElementById('set-defqty');
-  if (dq) dq.value = CFG.defQty;
-  const cs = document.getElementById('set-chartstyle');
-  if (cs) cs.value = CFG.chartStyle;
-  const ms = document.getElementById('set-maxnews');
-  if (ms) ms.value = String(CFG.maxNews);
-  const ss = document.getElementById('set-showsector');
-  if (ss) ss.checked = CFG.showSector;
-  const fr = document.getElementById('set-flashrows');
-  if (fr) fr.checked = CFG.flashRows;
-  applyAccent(CFG.accentColor);
+  const set = (id, val) => { const el = document.getElementById(id); if (el) { if (typeof val === 'boolean') el.checked = val; else el.value = String(val); } };
+
+  set('set-sound',      CFG.soundOn);
+  set('set-volume',     Math.round(CFG.volume * 100));
+  const vv = document.getElementById('set-volume-val');
+  if (vv) vv.textContent = Math.round(CFG.volume * 100);
+  set('set-tickspeed',  CFG.tickSpeed);
+  set('set-newsfreq',   CFG.newsFreq);
+  set('set-volatility', CFG.volatilityMult ?? 1.0);
+  set('set-startcash',  CFG.startCash ?? 1000);
+  set('set-defqty',     CFG.defQty);
+  set('set-events',     CFG.eventsOn !== false);
+  set('set-dividends',  CFG.dividendsOn !== false);
+  set('set-theme',      CFG.theme || 'dark');
+  set('set-chartstyle', CFG.chartStyle);
+  set('set-tablefont',  CFG.tableFont || '13px');
+  set('set-panelwidth', CFG.panelWidth || 320);
+  const pw = document.getElementById('set-panelwidth-val');
+  if (pw) pw.textContent = CFG.panelWidth || 320;
+  set('set-tickerspeed',CFG.tickerSpeed || '60s');
+  set('set-maxnews',    CFG.maxNews);
+  set('set-showsector', CFG.showSector !== false);
+  set('set-showfloat',  CFG.showFloat !== false);
+  set('set-flashrows',  CFG.flashRows !== false);
+  set('set-compact',    CFG.compactTable || false);
+  set('set-animchart',  CFG.animChart !== false);
+  set('set-confirmsell',CFG.confirmSell || false);
+  set('set-maxbuy',     CFG.maxBuyAmt || 0);
+  set('set-autosell',   CFG.autoSellProfit || 0);
+  set('set-stoploss',   CFG.stopLoss || 0);
+
+  applyAccent(CFG.accentColor || 'green');
+  if (CFG.theme)      applyTheme(CFG.theme);
+  if (CFG.tableFont)  applyTableFont(CFG.tableFont);
+  if (CFG.panelWidth) applyPanelWidth(CFG.panelWidth);
+
+  // Apply ticker speed
+  const ti = document.getElementById('ticker-inner');
+  if (ti && CFG.tickerSpeed) {
+    ti.style.animationDuration  = CFG.tickerSpeed === '0s' ? '0s' : CFG.tickerSpeed;
+    ti.style.animationPlayState = CFG.tickerSpeed === '0s' ? 'paused' : 'running';
+  }
+  // Apply compact table
+  if (CFG.compactTable) {
+    document.querySelectorAll('#tbody td').forEach(td => { td.style.padding = '3px 6px'; });
+  }
 }
 
 function applySavedUnlocks() {
@@ -5367,100 +5680,80 @@ function initTabDragger() {
   const wrap  = document.getElementById('tabs-dragger-wrap');
   if (!tabs || !thumb || !wrap) return;
 
-  /* ── Update thumb position/size based on tabs scroll state ── */
+  /* ── Sync thumb size and position to current scroll ── */
   function syncThumb() {
-    const scrollW  = tabs.scrollWidth;
-    const clientW  = tabs.clientWidth;
-    if (scrollW <= clientW) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'block';
-    const ratio     = clientW / scrollW;
-    const thumbW    = Math.max(28, Math.floor(clientW * ratio));
-    const maxLeft   = clientW - thumbW;
-    const thumbLeft = Math.floor((tabs.scrollLeft / (scrollW - clientW)) * maxLeft);
-    thumb.style.width = thumbW + 'px';
-    thumb.style.left  = thumbLeft + 'px';
+    const sw = tabs.scrollWidth, cw = tabs.clientWidth;
+    if (sw <= cw + 2) { wrap.style.opacity = '0'; wrap.style.pointerEvents = 'none'; return; }
+    wrap.style.opacity = '1'; wrap.style.pointerEvents = 'auto';
+    const tw   = Math.max(32, Math.round(cw * cw / sw));
+    const maxL = cw - tw;
+    const left = tabs.scrollLeft <= 0 ? 0
+               : tabs.scrollLeft >= (sw - cw) ? maxL
+               : Math.round((tabs.scrollLeft / (sw - cw)) * maxL);
+    thumb.style.width = tw + 'px';
+    thumb.style.left  = left + 'px';
   }
-  tabs.addEventListener('scroll', syncThumb);
-  window.addEventListener('resize', syncThumb);
+  tabs.addEventListener('scroll', syncThumb, { passive: true });
+  new ResizeObserver(syncThumb).observe(tabs);
   syncThumb();
 
-  /* ── Drag the thumb to scroll tabs ── */
-  let thumbDragging = false, thumbStartX = 0, thumbStartScroll = 0;
+  /* ── Drag the thumb ── */
+  let dragging = false, startX = 0, startScroll = 0;
 
-  thumb.addEventListener('mousedown', e => {
-    thumbDragging   = true;
-    thumbStartX     = e.clientX;
-    thumbStartScroll = tabs.scrollLeft;
+  thumb.addEventListener('pointerdown', e => {
+    dragging    = true;
+    startX      = e.clientX;
+    startScroll = tabs.scrollLeft;
+    thumb.setPointerCapture(e.pointerId);
     thumb.classList.add('is-dragging');
-    document.body.style.userSelect = 'none';
     e.preventDefault();
-    e.stopPropagation();
   });
-
-  document.addEventListener('mousemove', e => {
-    if (!thumbDragging) return;
-    const scrollW = tabs.scrollWidth;
-    const clientW = tabs.clientWidth;
-    const ratio   = (scrollW - clientW) / (clientW - thumb.offsetWidth);
-    tabs.scrollLeft = thumbStartScroll + (e.clientX - thumbStartX) * ratio;
+  thumb.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const sw = tabs.scrollWidth, cw = tabs.clientWidth;
+    const tw = thumb.offsetWidth;
+    const ratio = (sw - cw) / Math.max(1, cw - tw);
+    tabs.scrollLeft = startScroll + (e.clientX - startX) * ratio;
   });
+  thumb.addEventListener('pointerup',    () => { dragging = false; thumb.classList.remove('is-dragging'); });
+  thumb.addEventListener('pointercancel',() => { dragging = false; thumb.classList.remove('is-dragging'); });
 
-  document.addEventListener('mouseup', () => {
-    if (!thumbDragging) return;
-    thumbDragging = false;
-    thumb.classList.remove('is-dragging');
-    document.body.style.userSelect = '';
-  });
-
-  /* ── Click on the track to jump scroll there ── */
+  /* ── Click track to jump ── */
   wrap.addEventListener('click', e => {
     if (e.target === thumb) return;
-    const rect    = wrap.getBoundingClientRect();
-    const clickX  = e.clientX - rect.left;
-    const ratio   = clickX / wrap.clientWidth;
+    const rect  = wrap.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
     tabs.scrollLeft = ratio * (tabs.scrollWidth - tabs.clientWidth);
   });
 
-  /* ── Drag the tabs row itself (mouse/touch) ── */
-  let tabsDragging = false, tabsStartX = 0, tabsScrollStart = 0, didDrag = false;
+  /* ── Drag the tab row itself ── */
+  let rowDragging = false, rowStartX = 0, rowStartScroll = 0, rowMoved = false;
 
-  tabs.addEventListener('mousedown', e => {
-    // Don't hijack actual button clicks
+  tabs.addEventListener('pointerdown', e => {
     if (e.target.closest('.rp-tab')) return;
-    tabsDragging    = true;
-    tabsStartX      = e.clientX;
-    tabsScrollStart = tabs.scrollLeft;
-    didDrag         = false;
+    rowDragging    = true; rowMoved = false;
+    rowStartX      = e.clientX;
+    rowStartScroll = tabs.scrollLeft;
+    tabs.setPointerCapture(e.pointerId);
     tabs.classList.add('is-dragging');
-    document.body.style.userSelect = 'none';
   });
-
-  document.addEventListener('mousemove', e => {
-    if (!tabsDragging) return;
-    const dx = e.clientX - tabsStartX;
-    if (Math.abs(dx) > 3) didDrag = true;
-    tabs.scrollLeft = tabsScrollStart - dx;
+  tabs.addEventListener('pointermove', e => {
+    if (!rowDragging) return;
+    const dx = e.clientX - rowStartX;
+    if (Math.abs(dx) > 4) rowMoved = true;
+    if (rowMoved) tabs.scrollLeft = rowStartScroll - dx;
   });
+  tabs.addEventListener('pointerup',    () => { rowDragging = false; tabs.classList.remove('is-dragging'); });
+  tabs.addEventListener('pointercancel',() => { rowDragging = false; tabs.classList.remove('is-dragging'); });
 
-  document.addEventListener('mouseup', () => {
-    if (!tabsDragging) return;
-    tabsDragging = false;
-    tabs.classList.remove('is-dragging');
-    document.body.style.userSelect = '';
-  });
-
-  /* ── Touch support ── */
-  let touchStartX = 0, touchScrollStart = 0;
-  tabs.addEventListener('touchstart', e => {
-    touchStartX     = e.touches[0].clientX;
-    touchScrollStart = tabs.scrollLeft;
-  }, { passive: true });
-  tabs.addEventListener('touchmove', e => {
-    const dx = touchStartX - e.touches[0].clientX;
-    tabs.scrollLeft = touchScrollStart + dx;
-  }, { passive: true });
-  tabs.addEventListener('touchend', syncThumb);
+  /* ── Touch/wheel ── */
+  tabs.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // already horizontal
+    e.preventDefault();
+    tabs.scrollLeft += e.deltaY * 0.5;
+  }, { passive: false });
 }
+
 
 function initResizeHandle() {
   const handle = document.getElementById('resize-handle');
@@ -5881,6 +6174,9 @@ function initOrders() {
 /* ══════════════════════════════════════════════════════════
    🔍 PLAYER SEARCH
 ══════════════════════════════════════════════════════════ */
+/* Cache for player data so onclick doesn't need JSON in HTML attributes */
+const _playerCache = {};
+
 async function searchPlayers() {
   const query   = (document.getElementById('player-search-input').value || '').trim().toLowerCase();
   const results = document.getElementById('player-results');
@@ -5906,17 +6202,21 @@ async function searchPlayers() {
   }
 
   results.innerHTML = matches.map(([id, e]) => {
-    const isAdmin   = e.name === 'avstr';
-    const isMe      = id === PLAYER_ID;
-    const ago       = e.ts ? timeAgo(e.ts) : 'unknown';
-    const active    = e.ts && (Date.now() - e.ts) < 10 * 60 * 1000;
-    const dot       = active ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle"></span>' : '';
+    _playerCache[id] = e;  // store safely, no JSON in HTML
+    const isAdmin = e.name === 'avstr';
+    const isMe    = id === PLAYER_ID;
+    const ago     = e.ts ? timeAgo(e.ts) : 'unknown';
+    const active  = e.ts && (Date.now() - e.ts) < 10 * 60 * 1000;
+    const dot     = active ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle"></span>' : '';
     const portfolio = e.portfolio ? Object.entries(e.portfolio).filter(([,q]) => q > 0) : [];
-    const holdingsHtml = portfolio.length
-      ? portfolio.slice(0,12).map(([sym,qty]) => `<span class="player-holding-sym"><b>${escHtml(sym)}</b> ×${qty}</span>`).join('')
-      : '<span style="color:var(--text-dim)">No positions</span>';
+    const topHold   = portfolio.slice(0,3).map(([sym,qty]) => {
+      const s = STOCKS[sym];
+      return `<span style="font-size:0.58em;padding:2px 6px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);color:${s?s.color:'var(--text-dim)'}"><b>${sym}</b> ×${qty}</span>`;
+    }).join('');
+    const pnl    = (e.score||0) - 1000;
+    const pnlStr = (pnl>=0?'+':'')+$$(pnl);
     return `
-      <div class="player-card" onclick="selectSym('${portfolio[0]?.[0]||'TECH'}')">
+      <div class="player-card" onclick="showPlayerProfile('${id}')">
         <div class="player-card-top">
           <span class="player-card-name${isAdmin?' admin':''}">
             ${dot}${escHtml(e.name)}${isMe?' (you)':''}
@@ -5926,11 +6226,134 @@ async function searchPlayers() {
         <div class="player-card-stats">
           <span>🔄 ${e.trades||0} trades</span>
           <span>🏅 ${e.ach||0} badges</span>
+          <span style="color:${pnl>=0?'var(--green)':'var(--red)'}">P&L ${pnlStr}</span>
           <span>🕐 ${ago}</span>
         </div>
-        ${portfolio.length ? `<div class="player-holdings">${holdingsHtml}</div>` : ''}
+        ${topHold ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:5px">${topHold}</div>` : ''}
+        <div style="font-size:0.58em;color:rgba(var(--accent-rgb),0.5);margin-top:4px">Click to view full profile →</div>
       </div>`;
   }).join('');
+}
+
+function showPlayerProfile(pid) {
+  const e = _playerCache[pid];
+  if (!e) { flash('❌ Player data not available', '#ff1744'); return; }
+  const isAdmin   = e.name === 'avstr';
+  const isMe      = pid === PLAYER_ID;
+  const ago       = e.ts ? timeAgo(e.ts) : 'unknown';
+  const active    = e.ts && (Date.now() - e.ts) < 10*60*1000;
+  const pnl       = (e.score||0) - 1000;
+  const pnlPct    = ((pnl / 1000)*100).toFixed(1);
+  const portfolio = e.portfolio ? Object.entries(e.portfolio).filter(([,q]) => q>0) : [];
+  const portVal   = portfolio.reduce((a,[sym,qty]) => a + (STOCKS[sym]?.price||0)*qty, 0);
+
+  // Ownership highlights — any cornered stocks
+  const cornered = portfolio
+    .map(([sym,qty]) => ({ sym, qty, pct: ownershipPct(sym,qty) }))
+    .filter(x => x.pct >= 10)
+    .sort((a,b) => b.pct - a.pct);
+
+  const corneredHtml = cornered.length
+    ? cornered.map(x => {
+        const s  = STOCKS[x.sym];
+        const st = cornerStatus(x.sym, x.qty);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.7em">
+          <span style="font-weight:bold;color:${s?s.color:'var(--text)'}">${x.sym}</span>
+          <span style="color:var(--text-dim)">${x.qty.toLocaleString()} shares</span>
+          ${st ? `<span style="color:${st.color};font-weight:bold;font-size:0.9em">${st.label}</span>` : `<span style="color:var(--blue)">${x.pct.toFixed(1)}%</span>`}
+        </div>`;
+      }).join('')
+    : '<div style="font-size:0.68em;color:var(--text-dim)">No significant positions</div>';
+
+  const portfolioHtml = portfolio.length
+    ? portfolio.slice(0,10).map(([sym,qty]) => {
+        const s   = STOCKS[sym];
+        const val = (s?.price||0)*qty;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.02);font-size:0.68em">
+          <span style="font-weight:bold;color:${s?s.color:'var(--text)'}">${sym}</span>
+          <span style="color:var(--text-dim)">${qty.toLocaleString()} shares</span>
+          <span style="color:var(--text-hi)">${$$(val)}</span>
+        </div>`;
+      }).join('') + (portfolio.length>10?`<div style="font-size:0.6em;color:var(--text-dim);padding-top:4px">+${portfolio.length-10} more positions</div>`:'')
+    : '<div style="font-size:0.68em;color:var(--text-dim)">No open positions</div>';
+
+  // Performance rating
+  let rating = '🐣 Newcomer', ratingColor = 'var(--text-dim)';
+  if (pnl > 5000)       { rating = '🐋 Whale';          ratingColor = 'var(--gold)'; }
+  else if (pnl > 2000)  { rating = '🦈 Shark';          ratingColor = 'var(--orange)'; }
+  else if (pnl > 500)   { rating = '🐂 Bull';            ratingColor = 'var(--green)'; }
+  else if (pnl > 0)     { rating = '📈 In the Green';    ratingColor = 'var(--green)'; }
+  else if (pnl < -500)  { rating = '🐻 Bear';            ratingColor = 'var(--red)'; }
+
+  document.getElementById('profile-modal-inner').innerHTML = `
+    <!-- Header banner -->
+    <div style="background:linear-gradient(135deg,var(--bg3) 0%,var(--bg2) 100%);padding:20px 22px 16px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:1.3em;font-weight:bold;color:${isAdmin?'var(--gold)':'var(--text-hi)'};margin-bottom:2px">
+            ${isAdmin?'👑 ':''}${escHtml(e.name||'?')}${isMe?' <span style="font-size:0.6em;color:var(--accent)">(you)</span>':''}
+          </div>
+          <div style="font-size:0.68em;font-weight:bold;color:${ratingColor}">${rating}</div>
+          <div style="font-size:0.6em;color:var(--text-dim);margin-top:3px">
+            ${active?'<span style="color:var(--green)">● Online now</span>':'Last seen '+ago}
+          </div>
+        </div>
+        <button onclick="document.getElementById('profile-modal-bg').classList.remove('open')"
+          style="background:transparent;border:1px solid var(--border);color:var(--text-dim);width:28px;height:28px;border-radius:4px;cursor:pointer;font-size:0.8em;flex-shrink:0">✕</button>
+      </div>
+
+      <!-- Key stats grid -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        ${[
+          { label:'Total Value', val:$$(e.score||0), color:'var(--gold)' },
+          { label:'P & L',      val:(pnl>=0?'+':'')+$$(pnl), color:pnl>=0?'var(--green)':'var(--red)' },
+          { label:'Return',     val:(pnl>=0?'+':'')+pnlPct+'%', color:pnl>=0?'var(--green)':'var(--red)' },
+          { label:'Trades',     val:(e.trades||0).toLocaleString(), color:'var(--text-hi)' },
+        ].map(s=>`
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:5px;padding:6px 8px;text-align:center">
+            <div style="font-size:0.5em;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:2px">${s.label}</div>
+            <div style="font-size:0.82em;font-weight:bold;color:${s.color}">${s.val}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Body sections -->
+    <div style="padding:14px 22px">
+
+      <!-- Secondary stats -->
+      <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="font-size:0.65em;color:var(--text-dim)">🏅 <span style="color:var(--text-hi)">${e.ach||0}</span> badges</div>
+        <div style="font-size:0.65em;color:var(--text-dim)">💼 <span style="color:var(--text-hi)">${portfolio.length}</span> positions</div>
+        <div style="font-size:0.65em;color:var(--text-dim)">💰 Portfolio: <span style="color:var(--text-hi)">${$$(portVal)}</span></div>
+        ${cornered.length ? `<div style="font-size:0.65em;color:var(--gold)">👑 ${cornered.length} cornered stock${cornered.length>1?'s':''}</div>` : ''}
+      </div>
+
+      <!-- Float ownership -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px">⚖️ Float Ownership</div>
+        ${corneredHtml}
+      </div>
+
+      <!-- Portfolio -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:6px">💼 Portfolio</div>
+        ${portfolioHtml}
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:6px">
+        ${!isMe ? `<button onclick="document.getElementById('player-search-input').value='';searchPlayers();document.getElementById('profile-modal-bg').classList.remove('open')"
+          style="flex:1;padding:7px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:4px;transition:all 0.15s"
+          onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">← Back to Search</button>` : ''}
+        ${!isMe ? `<button onclick="document.getElementById('profile-modal-bg').classList.remove('open');switchTab('matches')"
+          style="flex:1;padding:7px;background:rgba(var(--accent-rgb),0.1);border:1px solid rgba(var(--accent-rgb),0.3);color:var(--accent);font-family:var(--mono);font-size:0.65em;font-weight:bold;cursor:pointer;border-radius:4px">
+          🏁 Challenge to Match
+        </button>` : ''}
+      </div>
+    </div>`;
+
+  document.getElementById('profile-modal-bg').classList.add('open');
 }
 
 function initPlayerSearch() {
@@ -5938,7 +6361,14 @@ function initPlayerSearch() {
   document.getElementById('player-search-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') searchPlayers();
   });
+  // Close profile modal on backdrop click
+  document.getElementById('profile-modal-bg').addEventListener('click', e => {
+    if (e.target.id === 'profile-modal-bg')
+      document.getElementById('profile-modal-bg').classList.remove('open');
+  });
 }
+
+
 
 /* ══════════════════════════════════════════════════════════
    👑 ADMIN — reserved username "avstr"
@@ -6091,153 +6521,259 @@ const MATCH_SUDDEN_EVENTS = [
   { txt:'🌊 BLACK SWAN — Unexpected global event hits all sectors!', imp:-0.10, sym:null },
 ];
 
+/* ── Generates a random 6-character alphanumeric match code ── */
+function genMatchCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars
+  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+/* ── Create match & show lobby ── */
 async function createMatch() {
   if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
-  const dur    = parseInt(document.getElementById('match-duration').value) || 10;
-  const cash   = parseFloat(document.getElementById('match-start-cash').value) || 1000;
-  const matchId = 'M' + Date.now().toString(36).toUpperCase();
-  const match   = {
-    id:        matchId,
+  if (G_matchId)    { flash('❌ Leave your current match first', '#ff1744'); return; }
+
+  const code     = genMatchCode();
+  const dur      = parseInt(document.getElementById('match-duration').value) || 10;
+  const cash     = parseFloat(document.getElementById('match-start-cash').value) || 1000;
+  const match    = {
+    id:        code,
+    code,
     name:      `${PLAYER_NAME}'s ${dur}m Match`,
     host:      PLAYER_ID,
     hostName:  PLAYER_NAME,
-    duration:  dur * 60,      // seconds
+    duration:  dur * 60,
     startCash: cash,
-    status:    'waiting',     // waiting | live | ended
+    status:    'waiting',
     startAt:   null,
     endAt:     null,
-    players:   { [PLAYER_ID]: { name: PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() } },
+    players:   { [PLAYER_ID]: { name:PLAYER_NAME, pid:PLAYER_ID, cash, portfolio:{}, ts:Date.now() } },
     events:    [],
     createdAt: Date.now(),
   };
   if (fbConfigured()) {
     try {
-      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${code}.json`, {
         method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(match)
       });
     } catch(e) {}
   }
-  joinMatchLocally(matchId, match);
-  renderMatches();
-  flash(`🏁 Match created — waiting for players!`, 'var(--accent)');
+  G_matchId = code; G_match = match; G_matchIsHost = true;
+  G_matchCash = cash; G_matchPortfolio = {}; G_matchCostBasis = {};
+  showLobbyUI(match);
+  startLobbyPoll(code);
+  flash(`🏁 Match created! Code: ${code}`, 'var(--accent)');
 }
 
-async function joinMatch(matchId) {
-  if (!PLAYER_NAME) { flash('❌ Set a username first', '#ff1744'); return; }
-  if (G_matchId) { flash('❌ Leave your current match first', '#ff1744'); return; }
+/* ── Join by code (entered in the code input) ── */
+async function joinByCode() {
+  const code = (document.getElementById('match-join-code').value || '').trim().toUpperCase();
+  if (code.length !== 6) { flash('❌ Enter a 6-character match code', '#ff1744'); return; }
+  if (!PLAYER_NAME)      { flash('❌ Set a username first', '#ff1744'); return; }
+  if (G_matchId)         { flash('❌ Leave your current match first', '#ff1744'); return; }
 
   let match = null;
   if (fbConfigured()) {
     try {
-      const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {cache:'no-store'});
+      const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${code}.json`, {cache:'no-store'});
       match = res.ok ? await res.json() : null;
     } catch(e) {}
   }
-  if (!match) { flash('❌ Match not found', '#ff1744'); return; }
-  if (match.status === 'ended') { flash('❌ Match has already ended', '#ff1744'); return; }
+  if (!match) { flash('❌ No match found with that code', '#ff1744'); return; }
+  if (match.status === 'ended')  { flash('❌ That match has already ended', '#ff1744'); return; }
+  if (match.status === 'live')   { flash('❌ That match is already in progress', '#ff1744'); return; }
 
-  const cash = match.startCash;
-  match.players[PLAYER_ID] = { name:PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() };
-
+  // Add ourselves to the match
+  match.players[PLAYER_ID] = { name:PLAYER_NAME, pid:PLAYER_ID, cash:match.startCash, portfolio:{}, ts:Date.now() };
   if (fbConfigured()) {
     try {
-      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}/players/${PLAYER_ID}.json`, {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${code}/players/${PLAYER_ID}.json`, {
         method:'PUT', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ name:PLAYER_NAME, cash, portfolio:{}, pnl:0, ts:Date.now() })
+        body:JSON.stringify({ name:PLAYER_NAME, pid:PLAYER_ID, cash:match.startCash, portfolio:{}, ts:Date.now() })
       });
     } catch(e) {}
   }
-
-  joinMatchLocally(matchId, match);
-  // If host, start the match
-  if (match.host === PLAYER_ID && match.status === 'waiting') startMatch(matchId, match);
-  flash(`🏁 Joined match!`, 'var(--accent)');
+  G_matchId = code; G_match = match; G_matchIsHost = false;
+  G_matchCash = match.startCash; G_matchPortfolio = {}; G_matchCostBasis = {};
+  showWaitingUI(match);
+  startLobbyPoll(code);
+  document.getElementById('match-join-code').value = '';
+  flash(`✅ Joined match ${code}!`, 'var(--blue)');
 }
 
-function joinMatchLocally(matchId, match) {
-  G_matchId = matchId;
-  G_match   = match;
-  G_matchCash = match.startCash;
-  G_matchPortfolio = {};
-  G_matchCostBasis = {};
-  updateMatchHUD();
-  startMatchCountdown(match);
+/* ── Lobby UI state management ── */
+let G_matchIsHost = false;
+let G_lobbyPollTimer = null;
+
+function showLobbyUI(match) {
+  document.getElementById('match-create-row').style.display = 'none';
+  document.getElementById('match-lobby').style.display = 'block';
+  document.getElementById('match-waiting').style.display = 'none';
+  document.getElementById('match-lobby-code').textContent = match.code || match.id;
+  document.getElementById('lobby-settings-summary').textContent =
+    `${match.duration/60}min · $${match.startCash.toLocaleString()} start`;
+  refreshLobbyPlayers(match);
+}
+
+function showWaitingUI(match) {
+  document.getElementById('match-create-row').style.display = 'none';
+  document.getElementById('match-lobby').style.display = 'none';
+  document.getElementById('match-waiting').style.display = 'block';
+  document.getElementById('match-waiting-code').textContent = match.code || match.id;
+  refreshWaitingPlayers(match);
+}
+
+function refreshLobbyPlayers(match) {
+  const players = Object.values(match.players || {});
+  const el = document.getElementById('lobby-players-list');
+  if (!el) return;
+  el.innerHTML = players.map(p =>
+    `<span style="font-size:0.65em;padding:3px 8px;border-radius:10px;background:var(--bg4);border:1px solid ${p.pid===PLAYER_ID?'var(--accent)':'var(--border)'};color:${p.pid===PLAYER_ID?'var(--accent)':'var(--text-dim)'}">
+      ${p.pid===match.host?'👑 ':''} ${escHtml(p.name||'?')}
+    </span>`
+  ).join('');
+}
+
+function refreshWaitingPlayers(match) {
+  const players = Object.values(match.players || {});
+  const el = document.getElementById('match-waiting-players');
+  if (!el) return;
+  el.innerHTML = players.map(p =>
+    `<span style="font-size:0.65em;padding:3px 8px;border-radius:10px;background:var(--bg4);border:1px solid ${p.pid===PLAYER_ID?'var(--blue)':'var(--border)'};color:${p.pid===PLAYER_ID?'var(--blue)':'var(--text-dim)'}">
+      ${p.pid===match.host?'👑 ':''}${escHtml(p.name||'?')}
+    </span>`
+  ).join('');
+}
+
+/* ── Poll lobby state (host and joiner both poll) ── */
+function startLobbyPoll(code) {
+  clearInterval(G_lobbyPollTimer);
+  G_lobbyPollTimer = setInterval(() => pollLobbyState(code), 2000);
+}
+
+async function pollLobbyState(code) {
+  if (!fbConfigured() || !code) return;
+  try {
+    const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${code}.json`, {cache:'no-store'});
+    if (!res.ok) return;
+    const m = await res.json();
+    if (!m) return;
+    G_match = m;
+    if (m.status === 'live') {
+      // Host started — transition to match
+      clearInterval(G_lobbyPollTimer);
+      document.getElementById('match-lobby').style.display = 'none';
+      document.getElementById('match-waiting').style.display = 'none';
+      document.getElementById('match-create-row').style.display = 'none';
+      document.getElementById('match-hud').style.display = 'block';
+      document.getElementById('match-live-badge').style.display = 'inline';
+      G_matchCash = m.players?.[PLAYER_ID]?.cash ?? m.startCash;
+      startMatchCountdown(m);
+      flash('🏁 Match started — GO!', '#ff1744');
+    } else if (m.status === 'ended') {
+      clearInterval(G_lobbyPollTimer);
+      leaveMatch();
+    } else {
+      // Still in lobby — refresh player list
+      if (G_matchIsHost) refreshLobbyPlayers(m);
+      else               refreshWaitingPlayers(m);
+    }
+  } catch(e) {}
+}
+
+/* ── Host starts the match ── */
+async function hostStartMatch() {
+  if (!G_matchId || !G_matchIsHost) return;
+  const now   = Date.now();
+  const endAt = now + G_match.duration * 1000;
+
+  // Freeze all player cash at startCash
+  const players = G_match.players || {};
+  for (const pid of Object.keys(players)) {
+    players[pid].cash = G_match.startCash;
+    players[pid].portfolio = {};
+  }
+
+  if (fbConfigured()) {
+    try {
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`, {
+        method: 'PATCH', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ status:'live', startAt:now, endAt, players })
+      });
+    } catch(e) {}
+  }
+  G_match.status = 'live'; G_match.startAt = now; G_match.endAt = endAt;
+  clearInterval(G_lobbyPollTimer);
+  document.getElementById('match-lobby').style.display = 'none';
   document.getElementById('match-hud').style.display = 'block';
   document.getElementById('match-live-badge').style.display = 'inline';
+  startMatchCountdown(G_match);
+
+  // Schedule 2-3 sudden events
+  const numEv = 2 + Math.floor(Math.random()*2);
+  for (let i=0; i<numEv; i++) {
+    const delay = (G_match.duration*1000*(i+1))/(numEv+1);
+    setTimeout(() => fireSuddenEvent(G_matchId), delay);
+  }
+  flash('🏁 Match started! Good luck!', 'var(--green)');
 }
 
-async function startMatch(matchId, match) {
-  if (match.host !== PLAYER_ID) return;
-  const now = Date.now();
-  const endAt = now + match.duration * 1000;
+/* ── Cancel match (host only) ── */
+async function cancelMatch() {
+  if (!G_matchId) return;
   if (fbConfigured()) {
     try {
-      await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}.json`, {
-        method:'PATCH', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ status:'live', startAt:now, endAt })
-      });
+      await fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`, { method:'DELETE' });
     } catch(e) {}
   }
-  match.status = 'live'; match.startAt = now; match.endAt = endAt;
-  G_match = match;
-  startMatchCountdown(match);
-  flash('🏁 Match started — GO!', '#ff1744');
+  leaveMatch();
+  flash('Match cancelled', 'var(--text-dim)');
+}
 
-  // Schedule 2-3 sudden events at random intervals
-  const numEvents = 2 + Math.floor(Math.random() * 2);
-  for (let i = 0; i < numEvents; i++) {
-    const delay = (match.duration * 1000 * (i + 1)) / (numEvents + 1);
-    setTimeout(() => fireSuddenEvent(matchId), delay);
-  }
+/* ── Leave match / lobby ── */
+function leaveMatch() {
+  clearInterval(G_matchTimer);
+  clearInterval(G_lobbyPollTimer);
+  G_match = null; G_matchId = null; G_matchTimer = null; G_matchIsHost = false;
+  G_matchPortfolio = {}; G_matchCostBasis = {}; G_matchCash = 0;
+  document.getElementById('match-hud').style.display    = 'none';
+  document.getElementById('match-lobby').style.display  = 'none';
+  document.getElementById('match-waiting').style.display= 'none';
+  document.getElementById('match-live-badge').style.display = 'none';
+  document.getElementById('match-create-row').style.display = 'block';
+  renderMatches();
 }
 
 function startMatchCountdown(match) {
   clearInterval(G_matchTimer);
   G_matchTimer = setInterval(() => {
     if (!G_match) { clearInterval(G_matchTimer); return; }
-    const now = Date.now();
-    const endAt = G_match.endAt || (G_match.startAt + G_match.duration * 1000);
-    const left = Math.max(0, Math.floor((endAt - now) / 1000));
-    const total = G_match.duration;
-    const mins = String(Math.floor(left / 60)).padStart(2,'0');
-    const secs = String(left % 60).padStart(2,'0');
+    const endAt = G_match.endAt || (G_match.startAt + G_match.duration*1000);
+    const left  = Math.max(0, Math.floor((endAt - Date.now())/1000));
+    const mins  = String(Math.floor(left/60)).padStart(2,'0');
+    const secs  = String(left%60).padStart(2,'0');
     const cd = document.getElementById('match-countdown');
     if (cd) {
-      cd.textContent = `${mins}:${secs}`;
-      cd.style.color = left < 30 ? 'var(--red)' : left < 60 ? 'var(--orange)' : 'var(--text-hi)';
+      cd.textContent   = `${mins}:${secs}`;
+      cd.style.color   = left<30?'var(--red)':left<60?'var(--orange)':'var(--text-hi)';
+      cd.style.textShadow = left<30?'0 0 12px rgba(255,23,68,0.8)':'none';
     }
     const bar = document.getElementById('match-pressure-bar');
-    if (bar) bar.style.width = `${(left / total) * 100}%`;
-    // Urgent pulse when <30s
-    if (left < 30 && left % 2 === 0 && cd) cd.style.textShadow = '0 0 10px rgba(255,23,68,0.8)';
-
-    if (left <= 0) {
-      clearInterval(G_matchTimer);
-      endMatch();
-    } else {
-      updateMatchHUD();
-      // Poll Firebase for match updates every 5s
-      if (left % 5 === 0) pollMatchState();
-    }
+    if (bar) bar.style.width = `${(left/G_match.duration)*100}%`;
+    if (left <= 0) { clearInterval(G_matchTimer); endMatch(); }
+    else { updateMatchHUD(); if (left%5===0) pollMatchState(); }
   }, 1000);
 }
 
 async function fireSuddenEvent(matchId) {
   if (!G_match || G_match.status !== 'live') return;
-  const ev = MATCH_SUDDEN_EVENTS[Math.floor(Math.random() * MATCH_SUDDEN_EVENTS.length)];
-
-  // Show overlay flash
+  const ev = MATCH_SUDDEN_EVENTS[Math.floor(Math.random()*MATCH_SUDDEN_EVENTS.length)];
   const div = document.createElement('div');
   div.className = 'match-event-flash';
   div.innerHTML = `⚡ SUDDEN EVENT<br><span style="font-size:0.75em;font-weight:normal">${ev.txt}</span>`;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3200);
-
-  // Apply price effect
-  const fakeEv = { sym: ev.sym, imp: ev.imp, type: ev.imp > 0 ? 'positive' : 'negative', txt: ev.txt, ts: Date.now() };
+  const fakeEv = { sym:ev.sym, imp:ev.imp, type:ev.imp>0?'positive':'negative', txt:ev.txt, ts:Date.now() };
   applyNewsEvent(fakeEv);
-
-  // Push to Firebase so all match participants see it
   if (fbConfigured()) {
     try {
       await fetch(`${FIREBASE_URL}/stockblitz_matches/${matchId}/events/${Date.now()}.json`, {
@@ -6250,57 +6786,52 @@ async function fireSuddenEvent(matchId) {
 function endMatch() {
   if (!G_match) return;
   G_match.status = 'ended';
+  const val = matchPortVal() + G_matchCash;
   if (fbConfigured() && G_matchId) {
-    // Push final score
-    const val = matchPortVal() + G_matchCash;
     fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players/${PLAYER_ID}.json`, {
       method:'PATCH', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ cash:G_matchCash, pnl:val - G_match.startCash, finalVal:val, ts:Date.now() })
+      body:JSON.stringify({ cash:G_matchCash, finalVal:val, ts:Date.now() })
     }).catch(()=>{});
-    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ status:'ended', endAt:Date.now() })
-    }).catch(()=>{});
+    if (G_matchIsHost) {
+      fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}.json`, {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ status:'ended', endAt:Date.now() })
+      }).catch(()=>{});
+    }
   }
-  setTimeout(showMatchResults, 500);
+  setTimeout(showMatchResults, 600);
 }
 
 async function showMatchResults() {
   let players = G_match?.players ? Object.values(G_match.players) : [];
-  // Fetch fresh from Firebase
   if (fbConfigured() && G_matchId) {
     try {
       const res = await fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players.json`,{cache:'no-store'});
-      if (res.ok) { const d = await res.json(); if (d) players = Object.values(d); }
+      if (res.ok) { const d=await res.json(); if(d) players=Object.values(d); }
     } catch(e) {}
   }
-  // Add my own final value
   const myFinal = matchPortVal() + G_matchCash;
-  players = players.map(p => p.name === PLAYER_NAME ? {...p, finalVal:myFinal} : p);
-  players.sort((a,b) => (b.finalVal||b.cash||0) - (a.finalVal||a.cash||0));
-
-  const winner = players[0];
-  const medals = ['🥇','🥈','🥉'];
-  const rows = players.map((p,i) =>
-    `<div class="match-lb-row">
+  players = players.map(p => p.pid===PLAYER_ID ? {...p,finalVal:myFinal} : p);
+  players.sort((a,b) => (b.finalVal||b.cash||0)-(a.finalVal||a.cash||0));
+  const winner  = players[0];
+  const medals  = ['🥇','🥈','🥉'];
+  const rows    = players.map((p,i) => `
+    <div class="match-lb-row">
       <span class="match-lb-rank">${medals[i]||'#'+(i+1)}</span>
-      <span class="match-lb-name">${escHtml(p.name||'?')}${p.name===PLAYER_NAME?' <span style="color:var(--accent)">(you)</span>':''}</span>
+      <span class="match-lb-name">${escHtml(p.name||'?')}${p.pid===PLAYER_ID?' <span style="color:var(--accent)">(you)</span>':''}</span>
       <span class="match-lb-val">${$$((p.finalVal||p.cash||0))}</span>
-    </div>`
-  ).join('');
-
+    </div>`).join('');
   const overlay = document.createElement('div');
   overlay.className = 'match-winner-overlay';
   overlay.innerHTML = `
     <div class="match-winner-box">
       <div style="font-size:2.4em;margin-bottom:8px">🏆</div>
-      <div style="font-size:0.65em;text-transform:uppercase;letter-spacing:3px;color:var(--gold);margin-bottom:4px">Match Over</div>
+      <div style="font-size:0.62em;text-transform:uppercase;letter-spacing:3px;color:var(--gold);margin-bottom:4px">Match Over</div>
       <div style="font-size:1.1em;font-weight:bold;color:var(--text-hi);margin-bottom:2px">${escHtml(winner?.name||'?')} wins!</div>
       <div style="font-size:0.72em;color:var(--gold);margin-bottom:16px">${$$(winner?.finalVal||0)}</div>
-      <div style="text-align:left;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;padding:6px 10px">${rows}</div>
+      <div style="text-align:left;border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-bottom:14px">${rows}</div>
       <button onclick="this.closest('.match-winner-overlay').remove();leaveMatch()"
-        style="width:100%;background:rgba(var(--accent-rgb),0.12);border:1px solid var(--accent);color:var(--accent);
-        padding:8px;font-family:var(--mono);font-size:0.72em;font-weight:bold;cursor:pointer;border-radius:5px">
+        style="width:100%;background:rgba(var(--accent-rgb),0.12);border:1px solid var(--accent);color:var(--accent);padding:8px;font-family:var(--mono);font-size:0.72em;font-weight:bold;cursor:pointer;border-radius:5px">
         ✕ Close
       </button>
     </div>`;
@@ -6310,20 +6841,18 @@ async function showMatchResults() {
 
 function matchPortVal() {
   let v = 0;
-  for (const [sym, qty] of Object.entries(G_matchPortfolio)) {
-    if (qty > 0 && STOCKS[sym]) v += qty * STOCKS[sym].price;
+  for (const [sym,qty] of Object.entries(G_matchPortfolio)) {
+    if (qty>0 && STOCKS[sym]) v += qty*STOCKS[sym].price;
   }
   return v;
 }
-
 function updateMatchHUD() {
   const val = matchPortVal() + G_matchCash;
   const el  = document.getElementById('match-hud-val');
-  if (el) { el.textContent = $$(val); el.style.color = val >= (G_match?.startCash||1000) ? 'var(--green)' : 'var(--red)'; }
+  if (el) { el.textContent=$$(val); el.style.color=val>=(G_match?.startCash||1000)?'var(--green)':'var(--red)'; }
   const nm = document.getElementById('match-hud-name');
   if (nm && G_match) nm.textContent = G_match.name;
 }
-
 async function pollMatchState() {
   if (!G_matchId || !fbConfigured()) return;
   try {
@@ -6332,106 +6861,65 @@ async function pollMatchState() {
     const m = await res.json();
     if (!m) return;
     G_match = m;
-    if (m.status === 'live' && !G_matchTimer) startMatchCountdown(m);
-    if (m.status === 'ended' && G_matchTimer) { clearInterval(G_matchTimer); showMatchResults(); }
+    if (m.status==='ended' && G_matchTimer) { clearInterval(G_matchTimer); showMatchResults(); }
   } catch(e) {}
 }
-
-function leaveMatch() {
-  clearInterval(G_matchTimer);
-  G_match = null; G_matchId = null; G_matchTimer = null;
-  G_matchPortfolio = {}; G_matchCostBasis = {}; G_matchCash = 0;
-  document.getElementById('match-hud').style.display = 'none';
-  document.getElementById('match-live-badge').style.display = 'none';
-  renderMatches();
-}
-
-/* Match buy/sell — uses isolated match portfolio */
 function matchBuy(sym) {
-  if (!G_match || G_match.status !== 'live') { flash('❌ No active match', '#ff1744'); return; }
-  const s = STOCKS[sym];
-  const qty = getQty(sym);
-  const cost = s.price * qty;
-  if (cost > G_matchCash) { flash('❌ Insufficient match funds', '#ff1744'); return; }
+  if (!G_match || G_match.status!=='live') { flash('❌ No active match','#ff1744'); return; }
+  const s=STOCKS[sym]; const qty=getQty(sym); const cost=s.price*qty;
+  if (cost>G_matchCash) { flash('❌ Insufficient match funds','#ff1744'); return; }
   G_matchCash -= cost;
-  G_matchPortfolio[sym] = (G_matchPortfolio[sym]||0) + qty;
-  G_matchCostBasis[sym]  = (G_matchCostBasis[sym]||0) + cost;
-  snd.buy();
-  updateMatchHUD();
-  flash(`🏁 [MATCH] Bought ${qty}× ${sym} @ ${$$(s.price)}`, 'var(--green)');
-  // Push to Firebase
+  G_matchPortfolio[sym] = (G_matchPortfolio[sym]||0)+qty;
+  G_matchCostBasis[sym] = (G_matchCostBasis[sym]||0)+cost;
+  snd.buy(); updateMatchHUD();
+  flash(`🏁 [MATCH] Bought ${qty}× ${sym} @ ${$$(s.price)}`,'var(--green)');
   if (fbConfigured() && G_matchId) {
-    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players/${PLAYER_ID}.json`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ cash:G_matchCash, portfolio:G_matchPortfolio, ts:Date.now() })
+    fetch(`${FIREBASE_URL}/stockblitz_matches/${G_matchId}/players/${PLAYER_ID}.json`,{
+      method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({cash:G_matchCash,portfolio:G_matchPortfolio,ts:Date.now()})
     }).catch(()=>{});
   }
 }
-
 async function renderMatches() {
   const el = document.getElementById('match-content');
   if (!el) return;
-  el.innerHTML = '<div class="orders-empty">Loading matches…</div>';
-
+  if (G_matchId && G_match?.status === 'live') {
+    // Show live match scoreboard
+    const players = Object.values(G_match.players||{}).sort((a,b)=>(b.finalVal||b.cash||0)-(a.finalVal||a.cash||0));
+    el.innerHTML = `<div style="font-size:0.6em;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:6px">Live Standings</div>` +
+      players.map((p,i)=>`<div class="match-lb-row"><span class="match-lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</span><span class="match-lb-name">${escHtml(p.name||'?')}</span><span class="match-lb-val">${$$(p.finalVal||p.cash||G_match?.startCash||0)}</span></div>`).join('');
+    return;
+  }
+  el.innerHTML = '<div class="orders-empty" style="padding:20px 0">Loading recent matches…</div>';
   let matches = {};
   if (fbConfigured()) {
     try {
-      const res = await fetch(FIREBASE_URL + MATCHES_PATH, {cache:'no-store'});
-      if (res.ok) matches = (await res.json()) || {};
+      const res = await fetch(FIREBASE_URL+MATCHES_PATH,{cache:'no-store'});
+      if (res.ok) matches=(await res.json())||{};
     } catch(e) {}
   }
-
   const list = Object.values(matches)
-    .filter(m => m && Date.now() - m.createdAt < 30*60*1000) // last 30 min
-    .sort((a,b) => b.createdAt - a.createdAt)
-    .slice(0, 20);
-
-  if (!list.length) {
-    el.innerHTML = `
-      <div class="orders-empty" style="padding:30px 12px">
-        No matches yet.<br><span style="font-size:0.85em">Create one above to get started!</span>
-      </div>`;
-    return;
-  }
-
+    .filter(m => m && Date.now()-m.createdAt < 60*60*1000)
+    .sort((a,b) => b.createdAt-a.createdAt)
+    .slice(0,15);
+  if (!list.length) { el.innerHTML='<div class="orders-empty" style="padding:30px 0">No recent matches.<br><span style="font-size:0.85em">Create one above!</span></div>'; return; }
   el.innerHTML = list.map(m => {
-    const inMatch   = G_matchId === m.id;
-    const players   = Object.values(m.players||{});
-    const playerChips = players.map(p =>
-      `<span class="match-player-chip${p.name===PLAYER_NAME?' you':''}">${escHtml(p.name||'?')}</span>`
-    ).join('');
-    const timeLeft  = m.endAt ? Math.max(0,Math.floor((m.endAt-Date.now())/1000)) : m.duration;
-    const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
-    const dur   = m.duration/60;
-    const canJoin = m.status !== 'ended' && !G_matchId && !inMatch;
-    const statusCls = m.status === 'live' ? 'live' : m.status === 'ended' ? 'ended' : 'waiting';
-
-    // Live scoreboard
-    let scoreHtml = '';
-    if (m.status !== 'waiting') {
-      const sorted = players.sort((a,b)=>(b.finalVal||b.cash||0)-(a.finalVal||a.cash||0));
-      scoreHtml = sorted.slice(0,5).map((p,i)=>
-        `<div class="match-lb-row"><span class="match-lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</span>
-        <span class="match-lb-name">${escHtml(p.name||'?')}</span>
-        <span class="match-lb-val">${$$(p.finalVal||p.cash||m.startCash)}</span></div>`
-      ).join('');
-    }
-
+    const players = Object.values(m.players||{});
+    const sorted  = [...players].sort((a,b)=>(b.finalVal||b.cash||0)-(a.finalVal||a.cash||0));
+    const chips   = players.map(p=>`<span class="match-player-chip${p.pid===PLAYER_ID?' you':''}">${escHtml(p.name||'?')}</span>`).join('');
+    const statusC = m.status==='live'?'live':m.status==='ended'?'ended':'waiting';
     return `
-      <div class="match-card ${statusCls}">
+      <div class="match-card ${statusC}" style="margin-bottom:8px">
         <div class="match-card-top">
           <span class="match-name">${escHtml(m.name)}</span>
-          <span class="match-status ${statusCls}">${m.status}</span>
+          <span class="match-status ${statusC}">${m.status}</span>
         </div>
         <div class="match-meta">
-          <span>⏱ ${dur}min · $${(m.startCash/1000).toFixed(0)}k start</span>
-          <span>👥 ${players.length} players</span>
-          ${m.status==='live' ? `<span style="color:var(--red)">⏳ ${mins}m ${secs}s left</span>` : ''}
+          <span>🔑 ${m.code||m.id}</span>
+          <span>⏱ ${m.duration/60}min · $${(m.startCash||0).toLocaleString()}</span>
         </div>
-        <div class="match-players">${playerChips}</div>
-        ${scoreHtml ? `<div style="border:1px solid var(--border);border-radius:4px;padding:4px 8px;margin-bottom:6px">${scoreHtml}</div>` : ''}
-        ${canJoin ? `<button class="match-join-btn" onclick="joinMatch('${m.id}')">Join Match</button>` : ''}
-        ${inMatch ? `<div style="text-align:center;font-size:0.62em;color:var(--accent)">✓ You are in this match</div>` : ''}
+        <div class="match-players">${chips}</div>
+        ${m.status==='ended'&&sorted[0]?`<div style="font-size:0.62em;color:var(--gold)">🥇 ${escHtml(sorted[0].name||'?')} — ${$$(sorted[0].finalVal||sorted[0].cash||0)}</div>`:''}
       </div>`;
   }).join('');
 }
@@ -7124,9 +7612,12 @@ function gameLoop() {
   tickPrices();
 
   // ── Ownership benefits ──
-  tickDividends();                                     // passive dividend income every tick
-  if (G.tickCount % 10 === 0) pollCornerTax();         // check if corner tax is owed
-  if (G.tickCount % 15 === 0) updateOwnershipPanel();  // refresh benefit panel
+  if (CFG.dividendsOn) tickDividends();
+  if (G.tickCount % 10 === 0) pollCornerTax();
+  if (G.tickCount % 15 === 0) updateOwnershipPanel();
+
+  // ── Auto-sell / stop-loss ──
+  if (G.tickCount % 3 === 0) checkAutoSell();
 
   // Check pending orders every tick
   checkOrders();
@@ -7159,22 +7650,13 @@ function gameLoop() {
     if (sp) sp.textContent = getAvailableSkillPts();
   }
 
-  // ── Random event triggers (checked every tick, fire rarely) ──
-
-  // Emergency market day: ~0.05% per tick ≈ once per ~33 min at 1s tick
-  if (!G.emergencyDay && G.tickCount - (G.lastEmergencyTick||0) > 600
-      && Math.random() < 0.0005) {
-    triggerEmergencyDay();
+  // ── Random event triggers (gated by eventsOn setting) ──
+  if (CFG.eventsOn) {
+    if (!G.emergencyDay && G.tickCount - (G.lastEmergencyTick||0) > 600 && Math.random() < 0.0005) triggerEmergencyDay();
+    if (Math.random() < 0.0002) triggerScandal();
+    if (Math.random() < 0.0008) triggerHypeWave();
+    if (ACTIVE_EVENTS.length < 2 && Math.random() < 0.0015) launchStagedEvent();
   }
-
-  // Company scandal: ~0.02% per tick ≈ once per ~80 min
-  if (Math.random() < 0.0002) triggerScandal();
-
-  // Hype wave: ~0.08% per tick ≈ once per ~20 min
-  if (Math.random() < 0.0008) triggerHypeWave();
-
-  // Multi-stage event: ~0.15% per tick ≈ once per ~10 min
-  if (ACTIVE_EVENTS.length < 2 && Math.random() < 0.0015) launchStagedEvent();
 }
 
 /* ─── INITIALIZATION ────────────────────────────── */
