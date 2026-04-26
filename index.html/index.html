@@ -788,7 +788,121 @@ canvas#chart{display:block;width:100%;border-radius:3px;flex-shrink:0;}
 #rank-box[data-rank="Diamond"]:hover::after { opacity: 1; left:0; right:0; }
 #rank-box[data-rank="Titan"]:hover::after   { opacity: 1; left:0; right:0; }
 
-/* CURSOR OVERRIDES */
+/* ══════════════════════════════════════════════════
+   📱 MOBILE LAYOUT
+══════════════════════════════════════════════════ */
+#mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 52px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 600;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+}
+.mob-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 6px 4px;
+  transition: color 0.15s;
+}
+.mob-nav-btn.active { color: var(--accent); }
+.mob-nav-icon { font-size: 1.2em; line-height: 1; }
+.mob-nav-label { font-size: 0.46em; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--mono); }
+
+/* SPECTATOR PANEL */
+#spectator-panel { font-family: var(--mono); }
+
+/* DAILY CHALLENGE TAB */
+#tab-daily { flex-direction: column; overflow: hidden; min-height: 0; }
+#daily-challenge-list { overflow-y: auto; flex: 1; min-height: 0; padding: 6px 8px; }
+
+@media (max-width: 768px) {
+  body { font-size: 12px; }
+  
+  #header-top { padding: 5px 10px; }
+  #header-stats { overflow-x: auto; }
+  .stat-box { min-width: 70px; padding: 7px 8px 5px; }
+  .stat-icon { font-size: 0.9em; }
+  .stat-value { font-size: 0.88em; }
+  .stat-sub { display: none; }
+  #rank-box { min-width: 100px !important; }
+  #rank-next { display: none; }
+  .hdr-actions { gap: 3px; }
+  .hdr-btn { padding: 4px 6px; font-size: 0.55em; }
+  #btn-changelog span, #btn-tutorial span { display: none; }
+
+  #main {
+    grid-template-columns: 1fr !important;
+    height: calc(100vh - 100px) !important;
+  }
+  #resize-handle { display: none !important; }
+  #right-panel {
+    position: fixed;
+    inset: 0;
+    top: 76px;
+    bottom: 52px;
+    z-index: 400;
+    display: none;
+  }
+  #left-panel {
+    min-width: 0;
+    padding: 6px 8px;
+  }
+  #mobile-nav { display: grid !important; }
+  #shortcuts { display: none; }
+
+  /* Make table scroll horizontally */
+  table { min-width: 500px; }
+  #left-panel { overflow-x: auto; }
+
+  /* Bigger tap targets */
+  .b-buy, .b-sell { padding: 5px 9px; font-size: 0.68em; }
+  .qty { width: 44px; font-size: 0.8em; padding: 4px; }
+  .sf-btn { padding: 4px 8px; font-size: 0.6em; }
+  
+  /* Right panel tabs bigger */
+  .rp-tab { padding: 9px 2px; }
+  .rp-tab .tl { font-size: 0.5em; }
+  #rp-tab-grid { grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 4px; }
+  
+  /* Modal full-screen on mobile */
+  .modal-box { width: 96vw !important; max-height: 95vh !important; }
+  #profile-system-modal > div { width: 96vw !important; max-height: 94vh !important; }
+  
+  /* Adjust stat tiles for mobile */
+  #player-name-edit { right: 4px !important; top: 82px !important; width: 200px !important; }
+  
+  /* Main panel height when spectator bar visible */
+  body.spectating #right-panel { bottom: 96px; }
+  body.spectating #main { height: calc(100vh - 148px) !important; }
+}
+
+/* WATCHLIST */
+.watch-btn { background:transparent; border:none; color:var(--text-dim); font-size:1em; cursor:pointer; padding:0 3px; transition:color 0.15s; }
+.watch-btn:hover { color:var(--gold); }
+.stock-row.watched { border-left:2px solid var(--gold) !important; }
+/* REACTIONS */
+.reaction-picker button:hover { transform: scale(1.2); }
+.react-bar { margin-top: 3px; min-height: 4px; }
+
+/* CURSOR OVERRIDES *//* CURSOR OVERRIDES *//* WATCHLIST */
+.watch-btn { background:transparent; border:none; color:var(--text-dim); font-size:1em; cursor:pointer; padding:0 3px; transition:color 0.15s; }
+.watch-btn:hover { color:var(--gold); }
+.stock-row.watched { border-left:2px solid var(--gold) !important; }
+/* REACTIONS */
+.reaction-picker button:hover { transform: scale(1.2); }
+.react-bar { margin-top: 3px; min-height: 4px; }
+
+/* CURSOR OVERRIDES *//* CURSOR OVERRIDES */
 button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-danger,.pick-buy-btn,
 .hist-filter-btn,.order-type-btn,.btn-place-order,.oc-cancel,#chat-send,#player-search-btn,
 .match-join-btn,.team-join-btn,.color-btn,.skill-up-btn,.setting-slider,.setting-select,
@@ -954,7 +1068,7 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
       </div>
       <table id="tbl">
         <thead><tr>
-          <th data-col="sym">Symbol</th>
+          <th style="width:24px">★</th><th data-col="sym">Symbol</th>
           <th data-col="name">Company</th>
           <th data-col="sector">Sector</th>
           <th class="r" data-col="price">Price</th>
@@ -1006,11 +1120,20 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
         <button class="rp-tab" data-tab="ach"><span class="ti">🏅</span><span class="tl">Badges</span></button>
         <button class="rp-tab" data-tab="bets"><span class="ti">🎲</span><span class="tl">Bets</span></button>
         <button class="rp-tab" data-tab="auction"><span class="ti">🏛️</span><span class="tl">Auction</span></button>
+        <button class="rp-tab" data-tab="daily"><span class="ti">🎯</span><span class="tl">Daily</span></button>
+        <button class="rp-tab" data-tab="loans"><span class="ti">🏦</span><span class="tl">Loans</span></button>
       </div>
 
       <!-- Admin panel -->
       <div id="admin-panel">
-        <div class="admin-title">👑 Admin Controls — avstr</div>
+        <div class="admin-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>👑 Admin Controls — avstr</span>
+          <button id="admin-minimize-btn" onclick="toggleAdminPanel()" 
+            style="background:transparent;border:1px solid rgba(255,214,0,0.3);color:var(--gold);padding:2px 8px;font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:3px;line-height:1.4">
+            ▲ Minimize
+          </button>
+        </div>
+        <div id="admin-body">
         <div class="admin-row">
           <select id="admin-sym" class="admin-input" style="flex:1.2"><option value="">Select stock…</option></select>
           <input id="admin-price" class="admin-input" type="number" placeholder="New price" min="0.01" step="0.01">
@@ -1041,12 +1164,13 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
         <div class="admin-row">
           <button class="admin-btn" style="flex:1;border-color:rgba(206,147,216,0.5);color:#ce93d8" onclick="adminAnnounce()">📢 Send to All</button>
         </div>
+        </div><!-- /admin-body -->
         <div id="admin-status" style="font-size:0.62em;color:var(--text-dim);margin-top:3px;min-height:14px"></div>
       </div>
 
       <!-- CHART TAB -->
       <div class="tab-content active" id="tab-chart">
-        <div id="chart-header"><span id="chart-sym">TECH</span><span id="chart-prc">$0.00</span></div>
+        <div id="chart-header"><span id="chart-sym">TECH</span><span id="chart-prc">$0.00</span><button id="chart-watch-btn" onclick="toggleWatch(G.selectedSym)" style="font-size:0.65em;background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:2px 8px;border-radius:4px;cursor:pointer;font-family:var(--mono);transition:all 0.15s">☆ Watch</button></div>
         <div id="chart-meta">Select a stock to view chart</div>
         <div id="chart-controls">
           <span style="font-size:0.6em;color:var(--text-dim)">ZOOM:</span>
@@ -1225,7 +1349,12 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
           <input id="player-search-input" type="text" placeholder="Search player name…" maxlength="20">
           <button id="player-search-btn">🔍 Search</button>
         </div>
-        <div id="player-results"><div class="orders-empty" style="padding-top:30px">Search for a player to see their stats.</div></div>
+        <!-- Friends list -->
+        <div style="padding:5px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="font-size:0.55em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:5px;font-weight:bold">👥 Following (<span id="friend-count">0</span>)</div>
+          <div id="friends-list" style="max-height:90px;overflow-y:auto"></div>
+        </div>
+        <div id="player-results"><div class="orders-empty" style="padding-top:20px">Search for a player to see their stats.</div></div>
       </div>
 
       <!-- MATCHES TAB -->
@@ -1424,6 +1553,98 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
         </div>
         <div id="auction-list" style="overflow-y:auto;flex:1;min-height:0;padding:6px 8px">
           <div class="orders-empty">Loading auctions…</div>
+        </div>
+      </div>
+
+
+      <!-- DAILY CHALLENGES TAB -->
+      <div class="tab-content" id="tab-daily">
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="panel-title">🎯 Daily Challenges</div>
+            <div style="font-size:0.58em;color:var(--text-dim)" id="daily-reset-time">Resets at midnight</div>
+          </div>
+          <div style="font-size:0.62em;color:var(--text-dim);line-height:1.4">Complete all 3 today for bonus cash. New challenges every day!</div>
+        </div>
+        <div id="daily-challenge-list" style="overflow-y:auto;flex:1;min-height:0;padding:6px 8px">
+          <div class="orders-empty">Loading challenges…</div>
+        </div>
+      </div>
+
+
+      <!-- LOANS TAB -->
+      <div class="tab-content" id="tab-loans">
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div class="panel-title" style="margin-bottom:8px">🏦 Loan Desk</div>
+
+          <!-- Tier info -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 7px;text-align:center">
+              <div style="font-size:0.46em;color:var(--text-dim);text-transform:uppercase">Your Tier</div>
+              <div style="font-size:0.78em;font-weight:bold;color:var(--gold)" id="loan-tier-label">—</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 7px;text-align:center">
+              <div style="font-size:0.46em;color:var(--text-dim);text-transform:uppercase">Max Loan</div>
+              <div style="font-size:0.78em;font-weight:bold;color:var(--text-hi)" id="loan-max-label">—</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 7px;text-align:center">
+              <div style="font-size:0.46em;color:var(--text-dim);text-transform:uppercase">Interest</div>
+              <div style="font-size:0.78em;font-weight:bold;color:var(--red)" id="loan-rate-label">—</div>
+            </div>
+          </div>
+
+          <!-- Active loan section -->
+          <div id="loan-active-section" style="display:none">
+            <div style="background:rgba(255,152,0,0.06);border:1px solid rgba(255,152,0,0.3);border-radius:6px;padding:10px;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:0.72em;font-weight:bold;color:var(--orange)">⚠️ Active Loan</span>
+                <span style="font-size:0.68em;color:var(--text-dim)">Principal: <span id="loan-principal" style="color:var(--text-hi)">$0</span></span>
+              </div>
+              <div style="font-size:0.6em;color:var(--text-dim);margin-bottom:5px">Balance owed:</div>
+              <div style="font-size:1.1em;font-weight:bold;color:var(--red);margin-bottom:6px" id="loan-balance">$0</div>
+              <div style="height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:8px">
+                <div id="loan-pct-paid" style="height:4px;background:var(--green);border-radius:2px;width:0%;transition:width 0.5s"></div>
+              </div>
+              <div style="display:flex;gap:5px">
+                <input id="loan-repay-inp" type="number" min="1" step="10" placeholder="Amount…"
+                  style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text-hi);font-family:var(--mono);font-size:0.72em;padding:5px 8px;border-radius:4px;outline:none">
+                <button onclick="repayLoan()" style="padding:5px 10px;background:rgba(0,230,118,0.12);border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:4px">Pay</button>
+                <button onclick="repayAll()" style="padding:5px 10px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.4);color:var(--green);font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:4px">Pay All</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- New loan section -->
+          <div id="loan-new-section">
+            <div style="font-size:0.58em;color:var(--text-dim);margin-bottom:6px;line-height:1.5;background:rgba(255,255,255,0.02);border-radius:4px;padding:5px 7px">
+              💡 Interest compounds every minute. Higher net worth = better rates & larger loans.<br>
+              ⚠️ Failing to repay lets your debt grow fast!
+            </div>
+            <div style="display:flex;gap:5px">
+              <input id="loan-amount-inp" type="number" min="1" step="100" placeholder="Loan amount…"
+                style="flex:1;background:var(--bg3);border:1px solid rgba(255,214,0,0.3);color:var(--text-hi);font-family:var(--mono);font-size:0.78em;padding:6px 9px;border-radius:4px;outline:none">
+              <button onclick="takeLoan()" style="padding:6px 14px;background:rgba(255,214,0,0.12);border:2px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:0.7em;font-weight:bold;cursor:pointer;border-radius:4px;white-space:nowrap">Get Loan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Give Money section -->
+        <div style="padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="font-size:0.6em;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);font-weight:bold;margin-bottom:7px">💸 Give Money to Player</div>
+          <div style="display:flex;gap:5px;margin-bottom:5px">
+            <input id="give-player-name" type="text" placeholder="Player name…" maxlength="20"
+              style="flex:1.5;background:var(--bg3);border:1px solid var(--border);color:var(--text-hi);font-family:var(--mono);font-size:0.72em;padding:5px 8px;border-radius:4px;outline:none">
+            <input id="give-amount-inp" type="number" min="1" step="100" placeholder="Amount…"
+              style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text-hi);font-family:var(--mono);font-size:0.72em;padding:5px 8px;border-radius:4px;outline:none">
+          </div>
+          <button onclick="giveMoney()" style="width:100%;padding:6px;background:rgba(var(--accent-rgb),0.1);border:1px solid rgba(var(--accent-rgb),0.3);color:var(--accent);font-family:var(--mono);font-size:0.7em;cursor:pointer;border-radius:4px;font-weight:bold">💸 Send Money</button>
+          <div style="font-size:0.58em;color:var(--text-dim);margin-top:4px">Sends cash directly from your wallet to another player.</div>
+        </div>
+
+        <!-- Loan history / info -->
+        <div style="padding:8px 12px;flex:1;overflow-y:auto">
+          <div style="font-size:0.58em;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:8px;font-weight:bold">📊 Loan Tiers</div>
+          <div id="loan-tiers-list" style="display:flex;flex-direction:column;gap:3px"></div>
         </div>
       </div>
 
@@ -2382,6 +2603,7 @@ function buildTable(){
     tr.id='row-'+sym;tr.dataset.sym=sym;tr.dataset.sector=s.sector;
     tr.onclick=()=>selectSym(sym);
     tr.innerHTML=`
+      <td style="width:24px;text-align:center"><button class="watch-btn" id="watch-${sym}" onclick="event.stopPropagation();toggleWatch('${sym}',event)" style="color:${isWatched(sym)?'var(--gold)':'var(--text-dim)'}">${isWatched(sym)?'★':'☆'}</button></td>
       <td><div class="sym" style="color:${s.color}">${sym}</div></td>
       <td><div class="co">${s.name}</div></td>
       <td><span class="sect" id="sect-${sym}">${s.sector}</span></td>
@@ -2439,6 +2661,7 @@ function refreshTable(){
       sigEl.innerHTML=`<span class="trend-lbl ${tm.cls}">${tm.txt}</span>${insiderHtml}`;
     }
     row.classList.toggle('alert-row',!!s.unusualVol);
+    row.classList.toggle('watched',isWatched(sym));
     const myOwned=G.portfolio[sym]||0,myPctRaw=ownershipPct(sym,myOwned);
     row.classList.toggle('cornered',myPctRaw>=75);row.classList.toggle('majority',myPctRaw>=50&&myPctRaw<75);row.classList.toggle('whale',myPctRaw>=25&&myPctRaw<50);
     if(sEl)sEl.parentElement.style.display=CFG.showSector?'':'none';
@@ -2456,6 +2679,11 @@ function applyFilter(){
     if(G.ownedOnly&&owned===0)show=false;
     row.classList.toggle('hidden',!show);
   }
+  // Sort watched stocks to top
+  const tbody=document.getElementById('tbody');
+  const rows=[...tbody.querySelectorAll('tr')];
+  rows.sort((a,b)=>{const wa=_watchlist.has(a.dataset.sym),wb=_watchlist.has(b.dataset.sym);return wb-wa;});
+  rows.forEach(r=>tbody.appendChild(r));
   const visible=SYM_LIST.filter(sym=>!document.getElementById('row-'+sym).classList.contains('hidden'));
   document.getElementById('stock-count').textContent=visible.length;
 }
@@ -2482,6 +2710,9 @@ function refreshChartHeader(){
   const pEl=document.getElementById('chart-prc');pEl.textContent=$$(s.price);pEl.style.color=s.price>=s.prev?'var(--green)':'var(--red)';
   const sess=((s.price-s.startP)/s.startP*100);
   document.getElementById('chart-meta').textContent=(sess>=0?'+':'')+sess.toFixed(2)+'% session · vol:'+(s.vol*100).toFixed(1)+'% · '+s.sector;
+  // Update watchlist star in chart header
+  const wBtn=document.getElementById('chart-watch-btn');
+  if(wBtn){wBtn.textContent=isWatched(sym)?'★ Watching':'☆ Watch';wBtn.style.color=isWatched(sym)?'var(--gold)':'var(--text-dim)';}
   refreshChartInfoPanel(sym,s,sess);
 }
 
@@ -2636,11 +2867,14 @@ function switchTab(name){
   if(name==='history')refreshHistory();
   if(name==='orders')renderOrders();
   if(name==='chat-room'){chatPoll();_chatUnread=0;updateChatBadge();}
+  if(name==='players'){renderFriendsList();const fc=document.getElementById('friend-count');if(fc)fc.textContent=_friends.size;}
   if(name==='matches')renderMatches();
   if(name==='teams')renderTeams();
   if(name==='trade')pollTradeOffers();
   if(name==='bets'){renderBets();_betUnread=0;updateBetBadge();pollBets();updateBetMaxLabel();}
   if(name==='auction'){renderAuctions();_auctionUnread=0;updateAuctionBadge();pollAuctions();}
+  if(name==='daily'){renderDailyChallenges();updateChallengeBadge();}
+  if(name==='loans'){refreshLoanUI();}
   if(name==='feed'){pollTradeFeed();if(!feedCache.length){const fl=document.getElementById('feed-list');if(fl)fl.innerHTML='<div class="feed-empty">No trades yet — be the first!</div>';}}
 }
 
@@ -2778,8 +3012,9 @@ function initPlayer(){
 
 /* ── NAME VALIDATION ── */
 const BAD_WORDS=['fuck','shit','ass','bitch','cunt','dick','cock','pussy','nigger','nigga','faggot','fag','whore','slut','bastard','retard','kike','spic','chink','gook','tranny','dyke'];
-function containsProfanity(name){const lower=name.toLowerCase().replace(/[^a-z0-9]/g,'');return BAD_WORDS.some(w=>lower.includes(w));}
+function containsProfanity(name){if(!name||typeof name!=='string')return false;const lower=name.toLowerCase().replace(/[^a-z0-9]/g,'');return BAD_WORDS.some(w=>lower.includes(w));}
 function isValidNameFormat(name){
+  if(!name||typeof name!=='string')return{ok:false,msg:'Enter a name'};
   name=name.trim();
   if(name.length<2)return{ok:false,msg:'Name must be at least 2 characters'};
   if(name.length>16)return{ok:false,msg:'Name must be 16 chars or less'};
@@ -2902,7 +3137,7 @@ async function renderLB(){
     const entryRank=getRank(e.score||0);
     const rankBadge=`<span style="font-size:0.55em;font-weight:bold;padding:1px 5px;border-radius:6px;background:${entryRank.color}22;color:${entryRank.color};border:1px solid ${entryRank.color}55;letter-spacing:0.5px;margin-right:4px;vertical-align:middle;text-transform:uppercase">${entryRank.name}</span>`;
     _playerCache[e.id]=e; // cache for profile click
-    return`<div class="${isYou?'lb-row lb-row-you':e.active?'lb-row':'lb-row lb-inactive'}" onclick="isYou?openMyProfile():showExternalProfile('${e.id}',_playerCache['${e.id}']||{})" style="cursor:pointer">
+    return`<div class="${isYou?'lb-row lb-row-you':e.active?'lb-row':'lb-row lb-inactive'}" onclick="isYou?openMyProfile():showExternalProfile('${e.id}',_playerCache['${e.id}']||{})" style="cursor:pointer" title="${isYou?'Your profile':'Click profile · Shift+click to spectate'}" ondblclick="event.preventDefault();${isYou?'':'startSpectating(\''+e.id+'\',\''+escHtml(e.name||'?')+'\')'}">
       <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
       <span class="lb-name">${dot}${rankBadge}${e.name||'Anon'}${youBadge}</span>
       <span class="lb-score" style="color:${entryRank.color};font-weight:bold">${$$(e.score)}</span>
@@ -3353,8 +3588,8 @@ async function chatSend(){
   if(!text)return;if(containsProfanity(text)){flash('❌ Message contains disallowed content','#ff1744');return;}
   if(!PLAYER_NAME){flash('❌ Set a username first','#ff1744');return;}
   inp.value='';
-  if(!fbConfigured()){chatAddMsg({name:PLAYER_NAME,text,ts:Date.now(),pid:PLAYER_ID,score:Math.round(totalVal()),selectedTag:G_profile.selectedTag||''});chatLastTs=Date.now();return;}
-  try{const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6);await fetch(`${FIREBASE_URL}${CHAT_SUBPATH}${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({pid:PLAYER_ID,name:PLAYER_NAME,text,ts:Date.now(),score:Math.round(totalVal()),selectedTag:G_profile.selectedTag||''})});chatAddMsg({name:PLAYER_NAME,text,ts:Date.now(),pid:PLAYER_ID});chatLastTs=Date.now();}
+  if(!fbConfigured()){_dailyChatsToday++;saveDailyState();chatAddMsg({name:PLAYER_NAME,text,ts:Date.now(),pid:PLAYER_ID,score:Math.round(totalVal()),selectedTag:G_profile.selectedTag||'',profileColor:G_profile.color||''});chatLastTs=Date.now();return;}
+  try{const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6);await fetch(`${FIREBASE_URL}${CHAT_SUBPATH}${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({pid:PLAYER_ID,name:PLAYER_NAME,text,ts:Date.now(),score:Math.round(totalVal()),selectedTag:G_profile.selectedTag||'',profileColor:G_profile.color||''})});chatAddMsg({name:PLAYER_NAME,text,ts:Date.now(),pid:PLAYER_ID});chatLastTs=Date.now();}
   catch(e){flash('❌ Chat send failed','#ff1744');}
 }
 let _chatUnread=0;
@@ -3374,8 +3609,14 @@ function chatAddMsg(msg){
       : `<span title="${msgTag.label}" style="font-size:0.6em;padding:1px 6px;border-radius:8px;background:${msgTag.color}22;color:${msgTag.color};border:1px solid ${msgTag.color}44;font-weight:bold;margin-right:4px;vertical-align:middle">${msgTag.icon} ${msgTag.label}</span>`
     : msgRank?`<span title="${msgRank.name}" style="font-size:0.85em;margin-right:2px;line-height:1;vertical-align:middle">${msgRank.icon}</span>`
     :'';
+  const nameColor = msg.profileColor && !isAdmin ? msg.profileColor : '';
+  const msgKey = `chat_${msg.pid}_${msg.ts}`;
   const div=document.createElement('div');div.className='chat-msg';
-  div.innerHTML=`<span class="chat-time">${time}</span>${rankBadge}<span class="chat-name${isAdmin?' admin':''}">${escHtml(msg.name)}${isMe?' (you)':''}</span><span class="chat-text"> ${escHtml(msg.text)}</span>`;
+  div.innerHTML=`<span class="chat-time">${time}</span>${rankBadge}<span class="chat-name${isAdmin?' admin':''}" style="${nameColor?`color:${nameColor}`:''}">${escHtml(msg.name)}${isMe?' (you)':''}</span><span class="chat-text"> ${escHtml(msg.text)}</span>
+    <span class="react-trigger" onclick="reactionPicker('${msgKey}',this)" style="font-size:0.7em;color:var(--text-dim);opacity:0;cursor:pointer;margin-left:4px;padding:1px 4px;border-radius:4px" title="React">😊</span>
+    <div id="react-${msgKey}" class="react-bar"></div>`;
+  div.onmouseenter=()=>{const t=div.querySelector('.react-trigger');if(t)t.style.opacity='1';};
+  div.onmouseleave=()=>{const t=div.querySelector('.react-trigger');if(t)t.style.opacity='0';};
   feed.appendChild(div);feed.scrollTop=feed.scrollHeight;while(feed.children.length>100)feed.removeChild(feed.firstChild);
   // Wire name click to show profile
   try{
@@ -3436,7 +3677,7 @@ async function searchPlayers(){
   let all={};
   if(fbConfigured()){try{const res=await fetch(FIREBASE_URL+LB_FB_PATH,{cache:'no-store'});all=res.ok?(await res.json()||{}):{};} catch(e){}}
   all={...lbLocalLoad(),...all};
-  const matches=Object.entries(all).filter(([id,e])=>e&&e.name&&e.name.toLowerCase().includes(query)).sort((a,b)=>(b[1].score||0)-(a[1].score||0)).slice(0,20);
+  const matches=Object.entries(all).filter(([id,e])=>e&&e.name&&typeof e.name==='string'&&e.name.toLowerCase().includes(query)).sort((a,b)=>(b[1].score||0)-(a[1].score||0)).slice(0,20);
   if(!matches.length){results.innerHTML=`<div class="orders-empty">No players found matching "${escHtml(query)}".</div>`;return;}
   results.innerHTML=matches.map(([id,e])=>{
     _playerCache[id]=e;
@@ -3445,7 +3686,10 @@ async function searchPlayers(){
     const pnl=(e.score||0)-1000;
     return`<div class="player-card" onclick="showPlayerProfile('${id}')">
       <div class="player-card-top"><span class="player-card-name${e.name==='avstr'?' admin':''}">${dot}${escHtml(e.name)}${isMe?' (you)':''}</span><span class="player-card-score">${$$(e.score||0)}</span></div>
-      <div class="player-card-stats"><span>🔄 ${e.trades||0} trades</span><span>🏅 ${e.ach||0} badges</span><span style="color:${pnl>=0?'var(--green)':'var(--red)'}">P&L ${(pnl>=0?'+':'')+$$(pnl)}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+        <div class="player-card-stats"><span>🔄 ${e.trades||0} trades</span><span>🏅 ${e.ach||0} badges</span><span style="color:${pnl>=0?'var(--green)':'var(--red)'}">P&L ${(pnl>=0?'+':'')+$$(pnl)}</span></div>
+        ${isMe?'':`<div style="display:flex;gap:4px">${friendFollowBtn(id,e.name||'?')}<button onclick="event.stopPropagation();startSpectating('${id}','${escHtml(e.name||'?')}')" style="padding:2px 7px;font-family:var(--mono);font-size:0.55em;border:1px solid rgba(41,182,246,0.3);background:rgba(41,182,246,0.08);color:var(--blue);border-radius:3px">👁</button></div>`}
+      </div>
     </div>`;
   }).join('');
 }
@@ -3515,7 +3759,7 @@ async function adminGiveMoney(){
   if(amount<=0){setAdminStatus('❌ Enter a valid amount','var(--red)');return;}
 
   // If it's ourselves, apply directly
-  if(name.toLowerCase()===PLAYER_NAME.toLowerCase()){
+  if(name&&name.toLowerCase()===PLAYER_NAME.toLowerCase()){
     G.cash+=amount;refreshUI();saveGame();pushLBScore();
     setAdminStatus(`✅ Gave yourself ${$$(amount)}`,'var(--green)');return;
   }
@@ -3572,6 +3816,28 @@ async function adminGlobalReset(){
 }
 
 function setAdminStatus(msg,color){const el=document.getElementById('admin-status');if(el){el.textContent=msg;el.style.color=color||'var(--text-dim)';}}
+
+function toggleAdminPanel(){
+  const body=document.getElementById('admin-body');
+  const btn=document.getElementById('admin-minimize-btn');
+  if(!body||!btn)return;
+  const minimized=body.style.display==='none';
+  body.style.display=minimized?'':'none';
+  btn.textContent=minimized?'▲ Minimize':'▼ Expand';
+  try{localStorage.setItem('sb_admin_minimized', minimized?'0':'1');}catch(e){}
+}
+
+// Restore minimized state on load
+function initAdminMinimize(){
+  try{
+    if(localStorage.getItem('sb_admin_minimized')==='1'){
+      const body=document.getElementById('admin-body');
+      const btn=document.getElementById('admin-minimize-btn');
+      if(body){body.style.display='none';}
+      if(btn){btn.textContent='▼ Expand';}
+    }
+  }catch(e){}
+}
 
 /* ── ADMIN ANNOUNCE ── */
 async function adminAnnounce(){
@@ -3906,7 +4172,13 @@ function feedAddItem(entry){
   const list=document.getElementById('feed-list');if(!list)return;
   const s=STOCKS[entry.sym],col=s?s.color:'var(--text)',isMe=entry.pid===PLAYER_ID,big=entry.qty*entry.price>5000;
   const div=document.createElement('div');div.className=`feed-item${big?' feed-hype':''}`;
-  div.innerHTML=`<span class="feed-action ${entry.action}">${entry.action.toUpperCase()}</span><span class="feed-player">${isMe?'<strong style="color:var(--accent)">You</strong>':`<strong>${escHtml(entry.name||'?')}</strong>`}</span><span class="feed-sym" style="color:${col}">${entry.sym}</span><span class="feed-qty">${entry.qty}×</span><span class="feed-price">@ ${$$(entry.price)}</span>${entry.corner?`<span style="font-size:0.8em;margin-left:2px">${entry.corner}</span>`:''}<span class="feed-ago">${timeAgo(entry.ts)}</span>`;
+  const feedKey=`feed_${entry.pid}_${entry.ts}`;
+  div.innerHTML=`<span class="feed-action ${entry.action}">${entry.action.toUpperCase()}</span><span class="feed-player">${isMe?'<strong style="color:var(--accent)">You</strong>':`<strong>${escHtml(entry.name||'?')}</strong>`}</span><span class="feed-sym" style="color:${col}">${entry.sym}</span><span class="feed-qty">${entry.qty}×</span><span class="feed-price">@ ${$$(entry.price)}</span>${entry.corner?`<span style="font-size:0.8em;margin-left:2px">${entry.corner}</span>`:''}<span class="feed-ago">${timeAgo(entry.ts)}</span>
+    ${!isMe?`<button onclick="event.stopPropagation();copyTrade(${JSON.stringify({sym:entry.sym,qty:entry.qty,price:entry.price,action:entry.action,pid:entry.pid,name:entry.name||'?'})})" style="font-size:0.58em;padding:1px 6px;font-family:var(--mono);border:1px solid rgba(var(--accent-rgb),0.25);background:rgba(var(--accent-rgb),0.06);color:var(--accent);border-radius:3px;opacity:0;transition:opacity 0.15s;margin-left:3px" class="copy-trade-btn">📋 Copy</button>`:''}
+    <span onclick="reactionPicker('${feedKey}',this)" style="font-size:0.75em;color:var(--text-dim);opacity:0;cursor:pointer;margin-left:4px" title="React">😊</span>
+    <div id="react-${feedKey}" class="react-bar"></div>`;
+  div.onmouseenter=()=>{const t=div.querySelector('[title=React]');if(t)t.style.opacity='0.7';};
+  div.onmouseleave=()=>{const t=div.querySelector('[title=React]');if(t)t.style.opacity='0';};
   list.insertBefore(div,list.firstChild);while(list.children.length>FEED_MAX)list.removeChild(list.lastChild);
 }
 function updateFeedStats(){
@@ -4079,6 +4351,9 @@ async function init(){
 
   const canvas=document.getElementById('chart');
   function fitMainPanel(){
+    const specBar=document.getElementById('spectator-panel');
+    if(specBar)document.body.classList.add('spectating');
+    else document.body.classList.remove('spectating');
     const header=document.getElementById('header'),ticker=document.getElementById('ticker-bar'),emer=document.getElementById('emergency-banner'),shorts=document.getElementById('shortcuts');
     // Header now has two rows — use offsetHeight which accounts for both
     const usedH=(header?.offsetHeight||0)+(ticker?.offsetHeight||0)+(emer?.offsetHeight||0)+(shorts?.offsetHeight||0);
@@ -4101,6 +4376,7 @@ async function init(){
 
   await loadOrCreateMarketStart();setInterval(pollNewsEvents,8000);setInterval(pollAdminOverride,5000);
   await checkAdminStatus();
+  initAdminMinimize();
 
   refreshUI();refreshPicks();refreshIntelTab();updateMajorityDisplay();
 
@@ -4114,6 +4390,10 @@ async function init(){
   initVoteSystem();
   initProfileSystem();
   initAuctions();
+  loadWatchlist();
+  initFriendAlerts();
+  initLoans();
+  initAllNewFeatures();
   console.log('%c📈 StockBlitz v3','color:#00e676;font-size:16px;font-weight:bold;');
   console.log(`%cSync: ${fbConfigured()?'Firebase':'Local'} | Player: ${PLAYER_NAME}|Stocks: ${SYM_LIST.length}`,'color:#5a6a78');
 }
@@ -4273,6 +4553,7 @@ async function placeBet() {
   });
 
   saveGame();
+  _dailyBetsToday++; saveDailyState();
   flash(`🎲 Bet placed: ${$$(amount)} on ${betLabel(bet)}`, 'var(--purple)');
   if (amtEl) amtEl.value = '';
   renderBets();
@@ -5637,10 +5918,16 @@ function showProfileModal({ name, pid, stats, tags, rank, isSelf, externalData =
       </div>
 
       <div style="font-size:0.62em;color:var(--text-dim);margin-bottom:5px">Profile Color</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
         ${PROFILE_COLORS.map(c => `<button onclick="setProfileColor('${c.value}')" title="${c.name}"
           style="width:26px;height:26px;border-radius:50%;background:${c.value};border:2px solid ${G_profile.color===c.value?'white':'transparent'};cursor:pointer;transform:${G_profile.color===c.value?'scale(1.2)':'scale(1)'};transition:all 0.15s"></button>`).join('')}
       </div>
+
+      <div style="font-size:0.62em;color:var(--text-dim);margin-bottom:5px">📖 Trader Bio <span style="opacity:0.5">(160 chars)</span></div>
+      <textarea id="bio-textarea" maxlength="160" rows="3" placeholder="Tell other traders about yourself…"
+        style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);color:var(--text-hi);font-family:var(--mono);font-size:0.7em;padding:7px 9px;border-radius:5px;resize:none;outline:none;margin-bottom:5px"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">${escHtml(_traderBio)}</textarea>
+      <button onclick="saveTraderBio()" style="width:100%;background:rgba(var(--accent-rgb),0.1);border:1px solid rgba(var(--accent-rgb),0.3);color:var(--accent);padding:5px;font-family:var(--mono);font-size:0.65em;cursor:pointer;border-radius:4px">Save Bio</button>
     </div>` : '';
 
   modal.innerHTML = `
@@ -5660,8 +5947,14 @@ function showProfileModal({ name, pid, stats, tags, rank, isSelf, externalData =
             </div>
 
           </div>
-          <!-- Close -->
-          <button onclick="document.getElementById('profile-system-modal').remove()" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.85em;flex-shrink:0">✕</button>
+          <!-- Close + Follow -->
+          <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+            ${!isSelf ? `<span onclick="toggleFollow('${pid}','${escHtml(name)}')" data-follow-pid="${pid}"
+              style="font-size:0.6em;padding:3px 9px;border:1px solid ${isFollowing(pid)?'rgba(255,23,68,0.35)':'rgba(var(--accent-rgb),0.3)'};background:${isFollowing(pid)?'rgba(255,23,68,0.06)':'rgba(var(--accent-rgb),0.06)'};color:${isFollowing(pid)?'var(--red)':'var(--accent)'};border-radius:4px;cursor:pointer">
+              ${isFollowing(pid)?'➖ Unfollow':'➕ Follow'}
+            </span>` : ''}
+            <button onclick="document.getElementById('profile-system-modal').remove()" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.85em">✕</button>
+          </div>
         </div>
 
         <!-- Tags -->
@@ -5672,6 +5965,7 @@ function showProfileModal({ name, pid, stats, tags, rank, isSelf, externalData =
 
       <!-- Stats grid -->
       <div style="padding:14px 22px">
+        ${(isSelf?_traderBio:externalData?.bio)||'' ? `<div style="font-size:0.68em;color:var(--text-dim);font-style:italic;margin-bottom:12px;padding:8px 10px;background:var(--bg3);border-radius:5px;border-left:2px solid var(--border);line-height:1.5">"${escHtml(isSelf?_traderBio:externalData?.bio)}"</div>` : ''}
         <div style="font-size:0.58em;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">📊 Stats</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:14px">
           ${statRows.map(r => `
@@ -5987,6 +6281,7 @@ async function resolveAuction(auction) {
       G.trades++;
 
       const savings = (s.price - bid) * auction.qty;
+      _dailyAuctionsWon++; saveDailyState();
       snd.ach();
       flash(`🏆 WON AUCTION: ${auction.qty}× ${auction.sym} @ ${$$(bid)}/share! Saved ${$$(Math.max(0, savings))} vs market!`, 'var(--gold)');
       addLimitedNewsItem(
@@ -6393,6 +6688,731 @@ function showChangelog() {
 
 function hideChangelog() {
   document.getElementById('changelog-modal-bg')?.classList.remove('open');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   📱 MOBILE LAYOUT + DAILY CHALLENGES + SPECTATOR + TRADER BIO
+══════════════════════════════════════════════════════════════ */
+
+/* ─── DAILY CHALLENGES ─────────────────────────────────────
+   3 challenges generated daily from a date seed.
+   Progress tracked in localStorage. Rewards: cash bonuses.    */
+const CHALLENGE_POOL = [
+  { id:'trades5',   icon:'⚡', title:'Speed Run',        desc:'Make 5 trades today',            type:'trades',    target:5,    reward:500  },
+  { id:'trades15',  icon:'🔄', title:'Active Trader',    desc:'Make 15 trades today',           type:'trades',    target:15,   reward:1500 },
+  { id:'trades30',  icon:'💯', title:'Trade Machine',    desc:'Make 30 trades today',           type:'trades',    target:30,   reward:4000 },
+  { id:'profit500', icon:'💰', title:'In The Green',     desc:'Earn $500 profit today',         type:'profit',    target:500,  reward:750  },
+  { id:'profit2k',  icon:'📈', title:'Bull Run',         desc:'Earn $2,000 profit today',       type:'profit',    target:2000, reward:3000 },
+  { id:'sectors3',  icon:'🌐', title:'Diversify',        desc:'Hold stocks in 3+ sectors',      type:'sectors',   target:3,    reward:800  },
+  { id:'sectors5',  icon:'🗺️', title:'Sector Lord',      desc:'Hold stocks in 5+ sectors',      type:'sectors',   target:5,    reward:2000 },
+  { id:'majority1', icon:'👑', title:'Power Move',       desc:'Hold a majority position',       type:'majority',  target:1,    reward:1200 },
+  { id:'sell5',     icon:'🔴', title:'Take Profits',     desc:'Complete 5 sell trades',         type:'sells',     target:5,    reward:600  },
+  { id:'news5',     icon:'📰', title:'News Watcher',     desc:'Witness 5 news events',          type:'news',      target:5,    reward:400  },
+  { id:'hold60',    icon:'🙌', title:'Diamond Hands',    desc:'Hold without selling for 60s',   type:'hold',      target:60,   reward:700  },
+  { id:'bet1',      icon:'🎲', title:'Roll the Dice',    desc:'Place any bet',                  type:'bets',      target:1,    reward:500  },
+  { id:'networth',  icon:'💎', title:'Worth It',         desc:'Reach $5,000 net worth',         type:'networth',  target:5000, reward:1000 },
+  { id:'auction1',  icon:'🏛️', title:'Going Once...',    desc:'Win an auction',                 type:'auctions',  target:1,    reward:1500 },
+  { id:'chat3',     icon:'💬', title:'Social Butterfly', desc:'Send 3 chat messages',           type:'chats',     target:3,    reward:300  },
+];
+
+const DAILY_KEY = 'sb_daily_v1';
+let _dailyChallenges  = [];
+let _dailyProgress    = {};
+let _dailyCompleted   = new Set();
+let _dailyDate        = '';
+let _dailyTradesStart = 0;
+let _dailySellsStart  = 0;
+let _dailyNewsStart   = 0;
+let _dailyProfitStart = 0;
+let _dailyChatsToday  = 0;
+let _dailyBetsToday   = 0;
+let _dailyAuctionsWon = 0;
+
+function getDailyDateKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function seedRand(seed) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function initDailyChallenges() {
+  const today = getDailyDateKey();
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}'); } catch(e) {}
+
+  if (saved.date !== today) {
+    // New day — pick 3 fresh challenges using date seed
+    const seed = today.split('-').reduce((a, n) => a * 31 + parseInt(n), 0);
+    const rng  = seedRand(seed);
+    const pool = [...CHALLENGE_POOL];
+    _dailyChallenges = [];
+    for (let i = 0; i < 3; i++) {
+      const idx = Math.floor(rng() * pool.length);
+      _dailyChallenges.push(pool.splice(idx, 1)[0]);
+    }
+    _dailyProgress  = {};
+    _dailyCompleted = new Set();
+    _dailyDate      = today;
+    // Snapshot starting values
+    _dailyTradesStart = G.trades;
+    _dailySellsStart  = G.tradeHistory.filter(t => t.action === 'sell').length;
+    _dailyNewsStart   = G.newsCount;
+    saveDailyState();
+  } else {
+    _dailyChallenges  = saved.challenges || [];
+    _dailyProgress    = saved.progress   || {};
+    _dailyCompleted   = new Set(saved.completed || []);
+    _dailyDate        = today;
+    _dailyTradesStart = saved.tradesStart || G.trades;
+    _dailySellsStart  = saved.sellsStart  || 0;
+    _dailyNewsStart   = saved.newsStart   || G.newsCount;
+    _dailyChatsToday  = saved.chats       || 0;
+    _dailyBetsToday   = saved.bets        || 0;
+    _dailyAuctionsWon = saved.auctions    || 0;
+  }
+  setInterval(tickDailyChallenges, 2000);
+}
+
+function saveDailyState() {
+  try {
+    localStorage.setItem(DAILY_KEY, JSON.stringify({
+      date: _dailyDate, challenges: _dailyChallenges,
+      progress: _dailyProgress, completed: [..._dailyCompleted],
+      tradesStart: _dailyTradesStart, sellsStart: _dailySellsStart,
+      newsStart: _dailyNewsStart, chats: _dailyChatsToday,
+      bets: _dailyBetsToday, auctions: _dailyAuctionsWon,
+    }));
+  } catch(e) {}
+}
+
+function tickDailyChallenges() {
+  let anyNew = false;
+  for (const ch of _dailyChallenges) {
+    if (_dailyCompleted.has(ch.id)) continue;
+    const prog = getDailyProgress(ch);
+    const pct  = Math.min(1, prog / ch.target);
+    _dailyProgress[ch.id] = prog;
+    if (pct >= 1) {
+      _dailyCompleted.add(ch.id);
+      G.cash += ch.reward;
+      refreshStats();
+      flash(`🎯 Challenge complete: ${ch.title}! +${$$(ch.reward)}`, 'var(--gold)');
+      snd.ach();
+      addLimitedNewsItem(`🎯 ${PLAYER_NAME} completed daily challenge: ${ch.title}! Reward: +${$$(ch.reward)}`, null, 'positive', 'CHALLENGE');
+      anyNew = true;
+    }
+  }
+  if (anyNew) { saveDailyState(); renderDailyChallenges(); updateChallengeBadge(); }
+  else if (document.getElementById('daily-challenge-list')?.closest('.active')) renderDailyChallenges();
+}
+
+function getDailyProgress(ch) {
+  switch (ch.type) {
+    case 'trades':   return Math.max(0, G.trades - _dailyTradesStart);
+    case 'sells':    return Math.max(0, G.tradeHistory.filter(t => t.action === 'sell').length - _dailySellsStart);
+    case 'profit':   return Math.max(0, G.tradeHistory.filter(t => t.action === 'sell' && t.ts > (new Date().setHours(0,0,0,0))).reduce((a,t) => a + (t.pnl||0), 0));
+    case 'sectors':  return new Set(SYM_LIST.filter(s => (G.portfolio[s]||0) > 0).map(s => STOCKS[s].sector)).size;
+    case 'majority': return getMajorityPositions().length;
+    case 'news':     return Math.max(0, G.newsCount - _dailyNewsStart);
+    case 'hold':     return Math.floor((Date.now() - G.holdStart) / 1000);
+    case 'bets':     return _dailyBetsToday;
+    case 'networth': return totalVal();
+    case 'auctions': return _dailyAuctionsWon;
+    case 'chats':    return _dailyChatsToday;
+    default:         return 0;
+  }
+}
+
+function renderDailyChallenges() {
+  const el = document.getElementById('daily-challenge-list');
+  if (!el) return;
+  const completed = _dailyCompleted.size;
+  const total     = _dailyChallenges.length;
+  el.innerHTML = _dailyChallenges.map(ch => {
+    const done  = _dailyCompleted.has(ch.id);
+    const prog  = done ? ch.target : (getDailyProgress(ch) || 0);
+    const pct   = Math.min(100, Math.round((prog / ch.target) * 100));
+    const bar   = done ? 100 : pct;
+    const barColor = done ? 'var(--green)' : pct > 50 ? 'var(--accent)' : 'var(--blue)';
+    return `<div style="background:var(--bg3);border:1px solid ${done?'rgba(0,230,118,0.35)':'var(--border)'};border-radius:7px;padding:10px 12px;margin-bottom:6px${done?';opacity:0.7':''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:1.3em">${ch.icon}</span>
+        <div style="flex:1">
+          <div style="font-size:0.78em;font-weight:bold;color:${done?'var(--green)':'var(--text-hi)'}">${ch.title} ${done?'✓':''}</div>
+          <div style="font-size:0.6em;color:var(--text-dim)">${ch.desc}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:0.62em;color:var(--gold);font-weight:bold">+${$$(ch.reward)}</div>
+          <div style="font-size:0.55em;color:var(--text-dim)">${done?'Claimed!':`${pct}%`}</div>
+        </div>
+      </div>
+      <div style="height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+        <div style="height:4px;width:${bar}%;background:${barColor};border-radius:2px;transition:width 0.5s"></div>
+      </div>
+      <div style="font-size:0.58em;color:var(--text-dim);margin-top:3px">${formatDailyProg(ch, prog)}</div>
+    </div>`;
+  }).join('') + `<div style="font-size:0.6em;color:var(--text-dim);text-align:center;padding:8px 0;border-top:1px solid var(--border);margin-top:4px">
+    ${completed}/${total} complete today · Resets at midnight · ${3-completed} reward${3-completed!==1?'s':''} left
+  </div>`;
+}
+
+function formatDailyProg(ch, prog) {
+  if (_dailyCompleted.has(ch.id)) return '✓ Complete!';
+  switch(ch.type) {
+    case 'trades': case 'sells': return `${prog}/${ch.target} trades`;
+    case 'profit':  return `${$$(prog)} / ${$$(ch.target)}`;
+    case 'sectors': return `${prog}/${ch.target} sectors`;
+    case 'majority':return `${prog}/${ch.target} positions`;
+    case 'news':    return `${prog}/${ch.target} events seen`;
+    case 'hold':    return `${prog}s / ${ch.target}s`;
+    case 'networth':return `${$$(prog)} / ${$$(ch.target)}`;
+    default:        return `${prog}/${ch.target}`;
+  }
+}
+
+function updateChallengeBadge() {
+  const btn = document.querySelector('.rp-tab[data-tab="daily"]');
+  if (!btn) return;
+  const remaining = _dailyChallenges.filter(c => !_dailyCompleted.has(c.id)).length;
+  let badge = btn.querySelector('.tab-notif');
+  if (remaining <= 0) { if (badge) badge.remove(); return; }
+  if (!badge) { badge = document.createElement('span'); badge.className = 'tab-notif'; btn.appendChild(badge); }
+  badge.textContent = remaining;
+}
+
+/* ─── SPECTATOR MODE ────────────────────────────────────────
+   Watch another player's live portfolio from the leaderboard. */
+let _spectatingPid = null, _spectatingName = '', _spectatorTimer = null;
+
+async function startSpectating(pid, name) {
+  if (pid === PLAYER_ID) { flash('❌ Cannot spectate yourself', '#ff1744'); return; }
+  _spectatingPid  = pid;
+  _spectatingName = name;
+  clearInterval(_spectatorTimer);
+  showSpectatorPanel();
+  await refreshSpectatorData();
+  _spectatorTimer = setInterval(refreshSpectatorData, 4000);
+  flash(`👁️ Spectating ${name}…`, 'var(--blue)');
+}
+
+function stopSpectating() {
+  clearInterval(_spectatorTimer);
+  _spectatingPid  = null;
+  _spectatingName = '';
+  const panel = document.getElementById('spectator-panel');
+  if (panel) panel.remove();
+}
+
+function showSpectatorPanel() {
+  let panel = document.getElementById('spectator-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'spectator-panel';
+    panel.style.cssText = 'position:fixed;bottom:48px;left:0;right:0;background:var(--bg2);border-top:2px solid var(--blue);z-index:500;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 -4px 20px rgba(41,182,246,0.2)';
+    document.body.appendChild(panel);
+  }
+  panel.innerHTML = `
+    <span style="font-size:0.65em;color:var(--blue);font-weight:bold;text-transform:uppercase;letter-spacing:1px;flex-shrink:0">👁️ Spectating</span>
+    <span style="font-size:0.78em;font-weight:bold;color:var(--text-hi);flex-shrink:0">${escHtml(_spectatingName)}</span>
+    <div id="spec-stats" style="flex:1;display:flex;gap:12px;font-size:0.65em;color:var(--text-dim);overflow:hidden"></div>
+    <button onclick="stopSpectating()" style="background:transparent;border:1px solid rgba(41,182,246,0.3);color:var(--blue);padding:3px 10px;font-family:var(--mono);font-size:0.6em;cursor:pointer;border-radius:4px;flex-shrink:0">Stop</button>`;
+  fitMainPanel();
+}
+
+async function refreshSpectatorData() {
+  if (!_spectatingPid || !fbConfigured()) return;
+  try {
+    const r = await fetch(`${FIREBASE_URL}stockblitz_lb/${_spectatingPid}.json`, { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data) return;
+    const el = document.getElementById('spec-stats');
+    if (!el) return;
+    const portfolio = data.portfolio || {};
+    const portVal   = Object.entries(portfolio).reduce((a, [sym, qty]) => a + (STOCKS[sym]?.price || 0) * qty, 0);
+    const pnl       = (data.score || 0) - 1000;
+    const positions = Object.entries(portfolio).filter(([, q]) => q > 0)
+      .sort((a, b) => (STOCKS[b[0]]?.price || 0) * b[1] - (STOCKS[a[0]]?.price || 0) * a[1])
+      .slice(0, 5)
+      .map(([sym, qty]) => {
+        const s = STOCKS[sym];
+        return `<span style="color:${s?.color||'var(--text)'}"><b>${sym}</b> ${qty}×</span>`;
+      }).join('<span style="color:var(--border);margin:0 4px">·</span>');
+    el.innerHTML = `
+      <span>Net: <b style="color:var(--gold)">${$$(data.score||0)}</b></span>
+      <span style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':''}${$$(pnl)}</span>
+      <span>Trades: <b>${data.trades||0}</b></span>
+      <span style="opacity:0.6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${positions || 'No positions'}</span>`;
+  } catch(e) {}
+}
+
+/* ─── TRADER BIO ────────────────────────────────────────────
+   Persistent bio text stored in profile, shown in modal.      */
+const BIO_KEY = 'sb_trader_bio_v1';
+let _traderBio = '';
+
+function loadTraderBio() {
+  try { _traderBio = localStorage.getItem(BIO_KEY) || ''; } catch(e) {}
+}
+function saveTraderBio() {
+  const inp = document.getElementById('bio-textarea');
+  if (!inp) return;
+  _traderBio = inp.value.trim().slice(0, 160);
+  try { localStorage.setItem(BIO_KEY, _traderBio); } catch(e) {}
+  // Push to LB
+  if (fbConfigured()) fbPatch(`stockblitz_lb/${PLAYER_ID}.json`, { bio: _traderBio }).catch(() => {});
+  flash('✅ Bio saved!', 'var(--accent)');
+}
+
+/* ─── MOBILE BOTTOM NAV ─────────────────────────────────────
+   On small screens, bottom nav switches between Market / Chart+Portfolio / Social / More */
+function initMobileNav() {
+  if (window.innerWidth > 768) return; // desktop only needs none
+  const nav = document.createElement('div');
+  nav.id = 'mobile-nav';
+  nav.style.cssText = 'display:none'; // shown via CSS on mobile
+  nav.innerHTML = `
+    <button class="mob-nav-btn active" data-view="market" onclick="switchMobileView('market')">
+      <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Market</span>
+    </button>
+    <button class="mob-nav-btn" data-view="chart" onclick="switchMobileView('chart')">
+      <span class="mob-nav-icon">⚡</span><span class="mob-nav-label">Chart</span>
+    </button>
+    <button class="mob-nav-btn" data-view="portfolio" onclick="switchMobileView('portfolio')">
+      <span class="mob-nav-icon">💼</span><span class="mob-nav-label">Portfolio</span>
+    </button>
+    <button class="mob-nav-btn" data-view="social" onclick="switchMobileView('social')">
+      <span class="mob-nav-icon">💬</span><span class="mob-nav-label">Chat</span>
+    </button>
+    <button class="mob-nav-btn" data-view="more" onclick="switchMobileView('more')">
+      <span class="mob-nav-icon">⋯</span><span class="mob-nav-label">More</span>
+    </button>`;
+  document.body.appendChild(nav);
+}
+
+function switchMobileView(view) {
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  const left  = document.getElementById('left-panel');
+  const right = document.getElementById('right-panel');
+  const handle= document.getElementById('resize-handle');
+  if (view === 'market') {
+    left.style.display = ''; right.style.display = 'none'; handle.style.display = 'none';
+  } else if (view === 'social') {
+    left.style.display = 'none'; right.style.display = ''; handle.style.display = 'none';
+    switchTab('chat-room');
+  } else if (view === 'chart') {
+    left.style.display = 'none'; right.style.display = ''; handle.style.display = 'none';
+    switchTab('chart');
+  } else if (view === 'portfolio') {
+    left.style.display = 'none'; right.style.display = ''; handle.style.display = 'none';
+    switchTab('portfolio');
+  } else if (view === 'more') {
+    left.style.display = 'none'; right.style.display = ''; handle.style.display = 'none';
+    switchTab('bets');
+  }
+}
+
+function initAllNewFeatures() {
+  loadTraderBio();
+  initDailyChallenges();
+  initMobileNav();
+}
+
+
+/* ── WATCHLIST ── */
+let _watchlist = new Set();
+function loadWatchlist(){try{_watchlist=new Set(JSON.parse(localStorage.getItem('sb_watchlist')||'[]'));}catch(e){}}
+function saveWatchlist(){try{localStorage.setItem('sb_watchlist',JSON.stringify([..._watchlist]));}catch(e){}}
+function toggleWatch(sym,e){
+  if(e)e.stopPropagation();
+  if(_watchlist.has(sym))_watchlist.delete(sym);
+  else _watchlist.add(sym);
+  saveWatchlist();
+  const btn=document.getElementById('watch-'+sym);
+  if(btn)btn.textContent=_watchlist.has(sym)?'★':'☆';
+  if(btn)btn.style.color=_watchlist.has(sym)?'var(--gold)':'var(--text-dim)';
+  applyFilter();
+}
+function isWatched(sym){return _watchlist.has(sym);}
+
+/* ── REACTIONS ── */
+const REACTION_EMOJIS = ['🚀','🔥','💀','😂','💎','📉','🤑','👑'];
+const _reactions = {}; // { msgKey: { emoji: [pid,...] } }
+
+function addReaction(key, emoji) {
+  if (!_reactions[key]) _reactions[key] = {};
+  if (!_reactions[key][emoji]) _reactions[key][emoji] = [];
+  const arr = _reactions[key][emoji];
+  const myIdx = arr.indexOf(PLAYER_ID);
+  if (myIdx >= 0) arr.splice(myIdx, 1); // toggle off
+  else arr.push(PLAYER_ID);
+  renderReactions(key);
+  // Push to Firebase
+  if(fbConfigured()) fbWrite(`stockblitz_reactions/${key.replace(/[^a-z0-9_]/gi,'_')}.json`, _reactions[key]).catch(()=>{});
+}
+
+function renderReactions(key) {
+  const el = document.getElementById('react-'+key);
+  if (!el || !_reactions[key]) return;
+  const r = _reactions[key];
+  el.innerHTML = Object.entries(r)
+    .filter(([,pids]) => pids.length > 0)
+    .map(([emoji, pids]) => {
+      const mine = pids.includes(PLAYER_ID);
+      return `<button onclick="addReaction('${key}','${emoji}')" 
+        style="display:inline-flex;align-items:center;gap:2px;padding:2px 5px;border-radius:10px;font-size:0.72em;border:1px solid ${mine?'rgba(var(--accent-rgb),0.5)':'var(--border)'};background:${mine?'rgba(var(--accent-rgb),0.1)':'var(--bg4)'};cursor:pointer;margin-right:2px">
+        ${emoji}<span style="font-size:0.75em;color:${mine?'var(--accent)':'var(--text-dim)'}">${pids.length}</span>
+      </button>`;
+    }).join('');
+}
+
+function reactionPicker(key, anchorEl) {
+  // Remove existing picker
+  document.querySelectorAll('.reaction-picker').forEach(p => p.remove());
+  const picker = document.createElement('div');
+  picker.className = 'reaction-picker';
+  picker.style.cssText = 'position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;z-index:2000;display:flex;gap:4px;box-shadow:0 4px 20px rgba(0,0,0,0.6)';
+  const rect = anchorEl.getBoundingClientRect();
+  picker.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+  picker.style.top  = (rect.top - 48) + 'px';
+  picker.innerHTML  = REACTION_EMOJIS.map(e =>
+    `<button onclick="addReaction('${key}','${e}');this.closest('.reaction-picker').remove()" 
+      style="font-size:1.2em;background:transparent;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.1s" 
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">${e}</button>`
+  ).join('');
+  document.body.appendChild(picker);
+  setTimeout(() => document.addEventListener('click', function rm(){ picker.remove(); document.removeEventListener('click', rm); }, { once: true }), 50);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   👥 FRIEND ALERTS + 📋 TRADE COPY
+══════════════════════════════════════════════════════════════ */
+
+/* ─── FRIEND ALERTS ────────────────────────────────────────── */
+const FRIENDS_KEY   = 'sb_friends_v1';
+const FRIEND_ALERT_THRESHOLD = 500; // notify on trades > $500
+let _friends        = new Map(); // pid → {name, lastTradeTs}
+let _friendFeedSeen = new Set(); // track notified trade keys
+
+function loadFriends() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(FRIENDS_KEY) || '{}');
+    _friends  = new Map(Object.entries(raw));
+  } catch(e) {}
+}
+function saveFriends() {
+  try { localStorage.setItem(FRIENDS_KEY, JSON.stringify(Object.fromEntries(_friends))); } catch(e) {}
+}
+function isFollowing(pid)  { return _friends.has(pid); }
+
+function toggleFollow(pid, name, e) {
+  name = name || '?';
+  if (e) e.stopPropagation();
+  if (pid === PLAYER_ID) { flash('❌ Cannot follow yourself', '#ff1744'); return; }
+  if (_friends.has(pid)) {
+    _friends.delete(pid);
+    flash(`➖ Unfollowed ${name}`, 'var(--text-dim)');
+  } else {
+    _friends.set(pid, { name, lastTradeTs: Date.now() });
+    flash(`✅ Following ${name} — you'll be alerted on big trades!`, 'var(--accent)');
+  }
+  saveFriends();
+  const fcEl=document.getElementById('friend-count');if(fcEl)fcEl.textContent=_friends.size;
+  renderFriendsList();
+  // Refresh any open UI that shows follow state
+  document.querySelectorAll(`[data-follow-pid="${pid}"]`).forEach(btn => {
+    btn.textContent = isFollowing(pid) ? '➖ Unfollow' : '➕ Follow';
+    btn.style.borderColor = isFollowing(pid) ? 'rgba(255,23,68,0.35)' : 'rgba(var(--accent-rgb),0.3)';
+    btn.style.color = isFollowing(pid) ? 'var(--red)' : 'var(--accent)';
+  });
+}
+
+function friendFollowBtn(pid, name) {
+  const following = isFollowing(pid);
+  return `<button data-follow-pid="${pid}" onclick="toggleFollow('${pid}','${escHtml(name)}',event)"
+    style="padding:2px 9px;font-family:var(--mono);font-size:0.55em;border:1px solid ${following?'rgba(255,23,68,0.35)':'rgba(var(--accent-rgb),0.3)'};background:${following?'rgba(255,23,68,0.06)':'rgba(var(--accent-rgb),0.06)'};color:${following?'var(--red)':'var(--accent)'};border-radius:3px;white-space:nowrap">
+    ${following ? '➖ Unfollow' : '➕ Follow'}
+  </button>`;
+}
+
+/* Poll trade feed for friend activity */
+async function pollFriendAlerts() {
+  if (!fbConfigured() || _friends.size === 0) return;
+  try {
+    const res = await fetch(FIREBASE_URL + 'stockblitz_trade_feed.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const all = await res.json();
+    if (!all) return;
+    const cutoff = Date.now() - 60000; // last 60s
+    for (const [key, entry] of Object.entries(all)) {
+      if (!entry || entry.ts < cutoff) continue;
+      if (!_friends.has(entry.pid))   continue;
+      if (_friendFeedSeen.has(key))   continue;
+      _friendFeedSeen.add(key);
+      const total = (entry.qty || 0) * (entry.price || 0);
+      if (total < FRIEND_ALERT_THRESHOLD) continue;
+      // Alert!
+      const friend = _friends.get(entry.pid);
+      const action = entry.action === 'buy' ? '🟢 bought' : '🔴 sold';
+      const msg    = `👥 ${friend.name} ${action} ${entry.qty}× ${entry.sym} (${$$(total)})`;
+      flash(msg, entry.action === 'buy' ? 'var(--green)' : 'var(--red)');
+      snd.good();
+      // Browser notification
+      if (document.hidden && Notification.permission === 'granted') {
+        try { new Notification('StockBlitz 👥 Friend Alert', { body: msg, tag: 'sb-friend' }); } catch(e) {}
+      }
+      // Show in news feed
+      addLimitedNewsItem(msg, entry.sym, entry.action === 'buy' ? 'positive' : 'neutral', 'FRIEND');
+      // Update friend's lastTradeTs
+      friend.lastTradeTs = entry.ts;
+      saveFriends();
+    }
+    // Trim seen set
+    if (_friendFeedSeen.size > 200) {
+      const arr = [..._friendFeedSeen];
+      _friendFeedSeen = new Set(arr.slice(-100));
+    }
+  } catch(e) {}
+}
+
+/* Friends panel in the Social tab — shown in player search */
+function renderFriendsList() {
+  const el = document.getElementById('friends-list');
+  if (!el) return;
+  if (_friends.size === 0) {
+    el.innerHTML = '<div style="font-size:0.68em;color:var(--text-dim);padding:6px 0">No friends yet. Search for players and click ➕ Follow.</div>';
+    return;
+  }
+  el.innerHTML = [..._friends.entries()].map(([pid, f]) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+      <span style="font-size:0.72em;font-weight:bold;color:var(--text-hi);flex:1">${escHtml(f.name)}</span>
+      ${friendFollowBtn(pid, f.name)}
+      <button onclick="startSpectating('${pid}','${escHtml(f.name)}')" 
+        style="padding:2px 7px;font-family:var(--mono);font-size:0.55em;border:1px solid rgba(41,182,246,0.3);background:rgba(41,182,246,0.06);color:var(--blue);border-radius:3px">
+        👁 Watch
+      </button>
+    </div>`).join('');
+}
+
+/* ─── TRADE COPY ────────────────────────────────────────────
+   One-click copy another player's last trade from the feed.
+   The original trader is never notified.                      */
+function copyTrade(entry) {
+  if (!entry || !entry.sym || !STOCKS[entry.sym]) { flash('❌ Stock not available', '#ff1744'); return; }
+  if (entry.pid === PLAYER_ID) { flash('❌ That is your own trade', '#ff1744'); return; }
+
+  const s   = STOCKS[entry.sym];
+  const qty = Math.max(1, entry.qty || 1);
+
+  if (entry.action === 'buy') {
+    const cost = s.price * qty;
+    if (cost > G.cash) {
+      // Auto-scale down qty to what we can afford
+      const maxQty = Math.floor(G.cash / s.price);
+      if (maxQty < 1) { flash(`❌ Not enough cash to copy — need ${$$(s.price)}+`, '#ff1744'); return; }
+      // Override qty input briefly
+      const qEl = document.getElementById('qty-' + entry.sym);
+      if (qEl) qEl.value = maxQty;
+      buy(entry.sym);
+      flash(`📋 Copied ${entry.name}'s buy — scaled to ${maxQty}× ${entry.sym} (max affordable)`, 'var(--accent)');
+    } else {
+      const qEl = document.getElementById('qty-' + entry.sym);
+      if (qEl) qEl.value = qty;
+      buy(entry.sym);
+      flash(`📋 Copied ${entry.name}'s trade: ${qty}× ${entry.sym}`, 'var(--accent)');
+    }
+  } else {
+    // Sell — can only sell what we own
+    const owned = G.portfolio[entry.sym] || 0;
+    if (owned < 1) { flash(`❌ You don't own ${entry.sym} to copy this sell`, '#ff1744'); return; }
+    const sellQty = Math.min(qty, owned);
+    const qEl = document.getElementById('qty-' + entry.sym);
+    if (qEl) qEl.value = sellQty;
+    sell(entry.sym);
+    flash(`📋 Copied ${entry.name}'s sell: ${sellQty}× ${entry.sym}`, 'var(--accent)');
+  }
+}
+
+function initFriendAlerts() {
+  loadFriends();
+  setInterval(pollFriendAlerts, 8000);
+  renderFriendsList();
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   🏦 LOAN SYSTEM
+   Loan limits based on net worth. Interest charged per minute.
+   Firebase: stockblitz_loans/{pid}
+══════════════════════════════════════════════════════════════ */
+
+const LOAN_TIERS = [
+  { minWorth:      0, maxLoan:    500, label:'Starter',   rate: 0.15 }, // 15%/min
+  { minWorth:   1000, maxLoan:   2000, label:'Basic',     rate: 0.15 },
+  { minWorth:   5000, maxLoan:   8000, label:'Standard',  rate: 0.15 },
+  { minWorth:  25000, maxLoan:  30000, label:'Silver',    rate: 0.15 },
+  { minWorth: 100000, maxLoan: 100000, label:'Gold',      rate: 0.15 },
+  { minWorth: 500000, maxLoan: 500000, label:'Platinum',  rate: 0.15 },
+];
+
+let G_loan = null; // { principal, balance, rate, takenAt, lastChargedAt }
+
+function getLoanTier() {
+  const nw = totalVal();
+  let tier = LOAN_TIERS[0];
+  for (const t of LOAN_TIERS) { if (nw >= t.minWorth) tier = t; }
+  return tier;
+}
+
+function loadLoan() {
+  try {
+    const raw = localStorage.getItem('sb_loan_v1');
+    if (raw) G_loan = JSON.parse(raw);
+  } catch(e) {}
+}
+function saveLoan() {
+  try { localStorage.setItem('sb_loan_v1', G_loan ? JSON.stringify(G_loan) : ''); } catch(e) {}
+}
+
+async function takeLoan() {
+  if (G_loan) { flash('❌ Pay back your current loan first!', '#ff1744'); return; }
+  const tier = getLoanTier();
+  const amtInp = document.getElementById('loan-amount-inp');
+  let amount = parseFloat(amtInp?.value || '0');
+  if (!amount || amount <= 0) { flash('❌ Enter a loan amount', '#ff1744'); return; }
+  if (amount > tier.maxLoan)  { flash(`❌ Max loan for your tier: ${$$(tier.maxLoan)}`, '#ff1744'); return; }
+  amount = Math.floor(amount);
+
+  G_loan = { principal: amount, balance: amount, rate: tier.rate, takenAt: Date.now(), lastChargedAt: Date.now() };
+  G.cash += amount;
+  saveLoan(); refreshStats(); refreshLoanUI();
+  flash(`🏦 Loan of ${$$(amount)} received! Repay ${(tier.rate*100).toFixed(0)}%/min interest.`, 'var(--gold)');
+  addLimitedNewsItem(`🏦 ${PLAYER_NAME} took a loan of ${$$(amount)} at ${(tier.rate*100).toFixed(0)}%/min`, null, 'neutral', 'LOAN');
+  if (fbConfigured()) fbPatch(`stockblitz_loans/${PLAYER_ID}.json`, { ...G_loan, name: PLAYER_NAME, ts: Date.now() }).catch(() => {});
+}
+
+async function repayLoan() {
+  if (!G_loan) { flash('❌ No active loan', '#ff1744'); return; }
+  const repayInp = document.getElementById('loan-repay-inp');
+  let amount = parseFloat(repayInp?.value || '0');
+  if (!amount || amount <= 0) { flash('❌ Enter repayment amount', '#ff1744'); return; }
+  amount = Math.min(amount, G_loan.balance);
+  if (amount > G.cash) { flash(`❌ Need ${$$(amount)} — you have ${$$(G.cash)}`, '#ff1744'); return; }
+  G.cash -= amount;
+  G_loan.balance -= amount;
+  if (G_loan.balance <= 0.01) {
+    G_loan = null;
+    flash('✅ Loan fully repaid! Debt cleared.', 'var(--green)');
+    addLimitedNewsItem(`✅ ${PLAYER_NAME} fully repaid their loan!`, null, 'positive', 'LOAN');
+    if (fbConfigured()) fbPatch(`stockblitz_loans/${PLAYER_ID}.json`, { balance: 0, cleared: true }).catch(() => {});
+  } else {
+    flash(`✅ Paid ${$$(amount)} · Remaining balance: ${$$(G_loan.balance)}`, 'var(--accent)');
+    if (fbConfigured()) fbPatch(`stockblitz_loans/${PLAYER_ID}.json`, { balance: G_loan.balance }).catch(() => {});
+  }
+  saveLoan(); refreshStats(); refreshLoanUI();
+}
+
+function repayAll() {
+  if (!G_loan) return;
+  if (G.cash < G_loan.balance) { flash(`❌ Need ${$$(G_loan.balance)} to repay — you have ${$$(G.cash)}`, '#ff1744'); return; }
+  G.cash -= G_loan.balance;
+  G_loan = null;
+  saveLoan(); refreshStats(); refreshLoanUI();
+  flash('✅ Loan fully repaid!', 'var(--green)');
+  if (fbConfigured()) fbPatch(`stockblitz_loans/${PLAYER_ID}.json`, { balance: 0, cleared: true }).catch(() => {});
+}
+
+/* Tick interest every minute */
+function tickLoanInterest() {
+  if (!G_loan) return;
+  const now = Date.now();
+  const elapsed = (now - G_loan.lastChargedAt) / 60000; // in minutes
+  if (elapsed < 1) return;
+  const interest = G_loan.balance * G_loan.rate * Math.floor(elapsed);
+  G_loan.balance += interest;
+  G_loan.lastChargedAt = now;
+  saveLoan(); refreshStats(); refreshLoanUI();
+  flash(`🏦 Loan interest: +${$$(interest)} — balance now ${$$(G_loan.balance)}`, 'var(--orange)');
+  const ind = document.getElementById('dividend-indicator');
+  if (ind) { ind.textContent = `💸 Loan interest: -${$$(interest)}`; ind.style.opacity='1'; clearTimeout(ind._t); ind._t=setTimeout(()=>{ind.style.opacity='0';},4000); }
+}
+
+function refreshLoanUI() {
+  const tier = getLoanTier();
+  const tierEl = document.getElementById('loan-tier-label');
+  const maxEl  = document.getElementById('loan-max-label');
+  const rateEl = document.getElementById('loan-rate-label');
+  const activeEl = document.getElementById('loan-active-section');
+  const newEl    = document.getElementById('loan-new-section');
+  if (tierEl)  tierEl.textContent  = tier.label;
+  if (maxEl)   maxEl.textContent   = $$(tier.maxLoan);
+  if (rateEl)  rateEl.textContent  = (tier.rate * 100).toFixed(0) + '%/min';
+  if (G_loan) {
+    if (activeEl) activeEl.style.display = '';
+    if (newEl)    newEl.style.display    = 'none';
+    const balEl = document.getElementById('loan-balance'); if(balEl) balEl.textContent = $$(G_loan.balance);
+    const prinEl= document.getElementById('loan-principal');if(prinEl)prinEl.textContent=$$(G_loan.principal);
+    const pctEl = document.getElementById('loan-pct-paid');
+    if (pctEl) {
+      const pct = Math.max(0,100-(G_loan.balance/G_loan.principal*100));
+      pctEl.style.width = pct.toFixed(0)+'%';
+    }
+    const repayInp = document.getElementById('loan-repay-inp');
+    if (repayInp && !repayInp.value) repayInp.value = Math.min(G_loan.balance, G.cash).toFixed(0);
+  } else {
+    if (activeEl) activeEl.style.display = 'none';
+    if (newEl)    newEl.style.display    = '';
+  }
+  const tiersEl = document.getElementById('loan-tiers-list');
+  if (tiersEl) tiersEl.innerHTML = LOAN_TIERS.map(t => `
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.64em;padding:4px 7px;border-radius:4px;background:var(--bg3);border:1px solid var(--border)">
+      <span style="color:var(--text-dim)">Net ≥ <span style="color:var(--text-hi)">${$$(t.minWorth)}</span></span>
+      <span style="color:var(--text-dim)">${t.label}</span>
+      <span style="color:var(--gold)">Max ${$$(t.maxLoan)}</span>
+      <span style="color:var(--red)">${(t.rate*100).toFixed(0)}%/min</span>
+    </div>`).join('');
+}
+
+/* ─── GIVE MONEY ────────────────────────────────────────────── */
+async function giveMoney() {
+  const nameInp   = document.getElementById('give-player-name');
+  const amountInp = document.getElementById('give-amount-inp');
+  const name      = (nameInp?.value || '').trim();
+  const amount    = parseFloat(amountInp?.value || '0');
+  if (!name)           { flash('❌ Enter a player name', '#ff1744'); return; }
+  if (amount <= 0)     { flash('❌ Enter an amount', '#ff1744'); return; }
+  if (amount > G.cash) { flash(`❌ Not enough cash — you have ${$$(G.cash)}`, '#ff1744'); return; }
+  if (name.toLowerCase() === PLAYER_NAME.toLowerCase()) { flash('❌ Cannot give money to yourself', '#ff1744'); return; }
+
+  if (!fbConfigured()) { flash('❌ Firebase required to send money', '#ff1744'); return; }
+  try {
+    const res = await fetch(FIREBASE_URL + LB_FB_PATH, { cache: 'no-store' });
+    const all  = res.ok ? await res.json() : {};
+    const entry = Object.entries(all || {}).find(([, e]) => e && e.name && typeof e.name === 'string' && e.name.toLowerCase() === name.toLowerCase());
+    if (!entry) { flash(`❌ Player "${name}" not found`, '#ff1744'); return; }
+    const [targetPid] = entry;
+    const key = 'gift_' + Date.now().toString(36);
+    await fetch(`${FIREBASE_URL}stockblitz_p2p_credits/${targetPid}/${key}.json`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, sym: null, qty: 0, ts: Date.now(), from: PLAYER_NAME, adminGift: true })
+    });
+    G.cash -= amount;
+    refreshStats(); saveGame(); pushLBScore();
+    flash(`💸 Sent ${$$(amount)} to ${name}!`, 'var(--green)');
+    addLimitedNewsItem(`💸 ${PLAYER_NAME} gifted ${$$(amount)} to ${name}!`, null, 'positive', 'GIFT');
+    if (nameInp)   nameInp.value   = '';
+    if (amountInp) amountInp.value = '';
+  } catch(e) { flash('❌ Failed: ' + e.message, '#ff1744'); }
+}
+
+function initLoans() {
+  loadLoan();
+  setInterval(tickLoanInterest, 60000); // every 60s
+  refreshLoanUI();
 }
 
 window.addEventListener('load',init);
