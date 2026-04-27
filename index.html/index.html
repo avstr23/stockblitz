@@ -751,7 +751,60 @@ canvas#chart{display:block;width:100%;border-radius:3px;flex-shrink:0;}
 .profile-stat-anim{transition:all 0.3s ease;}
 
 /* ── RANK SYSTEM ─────────────────────────────── */
-/* rank-box is now a .stat-box tile — only keep bar styles */
+#rank-glow-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: background 0.5s, opacity 0.5s;
+}
+#rank-box[data-rank="Bronze"]  #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #cd7f32, transparent 70%); opacity: 0.18; }
+#rank-box[data-rank="Silver"]  #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #c0c0c0, transparent 70%); opacity: 0.15; }
+#rank-box[data-rank="Gold"]    #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #ffd600, transparent 70%); opacity: 0.20; }
+#rank-box[data-rank="Diamond"] #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #50dcff, transparent 70%); opacity: 0.18; }
+#rank-box[data-rank="Titan"]   #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #ce93d8, transparent 70%); opacity: 0.20; }
+#rank-box[data-rank="Legend"]  #rank-glow-bg { background: radial-gradient(ellipse at 50% 0%, #ff6400, transparent 50%); opacity: 0.25; animation: legend-glow 2s ease-in-out infinite alternate; }
+@keyframes legend-glow { from { opacity: 0.20; } to { opacity: 0.35; } }
+
+#rank-name {
+  display: inline-block;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.4s, text-shadow 0.4s;
+}
+#rank-box[data-rank="Bronze"]  #rank-name { color: #cd7f32 !important; text-shadow: 0 0 16px rgba(205,127,50,0.7),  0 0 32px rgba(205,127,50,0.3); }
+#rank-box[data-rank="Silver"]  #rank-name { color: #d0d0d0 !important; text-shadow: 0 0 16px rgba(192,192,192,0.7), 0 0 32px rgba(192,192,192,0.3); }
+#rank-box[data-rank="Gold"]    #rank-name { color: #ffd600 !important; text-shadow: 0 0 16px rgba(255,214,0,0.8),   0 0 32px rgba(255,214,0,0.4); }
+#rank-box[data-rank="Diamond"] #rank-name { color: #50dcff !important; text-shadow: 0 0 16px rgba(80,220,255,0.8),  0 0 32px rgba(80,220,255,0.4); }
+#rank-box[data-rank="Titan"]   #rank-name { color: #ce93d8 !important; text-shadow: 0 0 16px rgba(206,147,216,0.8), 0 0 32px rgba(206,147,216,0.4); }
+#rank-box[data-rank="Legend"]  #rank-name {
+  background: linear-gradient(90deg,#ff6400,#ffd600,#00e676,#29b6f6,#ce93d8,#ff6400);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: sb-rainbow 3s linear infinite;
+  text-shadow: none;
+  filter: drop-shadow(0 0 8px rgba(255,100,0,0.6));
+}
+
+#rank-icon { transition: filter 0.4s; }
+#rank-box[data-rank="Bronze"]  #rank-icon { filter: drop-shadow(0 0 6px rgba(205,127,50,0.6)); }
+#rank-box[data-rank="Silver"]  #rank-icon { filter: drop-shadow(0 0 6px rgba(192,192,192,0.6)); }
+#rank-box[data-rank="Gold"]    #rank-icon { filter: drop-shadow(0 0 8px rgba(255,214,0,0.8)); }
+#rank-box[data-rank="Diamond"] #rank-icon { filter: drop-shadow(0 0 8px rgba(80,220,255,0.8)); }
+#rank-box[data-rank="Titan"]   #rank-icon { filter: drop-shadow(0 0 8px rgba(206,147,216,0.8)); }
+#rank-box[data-rank="Legend"]  #rank-icon { filter: drop-shadow(0 0 10px rgba(255,100,0,0.9)); animation: hype-pulse 1.5s ease-in-out infinite; }
+
+/* Colored top border per rank */
+#rank-box[data-rank="Bronze"]  { border-top: 2px solid #cd7f32 !important; }
+#rank-box[data-rank="Silver"]  { border-top: 2px solid #c0c0c0 !important; }
+#rank-box[data-rank="Gold"]    { border-top: 2px solid #ffd600 !important; }
+#rank-box[data-rank="Diamond"] { border-top: 2px solid #50dcff !important; }
+#rank-box[data-rank="Titan"]   { border-top: 2px solid #ce93d8 !important; }
+#rank-box[data-rank="Legend"]  { border-top: 2px solid transparent !important; border-image: linear-gradient(90deg,#ff6400,#ffd600,#00e676,#29b6f6,#ce93d8) 1 !important; }
+
 #rank-bar-track {
   height: 4px;
   background: var(--bg4);
@@ -761,6 +814,8 @@ canvas#chart{display:block;width:100%;border-radius:3px;flex-shrink:0;}
   max-width: 110px;
   margin-top: 3px;
 }
+
+#rank-name { text-shadow: 0 0 14px currentColor; filter: brightness(1.2); letter-spacing: 0.5px; }
 #rank-bar-fill {
   height: 4px;
   border-radius: 2px;
@@ -775,18 +830,8 @@ canvas#chart{display:block;width:100%;border-radius:3px;flex-shrink:0;}
 }
 #rank-box.rank-up-anim { animation: rank-up-flash 0.7s ease-out; }
 
-/* Rank color themes — bottom accent border */
-#rank-box[data-rank="Bronze"]::after  { background: #cd7f32; opacity: 0.6; }
-#rank-box[data-rank="Silver"]::after  { background: #b0b0b0; opacity: 0.6; }
-#rank-box[data-rank="Gold"]::after    { background: #ffd600; opacity: 0.7; }
-#rank-box[data-rank="Diamond"]::after { background: #50dcff; opacity: 0.7; }
-#rank-box[data-rank="Titan"]::after   { background: #ce93d8; opacity: 0.7; }
-#rank-box[data-rank="Legend"]::after  { background: linear-gradient(90deg,#ff6400,#ffd600); opacity:1; animation: hype-pulse 1.8s ease-in-out infinite; }
-#rank-box[data-rank="Bronze"]:hover::after  { opacity: 1; left:0; right:0; }
-#rank-box[data-rank="Silver"]:hover::after  { opacity: 1; left:0; right:0; }
-#rank-box[data-rank="Gold"]:hover::after    { opacity: 1; left:0; right:0; }
-#rank-box[data-rank="Diamond"]:hover::after { opacity: 1; left:0; right:0; }
-#rank-box[data-rank="Titan"]:hover::after   { opacity: 1; left:0; right:0; }
+/* Rank bottom border removed */
+#rank-box::after { display: none !important; }
 
 /* ══════════════════════════════════════════════════
    📱 MOBILE LAYOUT
@@ -1199,11 +1244,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -1504,11 +1545,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -1848,11 +1885,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -2153,11 +2186,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -2513,11 +2542,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -2818,11 +2843,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -3162,11 +3183,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -3467,11 +3484,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -3835,11 +3848,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -4140,11 +4149,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -4484,11 +4489,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -4789,11 +4790,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -5149,11 +5146,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -5454,11 +5447,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -5798,11 +5787,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -6103,11 +6088,7 @@ canvas#chart {
 
 /* ── Daily challenge cards ── */
 #daily-challenge-list > div {
-  animation: sb-fadein-up 0.25s ease both;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-#daily-challenge-list > div:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  transition: border-color 0.2s;
 }
 
 /* ── Loan tier rows ── */
@@ -6158,6 +6139,52 @@ canvas#chart {
     transition-duration: 0.01ms !important;
   }
 }
+/* ══════════════════════════════
+   🌈 RAINBOW ACCENTS
+══════════════════════════════ */
+@keyframes sb-rainbow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* Animated rainbow line at the bottom of the header */
+#header::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg,#ff0080,#ff4400,#ffaa00,#00e676,#00aaff,#aa00ff,#ff0080);
+  background-size: 300% 100%;
+  animation: sb-rainbow 6s linear infinite;
+}
+
+/* Rainbow logo — right panel only */
+#rp-logo-text {
+  background: linear-gradient(90deg,#ff0080,#ff4400,#ffaa00,#00e676,#00aaff,#aa00ff,#ff0080);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: sb-rainbow 6s linear infinite;
+  text-shadow: none;
+}
+
+/* Rainbow line under the tab grid */
+#rp-tab-grid {
+  border-bottom: none;
+  position: relative;
+  padding-bottom: 8px;
+}
+#rp-tab-grid::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 6px; right: 6px;
+  height: 1px;
+  background: linear-gradient(90deg,#ff0080,#ff4400,#ffaa00,#00e676,#00aaff,#aa00ff,#ff0080);
+  background-size: 300% 100%;
+  animation: sb-rainbow 6s linear infinite;
+  border-radius: 1px;
+}
+
 /* CURSOR OVERRIDES */
 button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-danger,.pick-buy-btn,
 .hist-filter-btn,.order-type-btn,.btn-place-order,.oc-cancel,#chat-send,#player-search-btn,
@@ -6166,6 +6193,8 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
 #btn-join-code,#pne-save,#pne-regen,.btn-create-offer,.btn-accept-offer,.btn-cancel-offer{cursor:pointer;}
 #resize-handle{cursor:col-resize;}
 
+
+body.hide-ticker #ticker-bar { display: none !important; }
 </style>
 </head>
 <body>
@@ -6235,13 +6264,14 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
       </div>
 
       <!-- Rank -->
-      <div class="stat-box" id="rank-box" data-rank="Bronze" style="min-width:130px;flex:1.4">
-        <div class="stat-icon" id="rank-icon">🥉</div>
-        <div class="stat-label">Rank</div>
-        <div id="rank-badge" style="display:flex;align-items:center;gap:4px;margin:1px 0">
-          <span id="rank-name" style="color:#cd7f32;font-size:0.88em;font-weight:900;letter-spacing:0.5px">Bronze</span>
+      <div class="stat-box" id="rank-box" data-rank="Bronze" style="min-width:150px;flex:1.6;position:relative;overflow:hidden">
+        <div id="rank-glow-bg"></div>
+        <div class="stat-icon" id="rank-icon" style="font-size:1.4em;margin-bottom:2px">🥉</div>
+        <div class="stat-label" style="letter-spacing:2px">RANK</div>
+        <div id="rank-badge" style="margin:3px 0 2px">
+          <span id="rank-name" style="color:#cd7f32;font-size:1.1em;font-weight:900;letter-spacing:2px;text-transform:uppercase">Bronze</span>
         </div>
-        <div id="rank-bar-track" style="width:90%;max-width:110px;margin:4px auto 2px">
+        <div id="rank-bar-track" style="width:85%;max-width:120px;margin:4px auto 3px">
           <div id="rank-bar-fill" style="width:0%;background:#cd7f32"></div>
         </div>
         <div id="rank-next" style="font-size:0.46em;color:var(--text-dim);letter-spacing:0.5px">$0 → $100k</div>
@@ -6384,6 +6414,7 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
         <button class="rp-tab" data-tab="auction"><span class="ti">🏛️</span><span class="tl">Auction</span></button>
         <button class="rp-tab" data-tab="daily"><span class="ti">🎯</span><span class="tl">Daily</span></button>
         <button class="rp-tab" data-tab="loans"><span class="ti">🏦</span><span class="tl">Loans</span></button>
+        <button class="rp-tab" data-tab="alerts"><span class="ti">🔔</span><span class="tl">Alerts</span></button>
       </div>
 
       <!-- Admin panel -->
@@ -6910,6 +6941,29 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
         </div>
       </div>
 
+
+      <!-- ALERTS TAB -->
+      <div class="tab-content" id="tab-alerts">
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div class="panel-title" style="margin-bottom:8px">🔔 Price Alerts</div>
+          <div style="display:flex;gap:5px;margin-bottom:5px;flex-wrap:wrap">
+            <select id="alert-sym-sel" style="flex:1.5;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.7em;padding:5px 7px;border-radius:4px;outline:none;min-width:0"></select>
+            <select id="alert-cond-sel" style="flex:0.8;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.7em;padding:5px 7px;border-radius:4px;outline:none">
+              <option value="above">▲ Above</option>
+              <option value="below">▼ Below</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:5px">
+            <input id="alert-price-inp" type="number" min="0.01" step="0.01" placeholder="Target price…"
+              style="flex:1;background:var(--bg3);border:1px solid rgba(var(--accent-rgb),0.3);color:var(--text-hi);font-family:var(--mono);font-size:0.78em;padding:6px 9px;border-radius:4px;outline:none">
+            <button onclick="addAlert()" style="padding:6px 14px;background:rgba(var(--accent-rgb),0.12);border:2px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:0.7em;font-weight:bold;cursor:pointer;border-radius:4px;white-space:nowrap">+ Alert</button>
+          </div>
+          <div style="font-size:0.58em;color:var(--text-dim);margin-top:5px">Get a flash + sound when any stock hits your target price.</div>
+        </div>
+        <div id="alerts-list" style="overflow-y:auto;flex:1;min-height:0;padding:6px 8px">
+          <div class="orders-empty">No alerts set. Add one above!</div>
+        </div>
+      </div>
     </div><!-- /right-panel -->
   </div><!-- /main -->
 
@@ -7013,6 +7067,7 @@ button,.b-buy,.b-sell,.hdr-btn,.sf-btn,.zoom-btn,.rp-tab,.modal-close,.btn-dange
       <div class="setting-row"><span class="setting-label">Flash Rows<span class="setting-sub">Color flash on price change</span></span><label class="toggle-wrap"><input type="checkbox" id="set-flashrows"><span class="toggle-slider"></span></label></div>
       <div class="setting-row"><span class="setting-label">Compact Table<span class="setting-sub">Smaller row height</span></span><label class="toggle-wrap"><input type="checkbox" id="set-compact"><span class="toggle-slider"></span></label></div>
       <div class="setting-row"><span class="setting-label">Show Sector Column</span><label class="toggle-wrap"><input type="checkbox" id="set-showsector" checked><span class="toggle-slider"></span></label></div>
+            <div class="setting-row"><span class="setting-label">News Ticker Bar<span class="setting-sub">Scrolling bar at the top</span></span><label class="toggle-wrap"><input type="checkbox" id="set-showticker" checked><span class="toggle-slider"></span></label></div>
       <div class="setting-row"><span class="setting-label">Ticker Speed<span class="setting-sub">Top scrolling bar</span></span><select class="setting-select" id="set-tickerspeed"><option value="80s">Normal</option><option value="40s">Fast</option><option value="160s">Slow</option></select></div>
       <div class="setting-row"><span class="setting-label">Price Format</span><select class="setting-select" id="set-priceformat"><option value="full" selected>Full ($1,234.56)</option><option value="short">Short ($1.2k)</option></select></div>
     </div>
@@ -8281,6 +8336,7 @@ function switchTab(name){
   if(name==='auction'){renderAuctions();_auctionUnread=0;updateAuctionBadge();pollAuctions();}
   if(name==='daily'){renderDailyChallenges();updateChallengeBadge();}
   if(name==='loans'){refreshLoanUI();}
+  if(name==='alerts'){renderAlerts();}
   if(name==='feed'){pollTradeFeed();if(!feedCache.length){const fl=document.getElementById('feed-list');if(fl)fl.innerHTML='<div class="feed-empty">No trades yet — be the first!</div>';}}
 }
 
@@ -8403,7 +8459,7 @@ const SUPABASE_URL='https://gasruxtfgchrdtogaryo.supabase.co/rest/v1';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdhc3J1eHRmZ2NocmR0b2dhcnlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMjEwNTYsImV4cCI6MjA5Mjc5NzA1Nn0.8V3-RclXMXQa74apm0yJAbIbj5osTo97rm_NMQOepSo';
 const SB_HDR={apikey:SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 // Legacy aliases kept so old code paths still work during transition
-const FIREBASE_URL='__DISABLED__';
+const FIREBASE_URL='https://stockblitz-cb418-default-rtdb.firebaseio.com/';
 const LB_FB_PATH='sb_players';
 function fbConfigured(){return true;}
 
@@ -8439,7 +8495,7 @@ async function isNameTaken(name,excludeId){
   /* Admin check */
   if(nameLower==='avstr'){
     if(!fbConfigured())return false;
-    try{const res=await fetch(`${SUPABASE_URL}/sb_market?key=eq.avstr_pid`,{headers:{apikey:SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},cache:'no-store'});const _apR=res.ok?await res.json():[];const pid=_apR?.[0]?.value||null;if(!pid)return false;return pid!==excludeId;}
+    try{const res=await fetch(`${FIREBASE_URL}stockblitz_admin/avstr_pid.json`,{cache:'no-store'});const pid=res.ok?await res.json():null;if(!pid)return false;return pid!==excludeId;}
     catch(e){return false;}
   }
   /* Normal uniqueness check */
@@ -8448,8 +8504,7 @@ async function isNameTaken(name,excludeId){
     return Object.entries(local).some(([id,e])=>id!==excludeId&&e.name&&e.name.toLowerCase()===nameLower);
   }
   try{
-    const _lbR2=await sbSelect('sb_players','order=score.desc&limit=200');
-    const all=Object.fromEntries((_lbR2||[]).map(r=>[r.pid,r]));
+    const _lbR2=await fetch(`${FIREBASE_URL}stockblitz_lb.json`,{cache:'no-store'});const all=_lbR2.ok?await _lbR2.json():{};
     return Object.entries(all||{}).some(([id,e])=>id!==excludeId&&e.name&&e.name.toLowerCase()===nameLower);
   }catch(e){return false;}
 }
@@ -8487,25 +8542,15 @@ function initPlayerBox(){
 /* ─── LEADERBOARD ── */
 async function lbLoadAll(){
   if(!fbConfigured()){const local=lbLocalLoad();recomputeSharesOwned(local);return local;}
-  try{const res=await fetch(`${SUPABASE_URL}/sb_players?order=score.desc`,{headers:{apikey:SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},cache:'no-store'});if(!res.ok)throw new Error('FB fail');const data=await res.json()||{};recomputeSharesOwned(data);return data;}
+  try{const res=await fetch(FIREBASE_URL+LB_FB_PATH,{cache:'no-store'});if(!res.ok)throw new Error('FB fail');const data=await res.json()||{};recomputeSharesOwned(data);return data;}
   catch(e){const local=lbLocalLoad();recomputeSharesOwned(local);return local;}
 }
 async function pushLBScore(){
   const portfolio=Object.fromEntries(Object.entries(G.portfolio).filter(([,q])=>q>0));
-  const entry={pid:PLAYER_ID,name:PLAYER_NAME,score:Math.round(totalVal()*100)/100,trades:G.trades,
-    ach:G.unlocked.size,ts:Date.now(),portfolio,bio:_traderBio||'',
-    selected_tag:G_profile?.selectedTag||'',profile_color:G_profile?.color||'',
-    avatar:G_profile?.avatar||'',active:true};
-  lbLocalSet(PLAYER_ID,entry);
-  if(!_lbPushScheduled){
-    _lbPushScheduled=true;
-    setTimeout(async()=>{
-      _lbPushScheduled=false;
-      try{ await sbUpsert('sb_players',entry); }catch(e){}
-    },15000); // batch: write at most once per 15s
-  }
+  const entry={name:PLAYER_NAME,score:Math.round(totalVal()*100)/100,trades:G.trades,ach:G.unlocked.size,ts:Date.now(),portfolio,bio:_traderBio||'',selectedTag:G_profile?.selectedTag||'',profileColor:G_profile?.color||'',avatar:G_profile?.avatar||''};
+  lbLocalSet(PLAYER_ID,entry);if(!fbConfigured())return;
+  try{await fetch(`${FIREBASE_URL}stockblitz_lb/${PLAYER_ID}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});}catch(e){}
 }
-let _lbPushScheduled=false;
 
 
 /* ── SUPABASE HELPERS ── */
@@ -8554,8 +8599,16 @@ async function sbDelete(table, filter) {
   } catch(e) {}
 }
 // Legacy shims so any remaining fbWrite/fbPatch calls don't crash
-function fbWrite(path,data){ console.warn('fbWrite called — migrate:', path); return Promise.resolve(); }
-function fbPatch(path,data){ console.warn('fbPatch called — migrate:', path); return Promise.resolve(); }
+function fbWrite(path,data){
+  return new Promise((resolve,reject)=>{
+    if(!fbConfigured()){reject(new Error('FB not configured'));return;}
+    const xhr=new XMLHttpRequest();xhr.open('PUT',FIREBASE_URL+path,true);
+    xhr.setRequestHeader('Content-Type','application/json');xhr.timeout=8000;
+    xhr.onload=()=>xhr.status<300?resolve(xhr.responseText):reject(new Error('HTTP '+xhr.status));
+    xhr.onerror=()=>reject(new Error('Network'));xhr.ontimeout=()=>reject(new Error('Timeout'));
+    try{xhr.send(JSON.stringify(data));}catch(e){reject(e);}
+  });
+}
 
 function fbPatch(path, data) {
   return new Promise((resolve, reject) => {
@@ -8775,6 +8828,7 @@ function applyDefaultSort(){
 function _initSettings(){
   wire('set-friendalert',e=>{CFG.friendAlertMin=parseFloat(e.target.value)||500;if(typeof FRIEND_ALERT_THRESHOLD!=='undefined')window.FRIEND_ALERT_THRESHOLD=CFG.friendAlertMin;});
   wire('set-chartcolor',e=>{CFG.chartColor=e.target.value;drawChart();});
+  wire('set-showticker',e=>{CFG.showTicker=e.target.checked;document.body.classList.toggle('hide-ticker',!CFG.showTicker);});
   wire('set-tickerspeed',e=>{const ti=document.getElementById('ticker-inner');if(ti)ti.style.animationDuration=e.target.value;CFG.tickerSpeed=e.target.value;});
   wire('set-priceformat',e=>{CFG.priceFormat=e.target.value;refreshUI();});
   wire('set-autosell',e=>{CFG.autoSellProfit=parseFloat(e.target.value)||0;});
@@ -8798,6 +8852,8 @@ function applySavedSettings(){
   set('set-spectatable',CFG.spectatable!==false);
   set('set-friendalert',CFG.friendAlertMin||500);
   set('set-chartcolor',CFG.chartColor||'accent');
+  set('set-showticker',CFG.showTicker!==false);
+  if(CFG.showTicker===false)document.body.classList.add('hide-ticker');
   set('set-tickerspeed',CFG.tickerSpeed||'80s');
   set('set-priceformat',CFG.priceFormat||'full');
   set('set-tradesounds',CFG.tradeSounds!==false);
@@ -8974,7 +9030,7 @@ async function createTradeOffer(){
   // Always add locally first so user gets instant feedback
   _localOffers.push(offer);
   // Async Firebase sync — failure just means others won't see this offer
-  sbInsert('sb_bets',{id:offer.id,pid:offer.sellerPid,name:offer.sellerName,sym:offer.sym,type:'p2p',amount:offer.qty*offer.askPerShare,ts:offer.ts,data:offer}).catch(()=>{});
+  fbWrite('stockblitz_p2p_trades/'+offer.id+'.json',offer).catch(()=>{});
   flash(`✅ Trade offer posted: ${qty}× ${sym} @ ${$$(askPerShare)}/share`,'var(--blue)');
   pollTradeOffers();
   document.getElementById('trade-qty-inp').value='1';
@@ -8985,7 +9041,7 @@ async function acceptTradeOffer(offerId){
   if(!PLAYER_NAME){flash('❌ Set a username first','#ff1744');return;}
   let offer=null;
   if(fbConfigured()){
-    try{const res=await fetch(`${SUPABASE_URL}/sb_bets?id=eq.${offerId}`,{cache:'no-store'});offer=res.ok?await res.json():null;}
+    try{const res=await fetch(`${FIREBASE_URL}stockblitz_bets/${offerId}.json`,{cache:'no-store'});offer=res.ok?await res.json():null;}
     catch(e){}
   }
   if(!offer||offer.status!=='open'){flash('❌ Offer no longer available','#ff1744');pollTradeOffers();return;}
@@ -9003,10 +9059,10 @@ async function acceptTradeOffer(offerId){
 
   /* Mark offer filled in Firebase */
   if(fbConfigured()){
-    try{await fetch(`${SUPABASE_URL}/sb_bets?id=eq.${offerId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'filled',buyerPid:PLAYER_ID,buyerName:PLAYER_NAME,filledTs:Date.now()})});}
+    try{await fetch(`${FIREBASE_URL}stockblitz_bets/${offerId}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'filled',buyerPid:PLAYER_ID,buyerName:PLAYER_NAME,filledTs:Date.now()})});}
     catch(e){}
     /* Credit seller via a separate credit path */
-    try{const creditKey='credit_'+Date.now().toString(36);await fetch(`${SUPABASE_URL}/sb_p2p_credits`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:totalCost,sym:offer.sym,qty:offer.qty,ts:Date.now(),from:PLAYER_NAME})});}
+    try{const creditKey='credit_'+Date.now().toString(36);await fetch(`${FIREBASE_URL}stockblitz_p2p_credits/${offer.sellerPid}/${creditKey}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:totalCost,sym:offer.sym,qty:offer.qty,ts:Date.now(),from:PLAYER_NAME})});}
     catch(e){}
   }
 
@@ -9021,8 +9077,7 @@ async function acceptTradeOffer(offerId){
 async function pollP2PCredits(){
   if(!fbConfigured())return;
   try{
-    const _p2pRows=await sbSelect('sb_p2p_credits',`pid=eq.${PLAYER_ID}&claimed=eq.false`);
-  const all=Object.fromEntries((_p2pRows||[]).map(r=>[r.id,{amount:r.amount,sym:r.sym,qty:r.qty,from:r.from_name}]));
+    const _p2pRes=await fetch(`${FIREBASE_URL}stockblitz_p2p_credits/${PLAYER_ID}.json`,{cache:'no-store'});const all=_p2pRes.ok?await _p2pRes.json():{};
     for(const[key,credit]of Object.entries(all)){
       if(!credit||credit.claimed)continue;
       G.cash+=credit.amount;
@@ -9040,7 +9095,7 @@ async function pollP2PCredits(){
 }
 
 async function cancelTradeOffer(offerId){
-  if(fbConfigured()){try{await fetch(`${SUPABASE_URL}/sb_bets?id=eq.${offerId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'cancelled',cancelledTs:Date.now()})});}catch(e){}}
+  if(fbConfigured()){try{await fetch(`${FIREBASE_URL}stockblitz_bets/${offerId}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({acceptorPid:PLAYER_ID,acceptorName:PLAYER_NAME,status:'accepted',acceptedAt:Date.now()})});}catch(e){}}
   flash('✅ Offer cancelled','var(--text-dim)');pollTradeOffers();
 }
 
@@ -9262,13 +9317,9 @@ async function chatPoll(){
   if(document.hidden)return; // don't poll hidden tab
   if(!document.getElementById('tab-chat-room')?.classList.contains('active'))return;
   try{
-    const rows=await sbSelect('sb_chat','order=created_at.desc&limit=60');
-    if(!Array.isArray(rows))return;
-    const cutoff=Date.now()-24*3600*1000;
-    const newMsgs=rows.filter(m=>m&&m.ts>chatLastTs&&m.ts>cutoff&&m.pid!==PLAYER_ID)
-      .sort((a,b)=>a.ts-b.ts);
-    newMsgs.forEach(m=>chatAddMsg(m));
-    if(newMsgs.length){chatLastTs=Math.max(...newMsgs.map(m=>m.ts));notifyNewChat(newMsgs);}
+    const res=await fetch(FIREBASE_URL+CHAT_PATH,{cache:'no-store'});if(!res.ok)return;const all=await res.json();if(!all)return;
+    const cutoff=Date.now()-24*3600*1000;const newMsgs=Object.values(all).filter(m=>m&&m.ts>chatLastTs&&m.ts>cutoff&&m.pid!==PLAYER_ID).sort((a,b)=>a.ts-b.ts);
+    for(const m of newMsgs)chatAddMsg(m);if(newMsgs.length)chatLastTs=Math.max(...newMsgs.map(m=>m.ts));
   }catch(e){}
 }
 function initChat(){
@@ -9287,7 +9338,7 @@ async function searchPlayers(){
   if(!query){results.innerHTML='<div class="orders-empty">Enter a name to search.</div>';return;}
   results.innerHTML='<div class="orders-empty">Searching…</div>';
   let all={};
-  try{const _sr2=await fetch(`${SUPABASE_URL}/sb_players?order=score.desc`,{headers:{apikey:SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},cache:'no-store'});const _srJ=_sr2.ok?await _sr2.json():[];all=Object.fromEntries((_srJ||[]).map(r=>[r.pid,r]));}catch(e){}
+  try{const _sr2=await fetch(`${FIREBASE_URL}stockblitz_lb.json`,{cache:'no-store'});const _srJ=_sr2.ok?await _sr2.json():{};all={...all,...(_srJ||{})};}catch(e){}
   all={...lbLocalLoad(),...all};
   const matches=Object.entries(all).filter(([id,e])=>e&&e.name&&typeof e.name==='string'&&e.name.toLowerCase().includes(query)).sort((a,b)=>(b[1].score||0)-(a[1].score||0)).slice(0,20);
   if(!matches.length){results.innerHTML=`<div class="orders-empty">No players found matching "${escHtml(query)}".</div>`;return;}
@@ -9342,9 +9393,8 @@ let isAdmin=false;
 async function checkAdminStatus(){
   if(PLAYER_NAME!==ADMIN_NAME){isAdmin=false;updateAdminUI();return;}
   if(!fbConfigured()){isAdmin=true;updateAdminUI();return;}
-  try{const rows=await sbSelect('sb_market','key=eq.avstr_pid');
-  const pid=rows?.[0]?.value;
-  if(!pid){await sbUpsert('sb_market',{key:'avstr_pid',value:PLAYER_ID});isAdmin=true;}
+  try{const _mres=await fetch(`${FIREBASE_URL}stockblitz_admin/avstr_pid.json`,{cache:'no-store'});const pid=_mres.ok?await _mres.json():null;
+  if(!pid){await fetch(`${FIREBASE_URL}stockblitz_admin/avstr_pid.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(PLAYER_ID)});isAdmin=true;}
   else isAdmin=(pid===PLAYER_ID);}
   catch(e){isAdmin=false;}updateAdminUI();
 }
@@ -9381,8 +9431,7 @@ async function adminGiveMoney(){
 
   // Find player in leaderboard by name
   try{
-    const _lbR2=await sbSelect('sb_players','order=score.desc&limit=200');
-    const all=Object.fromEntries((_lbR2||[]).map(r=>[r.pid,r]));
+    const _lbR2=await fetch(`${FIREBASE_URL}stockblitz_lb.json`,{cache:'no-store'});const all=_lbR2.ok?await _lbR2.json():{};
     const entry=Object.entries(all||{}).find(([id,e])=>e&&e.name&&e.name.toLowerCase()===name.toLowerCase());
     if(!entry){setAdminStatus(`❌ Player "${name}" not found`,'var(--red)');return;}
     const[targetPid,targetData]=entry;
@@ -9410,7 +9459,7 @@ async function adminGlobalReset(){
   if(fbConfigured()){
     try{
       // Wipe leaderboard
-      await fetch(`${SUPABASE_URL}/sb_players?order=score.desc`,{headers:{apikey:SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},cache:'no-store'})
+      await fetch(`${FIREBASE_URL}stockblitz_lb.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(null)})
       // Wipe trade feed
       await fetch(`${FIREBASE_URL}stockblitz_trade_feed.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(null)});
       // Wipe chat
@@ -10015,6 +10064,10 @@ async function init(){
   initRpMinimize();
   initLoans();
   initAllNewFeatures();
+  initAlerts();
+  // Populate alert stock selector
+  const alertSel = document.getElementById('alert-sym-sel');
+  if(alertSel){ SYM_LIST.forEach(sym=>{ const o=document.createElement('option'); o.value=sym; o.textContent=sym+' — '+STOCKS[sym].name; alertSel.appendChild(o); }); }
   console.log('%c📈 StockBlitz v3','color:#00e676;font-size:16px;font-weight:bold;');
   console.log(`%cSync: ${fbConfigured()?'Firebase':'Local'} | Player: ${PLAYER_NAME}|Stocks: ${SYM_LIST.length}`,'color:#5a6a78');
 }
@@ -10769,7 +10822,7 @@ async function triggerVote() {
   };
 
   if (fbConfigured()) {
-    sbUpsert('sb_votes',{id:vote.id,data:vote,expires_at:vote.endsAt,resolved:false}).catch(()=>{});
+    fbWrite('stockblitz_v5_market/active_vote.json',vote).catch(()=>{});
   }
 
   _currentVote  = vote;
@@ -10926,8 +10979,7 @@ async function pollVoteState() {
   if (!fbConfigured()) return;
   try {
     if(document.hidden)return;
-    const rows=await sbSelect('sb_votes','resolved=eq.false&order=created_at.desc&limit=1');
-    const vote=rows?.[0]?.data; if(!vote||!vote.id)return;
+    const _vres=await fetch(`${FIREBASE_URL}stockblitz_v5_market/active_vote.json`,{cache:'no-store'});const vote=_vres.ok?await _vres.json():null; if(!vote||!vote.id||!vote.startTs)return;
 
     // Already resolved
     if (vote.status === 'resolved') {
@@ -11939,10 +11991,7 @@ async function pollAuctions() {
   if (!fbConfigured()) return;
   try {
     if(document.hidden)return;
-    const rows=await sbSelect('sb_auctions','resolved=eq.false&order=created_at.desc&limit=20');
-    if(!Array.isArray(rows))return;
-    const cutoff=Date.now()-5*60*1000;
-    for(const[id,a]of rows.map(r=>[r.id,r.data?{...r,...r.data}:r])){
+    const _ares=await fetch(`${FIREBASE_URL}stockblitz_auctions.json`,{cache:'no-store'});if(!_ares.ok)return;const _aall=await _ares.json();if(!_aall)return;const cutoff=Date.now()-5*60*1000;for(const[id,a] of Object.entries(_aall)){
       if(!a||a.createdAt<cutoff)continue;
       const existing = _auctions[id];
       if (!existing) {
@@ -12206,17 +12255,12 @@ const CHANGELOG = [
     version: 'Latest',
     date: 'Today',
     entries: [
-      { icon: '👥', type: 'new',   text: '<b>Friend Alerts</b> — follow players and get notified when they make big trades. Browser push if you are tabbed out.' },
-      { icon: '📋', type: 'new',   text: '<b>Trade Copy</b> — hover any feed item and hit Copy to mirror that trade. Auto-scales qty if you cannot afford the full amount.' },
-      { icon: '★',      type: 'new',   text: '<b>Watchlist</b> — star any stock to pin it to the top with a gold border. Also togglable from the chart tab.' },
-      { icon: '😊', type: 'new',   text: '<b>Reactions</b> — hover chat or feed items to react with emoji. Synced to Firebase for all players.' },
-      { icon: '🎨', type: 'new',   text: '<b>Profile color in chat</b> — your chosen profile color shows on your name in chat for everyone to see.' },
-      { icon: '🏦', type: 'new',   text: '<b>Loan System</b> — borrow cash based on net worth tier. 15%/min flat interest, compounds every minute.' },
-      { icon: '💸', type: 'new',   text: '<b>Give Money</b> — send cash directly from your wallet to any player by name. Shows in the news feed.' },
-      { icon: '⚙️', type: 'new', text: '<b>Settings expanded to 82 options</b> — 13 sections including notifications, chart, table, portfolio, social, accessibility, feed, keyboard, and more.' },
-      { icon: '🔧', type: 'fix',   text: '<b>TypeError fixed</b> — null guards on name fields prevent toLowerCase crashes in player search and chat.' },
-      { icon: '🔧', type: 'tweak', text: '<b>Flash Rows now off by default</b> — toggle in Display settings.' },
-      { icon: '🔧', type: 'tweak', text: '<b>Settings cleaned up</b> — Market Events, Volatility, Dividends, Contagion, Hype, Starting Cash removed — fixed for all players.' },
+      { icon: '🔔', type: 'new',   text: '<b>Stock Alerts</b> — set a price target (above or below) on any stock. Flash, sound, news entry, and browser push notification when it hits.' },
+      { icon: '🎯', type: 'fix',   text: '<b>Daily challenge bounce removed</b> — cards no longer animate in on render.' },
+      { icon: '🌈', type: 'new',   text: '<b>Rainbow accents</b> — animated gradient line under the header and tab bar. Right panel STOCKBLITZ logo cycles the full spectrum.' },
+      { icon: '🏅', type: 'new',   text: '<b>Rank tile overhaul</b> — each rank now has a colored glow, tinted background, and matching top border. Legend gets a full animated rainbow.' },
+      { icon: '📰', type: 'new',   text: '<b>Ticker bar toggle</b> — Settings → Display → News Ticker Bar. Hides the scrolling bar without affecting events.' },
+      { icon: '🔥', type: 'fix',   text: '<b>Full Firebase restore</b> — all data goes through Firebase. fbWrite is a real XHR PUT again. Auction warning eliminated.' },
     ]
   },
   {
@@ -12692,7 +12736,7 @@ function addReaction(key, emoji) {
   else arr.push(PLAYER_ID);
   renderReactions(key);
   // Push to Firebase
-  sbUpsert('sb_reactions',{msg_key:key.replace(/[^a-z0-9_]/gi,'_'),data:_reactions[key]}).catch(()=>{});
+  fbWrite('stockblitz_reactions/'+key.replace(/[^a-z0-9]/gi,'_')+'.json',_reactions[key]).catch(()=>{});
 }
 
 function renderReactions(key) {
@@ -12785,10 +12829,7 @@ async function pollFriendAlerts() {
   if (!fbConfigured() || _friends.size === 0) return;
   try {
     if(document.hidden)return;
-    const rows=await sbSelect('sb_trade_feed','order=created_at.desc&limit=50');
-    if(!Array.isArray(rows))return;
-    const cutoff=Date.now()-60000;
-    for(const [key,entry] of rows.map((r,i)=>[r.id||i,r])){
+    const _fres=await fetch(`${FIREBASE_URL}stockblitz_trade_feed.json`,{cache:'no-store'});if(!_fres.ok)return;const _fall=await _fres.json();if(!_fall)return;const cutoff=Date.now()-60000;for(const[key,entry] of Object.entries(_fall)){
       if (!entry || entry.ts < cutoff) continue;
       if (!_friends.has(entry.pid))   continue;
       if (_friendFeedSeen.has(key))   continue;
@@ -12932,7 +12973,7 @@ async function takeLoan() {
   saveLoan(); refreshStats(); refreshLoanUI();
   flash(`🏦 Loan of ${$$(amount)} received! Repay ${(tier.rate*100).toFixed(0)}%/min interest.`, 'var(--gold)');
   addLimitedNewsItem(`🏦 ${PLAYER_NAME} took a loan of ${$$(amount)} at ${(tier.rate*100).toFixed(0)}%/min`, null, 'neutral', 'LOAN');
-  sbUpsert('sb_loans',{pid:PLAYER_ID,name:PLAYER_NAME,...G_loan}).catch(()=>{});
+  fbWrite('stockblitz_loans/'+PLAYER_ID+'.json',{pid:PLAYER_ID,name:PLAYER_NAME,...G_loan}).catch(()=>{});
 }
 
 async function repayLoan() {
@@ -12948,10 +12989,10 @@ async function repayLoan() {
     G_loan = null;
     flash('✅ Loan fully repaid! Debt cleared.', 'var(--green)');
     addLimitedNewsItem(`✅ ${PLAYER_NAME} fully repaid their loan!`, null, 'positive', 'LOAN');
-    sbUpdate('sb_loans','pid=eq.'+PLAYER_ID,{balance:0,cleared:true}).catch(()=>{});
+    fbPatch('stockblitz_loans/'+PLAYER_ID+'.json',{balance:0,cleared:true}).catch(()=>{});
   } else {
     flash(`✅ Paid ${$$(amount)} · Remaining balance: ${$$(G_loan.balance)}`, 'var(--accent)');
-    sbUpdate('sb_loans','pid=eq.'+PLAYER_ID,{balance:G_loan.balance}).catch(()=>{});
+    fbPatch('stockblitz_loans/'+PLAYER_ID+'.json',{balance:G_loan.balance}).catch(()=>{});
   }
   saveLoan(); refreshStats(); refreshLoanUI();
 }
@@ -12963,7 +13004,7 @@ function repayAll() {
   G_loan = null;
   saveLoan(); refreshStats(); refreshLoanUI();
   flash('✅ Loan fully repaid!', 'var(--green)');
-  sbUpdate('sb_loans','pid=eq.'+PLAYER_ID,{balance:0,cleared:true}).catch(()=>{});
+  fbPatch('stockblitz_loans/'+PLAYER_ID+'.json',{balance:0,cleared:true}).catch(()=>{});
 }
 
 /* Tick interest every minute */
@@ -13030,13 +13071,12 @@ async function giveMoney() {
 
   if (!fbConfigured()) { flash('❌ Firebase required to send money', '#ff1744'); return; }
   try {
-    const _lbR=await sbSelect('sb_players','');
-    const all=Object.fromEntries((_lbR||[]).map(r=>[r.pid,r]));
+    const _lbR=await fetch(`${FIREBASE_URL}stockblitz_lb.json`,{cache:'no-store'});const all=_lbR.ok?await _lbR.json():{};
     const entry = Object.entries(all || {}).find(([, e]) => e && e.name && typeof e.name === 'string' && e.name.toLowerCase() === name.toLowerCase());
     if (!entry) { flash(`❌ Player "${name}" not found`, '#ff1744'); return; }
     const [targetPid] = entry;
     const key = 'gift_' + Date.now().toString(36);
-    await sbInsert('sb_p2p_credits',{id:key,pid:targetPid,amount,sym:null,qty:0,ts:Date.now(),from_name:PLAYER_NAME,claimed:false});
+    await fetch(`${FIREBASE_URL}stockblitz_p2p_credits/${targetPid}/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,sym:null,qty:0,ts:Date.now(),from:PLAYER_NAME,claimed:false})});
     G.cash -= amount;
     refreshStats(); saveGame(); pushLBScore();
     flash(`💸 Sent ${$$(amount)} to ${name}!`, 'var(--green)');
@@ -13181,6 +13221,110 @@ let _pollsPaused = false;
 document.addEventListener('visibilitychange', () => {
   _pollsPaused = document.hidden;
 });
+
+/* ══════════════════════════════════════════════════
+   🔔 STOCK ALERTS
+   Set a price target on any stock. Flash + sound when hit.
+══════════════════════════════════════════════════ */
+const ALERTS_KEY = 'sb_alerts_v1';
+let _alerts = []; // [{id, sym, condition:'above'|'below', price, triggered, createdAt}]
+
+function loadAlerts() {
+  try { _alerts = JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch(e) { _alerts = []; }
+}
+function saveAlerts() {
+  try { localStorage.setItem(ALERTS_KEY, JSON.stringify(_alerts)); } catch(e) {}
+}
+
+function addAlert() {
+  const symEl   = document.getElementById('alert-sym-sel');
+  const condEl  = document.getElementById('alert-cond-sel');
+  const priceEl = document.getElementById('alert-price-inp');
+  const sym     = symEl?.value;
+  const cond    = condEl?.value || 'above';
+  const price   = parseFloat(priceEl?.value);
+  if (!sym)            { flash('❌ Select a stock', '#ff1744'); return; }
+  if (!price || price <= 0) { flash('❌ Enter a valid price', '#ff1744'); return; }
+  const s = STOCKS[sym];
+  if (!s) return;
+  const dir = cond === 'above' ? '▲ above' : '▼ below';
+  _alerts.push({ id: Date.now().toString(36), sym, condition: cond, price, triggered: false, createdAt: Date.now() });
+  saveAlerts();
+  renderAlerts();
+  if (priceEl) priceEl.value = '';
+  flash(`🔔 Alert set: ${sym} ${dir} ${$$(price)}`, 'var(--accent)');
+}
+
+function removeAlert(id) {
+  _alerts = _alerts.filter(a => a.id !== id);
+  saveAlerts();
+  renderAlerts();
+}
+
+function clearTriggeredAlerts() {
+  _alerts = _alerts.filter(a => !a.triggered);
+  saveAlerts();
+  renderAlerts();
+}
+
+function checkAlerts() {
+  let anyTriggered = false;
+  for (const alert of _alerts) {
+    if (alert.triggered) continue;
+    const s = STOCKS[alert.sym];
+    if (!s) continue;
+    const hit = alert.condition === 'above' ? s.price >= alert.price : s.price <= alert.price;
+    if (!hit) continue;
+    alert.triggered = true;
+    anyTriggered = true;
+    const dir = alert.condition === 'above' ? '▲' : '▼';
+    const msg = `🔔 ALERT: ${alert.sym} ${dir} ${$$(alert.price)} — now ${$$(s.price)}`;
+    flash(msg, alert.condition === 'above' ? 'var(--green)' : 'var(--red)');
+    snd[alert.condition === 'above' ? 'good' : 'bad']();
+    addLimitedNewsItem(msg, alert.sym, alert.condition === 'above' ? 'positive' : 'negative', 'ALERT');
+    if (Notification.permission === 'granted') {
+      try { new Notification('StockBlitz 🔔 Price Alert', { body: msg, tag: 'sb-alert' }); } catch(e) {}
+    }
+  }
+  if (anyTriggered) { saveAlerts(); renderAlerts(); }
+}
+
+function renderAlerts() {
+  const el = document.getElementById('alerts-list');
+  if (!el) return;
+  const active    = _alerts.filter(a => !a.triggered);
+  const triggered = _alerts.filter(a => a.triggered);
+  if (!_alerts.length) {
+    el.innerHTML = '<div class="orders-empty">No alerts set. Add one above!</div>';
+    return;
+  }
+  const renderCard = (a) => {
+    const s   = STOCKS[a.sym];
+    const col = s ? s.color : 'var(--text)';
+    const cur = s ? s.price : 0;
+    const dir = a.condition === 'above' ? '▲' : '▼';
+    const pct = cur > 0 ? (((a.price - cur) / cur) * 100).toFixed(1) : '—';
+    const pctColor = a.condition === 'above'
+      ? (cur >= a.price ? 'var(--green)' : 'var(--text-dim)')
+      : (cur <= a.price ? 'var(--green)' : 'var(--text-dim)');
+    return `<div style="background:var(--bg3);border:1px solid ${a.triggered ? 'rgba(0,230,118,0.3)' : 'var(--border)'};border-radius:5px;padding:7px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.1em">${a.triggered ? '✅' : '🔔'}</span>
+      <span style="font-weight:bold;color:${col};font-size:0.8em;flex-shrink:0">${a.sym}</span>
+      <span style="font-size:0.7em;color:${a.condition==='above'?'var(--green)':'var(--red)'};flex-shrink:0">${dir} ${$$(a.price)}</span>
+      <span style="font-size:0.62em;color:var(--text-dim);flex:1">${a.triggered ? 'Triggered!' : `cur: ${$$(cur)} · ${pct}% away`}</span>
+      <button onclick="removeAlert('${a.id}')" style="background:transparent;border:1px solid rgba(255,23,68,0.25);color:var(--red);font-family:var(--mono);font-size:0.55em;padding:2px 6px;border-radius:3px;cursor:pointer">✕</button>
+    </div>`;
+  };
+  el.innerHTML =
+    (active.length    ? active.map(renderCard).join('')    : '') +
+    (triggered.length ? `<div style="font-size:0.55em;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;padding:6px 0 3px;border-top:1px solid var(--border);margin-top:4px">Triggered</div>` + triggered.map(renderCard).join('') + `<button onclick="clearTriggeredAlerts()" style="width:100%;margin-top:4px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.6em;padding:4px;border-radius:3px;cursor:pointer">Clear triggered</button>` : '');
+}
+
+function initAlerts() {
+  loadAlerts();
+  setInterval(checkAlerts, 1000);
+}
+
 window.addEventListener('load',init);
 
 </script>
